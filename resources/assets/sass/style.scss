@@ -1,0 +1,112 @@
+.welcome {
+  color: #efdab9;
+  height: 100vh;
+}
+
+body {
+  background-color: $background-welcome;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  font-family: "Helvetica Neue", 'Roboto', arial, sans-serif;
+}
+
+.title-hackaton {
+  margin: 0;
+  padding: 1em 0;
+}
+
+.gra-init-algo {
+  stop-color: $gra-color-init;
+}
+.gra-final-algo {
+  stop-color: $gra-color-final;
+}
+
+.container-algorithm-icon {
+  width: 300px;
+  margin: auto;
+}
+
+.st0-solar {
+  fill: #c5c5c5;
+}
+
+.half-saucer, .dish-outside, .sun {
+  transform-origin: 32px 32px;
+}
+
+.sun {
+  animation: sunAnim 45s linear infinite;
+}
+
+.half-saucer {
+  animation: rotateHalfSaucer 20s linear infinite;
+}
+
+.dish-outside {
+  animation: rotateDishOutside 15s linear infinite;
+}
+
+.rect-anim-one {
+  animation: rectAnimOne 5s linear infinite;
+}
+
+.rect-anim-two {
+  animation: rectAnimTwo 2s linear infinite;
+}
+
+.rect-anim-three {
+  animation: rectAnimThree 1s linear infinite alternate;
+}
+
+.rect-anim-four {
+  animation: rectAnimFour 3s linear infinite;
+}
+
+.rect-anim-five {
+  animation: rectAnimFive 1s linear infinite alternate;
+}
+
+.container-list-menu {
+  display: flex;
+  flex-wrap: wrap;
+  & .list-items-menu {
+    margin-top: 0;
+    margin-left: 50px;
+    flex-direction: column;
+    display: inline-flex;
+    margin: 1em 0 0 0;
+    border-radius: 20px;
+    border: 1px solid #4e4b4d;
+    list-style: none;
+    padding: 0;
+    flex: 1;
+    & li:first-child {
+      padding: 2em 1em;
+    }
+    & li {
+      padding: 1em 1.75em;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    & li+li {
+      border-left: none;
+      border-top: 1px solid #4e4b4d;
+    }
+  }
+}
+
+.menu-bar {
+  width: 100px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  z-index: 6;
+}
+
+.blur {
+  filter: blur(10px);
+}
