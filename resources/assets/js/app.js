@@ -7,8 +7,8 @@ import routes from './routes';
 
 Vue.use(VueRouter);
 
+Vue.component('main-app', require('./components/App.vue'));
 Vue.component('word-writing', require('./components/WordWriting.vue'));
-Vue.component('menu-options', require('./components/Menu.vue'));
 
 const router = new VueRouter({
     routes
@@ -19,23 +19,10 @@ const app = new Vue({
     router,
     data() {
       return {
-        show_menu: false
-      }
-    },
-    watch: {
-      show_menu: function () {
-        const b = document.body
-        if (this.show_menu) {
-          b.style.overflow = 'hidden'
-        } else {
-          b.style.overflow = 'initial'
-        }
+
       }
     },
     methods: {
-      handleMenu: function () {
-        this.show_menu = !this.show_menu
-      },
       goToView: function (id) {
         document.getElementById(id).scrollIntoView({block: 'start', behavior: 'smooth'})
       }
@@ -54,11 +41,12 @@ const tween_1 = new TimelineMax()
                     .add([
                       TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0' }),
                       TweenMax.to("#title-section-two", 0.5, { opacity: 1 }),
+                      TweenMax.to(".judge", 0.5, { opacity: 1 }),
                       TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' })
                     ])
 const tween_2 = new TimelineMax()
                     .add([
-                      TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1100px)', backgroundPositionY: 'center' })
+                      TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' })
                     ])
 
 // scenes

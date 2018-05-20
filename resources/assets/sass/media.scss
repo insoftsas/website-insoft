@@ -1,0 +1,21 @@
+@media #{$small-and-down} {
+	.container-judges {
+  	& .judge {
+  		width: 50%;
+  		width: 100%;
+    	margin-bottom: calc(25px + 20px);
+		}
+	}
+}
+@media #{$medium-and-up} {
+// styles for medium screens and larger
+}
+@media #{$medium-and-down} {
+// styles for medium screens and down
+}
+@media #{$large-and-up} {
+// styles for large screens and up
+}
+@media #{$extra-large-and-up} {
+// styles for extra large screens and up
+}
