@@ -10,6 +10,7 @@
 	    <div class="item" id="hom-item">Cupos</div>
 	    <div class="item" id="hom-item">Inscripción</div>
 	    <div class="item" id="hom-item">Retos</div>
+	    <router-link to="/login" class="item">Login</router-link>
 	  </div>
 	  <section id="home">
 	  	<div class="container">
@@ -131,7 +132,10 @@
     background: #222122;
   }
 }
-
+a.item{
+	position: absolute;
+	right: 0px;
+}
 .content-register {
   padding: 0 1em;
   text-align: center;
