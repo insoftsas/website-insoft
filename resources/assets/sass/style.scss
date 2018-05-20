@@ -185,7 +185,8 @@ body {
   background-color: #ffd152;
   border: 0;
   cursor: pointer;
-  margin: 0 7px;
+  width: 100%;
+  font-size: .9rem;
   &:active {
     color: #343233;
     background-color: #ebac00;
@@ -201,6 +202,14 @@ body {
 }
 
 .icon-caracter {
-  width: 70px;
   margin: auto;
+  display: inline-block;
+  width: 20px;
+  vertical-align: middle;
+}
+
+.description-text {
+  margin: 0 0 1em 0;
+  text-align: left;
+  font-size: 1.2rem;
 }

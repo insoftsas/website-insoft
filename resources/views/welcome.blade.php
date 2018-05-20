@@ -7,9 +7,11 @@
     <div class="col s12 m5">
       <div class="box-register">
         <h2 class="title-sub center">Registrate <span class="y-text">aquí</span></h2>
-        <p>Es muy facíl solo selecciona tu rol</p>
         <div class="content-register">
           <div class="row">
+            <div class="col s12">
+              <p class="description-text">Es muy facíl solo selecciona tu rol.</p>
+            </div>
             <div class="col s12 m6">
               <button class="button-register">
                 <div class="icon-caracter">
