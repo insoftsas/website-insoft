@@ -30518,22 +30518,22 @@ Vue.component('main-app', __webpack_require__(180));
 Vue.component('word-writing', __webpack_require__(185));
 
 var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
-  routes: __WEBPACK_IMPORTED_MODULE_1__routes__["a" /* default */]
+                             routes: __WEBPACK_IMPORTED_MODULE_1__routes__["a" /* default */]
 });
 
 var app = new Vue({
-  el: '#app',
-  router: router,
-  data: function data() {
-    return {};
-  },
+                             el: '#app',
+                             router: router,
+                             data: function data() {
+                                                          return {};
+                             },
 
-  methods: {
-    goToView: function goToView(id) {
-      document.getElementById(id).scrollIntoView({ block: 'start', behavior: 'smooth' });
-    }
-  },
-  mounted: function mounted() {}
+                             methods: {
+                                                          goToView: function goToView(id) {
+                                                                                       document.getElementById(id).scrollIntoView({ block: 'start', behavior: 'smooth' });
+                                                          }
+                             },
+                             mounted: function mounted() {}
 });
 
 __webpack_require__(191);
@@ -30547,11 +30547,36 @@ var tween_2 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPosit
 // scenes
 var scene_2 = new ScrollMagic.Scene({ offset: -1, duration: 300 }).setTween(tween_2).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
 
+// menu activate
 var scene_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 400 }).setTween(tween_1).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
 
 var scene_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: 400 })
 //.setTween(tween_3)
 .addTo(controller).addIndicators().setClassToggle("#trainer-item", 'active');
+
+var scene_4 = new ScrollMagic.Scene({ triggerElement: "#project-route", duration: 400 })
+//.setTween(tween_3)
+.addTo(controller).addIndicators().setClassToggle("#project-route-item", 'active');
+
+var scene_5 = new ScrollMagic.Scene({ triggerElement: "#places", duration: 400 })
+//.setTween(tween_3)
+.addTo(controller).addIndicators().setClassToggle("#place-item", 'active');
+
+var scene_6 = new ScrollMagic.Scene({ triggerElement: "#how-to-get", duration: 400 })
+//.setTween(tween_3)
+.addTo(controller).addIndicators().setClassToggle("#how-to-get-item", 'active');
+
+var scene_7 = new ScrollMagic.Scene({ triggerElement: "#quotas", duration: 400 })
+//.setTween(tween_3)
+.addTo(controller).addIndicators().setClassToggle("#quota-item", 'active');
+
+var scene_8 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: 400 })
+//.setTween(tween_3)
+.addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
+
+var scene_9 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: 400 })
+//.setTween(tween_3)
+.addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
 
 /***/ }),
 /* 142 */
@@ -89895,6 +89920,36 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -89960,29 +90015,95 @@ var render = function() {
         [_vm._v("Capacitadores")]
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
-        _vm._v("Ruta del proyecto")
-      ]),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "project-route-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("project-route")
+            }
+          }
+        },
+        [_vm._v("Ruta del proyecto")]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
-        _vm._v("Lugar evento")
-      ]),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "place-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("places")
+            }
+          }
+        },
+        [_vm._v("Lugar evento")]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
-        _vm._v("¿Cómo llegar?")
-      ]),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "how-to-get-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("how-to-get")
+            }
+          }
+        },
+        [_vm._v("¿Cómo llegar?")]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
-        _vm._v("Cupos")
-      ]),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "quota-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("quotas")
+            }
+          }
+        },
+        [_vm._v("Cupos")]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
-        _vm._v("Inscripción")
-      ]),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "inscription-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("inscriptions")
+            }
+          }
+        },
+        [_vm._v("Inscripción")]
+      ),
       _vm._v(" "),
-      _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
-        _vm._v("Retos")
-      ])
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "challenge-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("challenges")
+            }
+          }
+        },
+        [_vm._v("Retos")]
+      )
     ]),
     _vm._v(" "),
     _c("section", { attrs: { id: "home" } }, [
@@ -90121,7 +90242,19 @@ var render = function() {
     _vm._v(" "),
     _vm._m(2),
     _vm._v(" "),
-    _vm._m(3)
+    _vm._m(3),
+    _vm._v(" "),
+    _vm._m(4),
+    _vm._v(" "),
+    _vm._m(5),
+    _vm._v(" "),
+    _vm._m(6),
+    _vm._v(" "),
+    _vm._m(7),
+    _vm._v(" "),
+    _vm._m(8),
+    _vm._v(" "),
+    _vm._m(9)
   ])
 }
 var staticRenderFns = [
@@ -90298,6 +90431,66 @@ var staticRenderFns = [
             ])
           ])
         ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "project-route" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("RUTA DEL PROYECTO")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "places" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("LUGAR")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "how-to-get" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("¿CÓMO LLEGAR?")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "quotas" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("CUPOS")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "inscriptions" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("INSCRIPCIÓN")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "challenges" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("RETOS")])
       ])
     ])
   }

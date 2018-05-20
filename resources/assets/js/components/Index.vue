@@ -4,12 +4,12 @@
 	    <div class="item" id="home-item" @click.prevent="$root.goToView('home')">Inicio</div>
 	    <div class="item" id="judge-item" @click.prevent="$root.goToView('judges')">Jurados</div>
 	    <div class="item" id="trainer-item" @click.prevent="$root.goToView('trainers')">Capacitadores</div>
-	    <div class="item" id="hom-item">Ruta del proyecto</div>
-	    <div class="item" id="hom-item">Lugar evento</div>
-	    <div class="item" id="hom-item">¿Cómo llegar?</div>
-	    <div class="item" id="hom-item">Cupos</div>
-	    <div class="item" id="hom-item">Inscripción</div>
-	    <div class="item" id="hom-item">Retos</div>
+	    <div class="item" id="project-route-item" @click.prevent="$root.goToView('project-route')">Ruta del proyecto</div>
+	    <div class="item" id="place-item" @click.prevent="$root.goToView('places')">Lugar evento</div>
+	    <div class="item" id="how-to-get-item" @click.prevent="$root.goToView('how-to-get')">¿Cómo llegar?</div>
+	    <div class="item" id="quota-item" @click.prevent="$root.goToView('quotas')">Cupos</div>
+	    <div class="item" id="inscription-item" @click.prevent="$root.goToView('inscriptions')">Inscripción</div>
+	    <div class="item" id="challenge-item" @click.prevent="$root.goToView('challenges')">Retos</div>
 	  </div>
 	  <section id="home">
 	  	<div class="container">
@@ -149,6 +149,36 @@
 		    </div>
 	    </div>
 	  </section>
+	  <section id="project-route">
+	  	<div class="container">
+		    <h1 class="title-main">RUTA DEL PROYECTO</h1>
+	    </div>
+    </section>
+    <section id="places">
+	  	<div class="container">
+		    <h1 class="title-main">LUGAR</h1>
+	    </div>
+    </section>
+    <section id="how-to-get">
+	  	<div class="container">
+		    <h1 class="title-main">¿CÓMO LLEGAR?</h1>
+	    </div>
+    </section>
+    <section id="quotas">
+	  	<div class="container">
+		    <h1 class="title-main">CUPOS</h1>
+	    </div>
+    </section>
+		<section id="inscriptions">
+	  	<div class="container">
+		    <h1 class="title-main">INSCRIPCIÓN</h1>
+	    </div>
+    </section>
+		<section id="challenges">
+	  	<div class="container">
+		    <h1 class="title-main">RETOS</h1>
+	    </div>
+    </section>
   </div>
 </template>
 <script>
