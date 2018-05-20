@@ -214,7 +214,7 @@
     position: relative;
     padding: 0 1em 1em 1em;
     background: #4db2ce;
-    background-image: linear-gradient(#4db2ce, #232323);
+    background-image: linear-gradient(#4db2ce, #086a86);
     border-radius: 5px;
     text-align: center;
     margin: 25px 20px;
@@ -229,6 +229,9 @@
 	    display: block;
 	    color: #fff;
     }
+    .profession {
+	    color: #fff;
+		}
   }
   & img {
     width: 150px;
