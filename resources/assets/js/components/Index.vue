@@ -12,6 +12,7 @@
 	    <div class="item" id="hom-item">Retos</div>
 	  </div>
 	  <section id="home">
+	  	<div class="container">
 		    <h1 class="title-main">Hackathon Montería</h1>
 		    <div class="col s12 m5">
 		      <div class="box-register">
@@ -75,22 +76,25 @@
 		    <div class="col s12 m7">
 		      <word-writing></word-writing>
 		    </div>
+	    </div>
 	  </section>
 	  <section id="judges">
-	    <h1 class="title-main" id="title-section-two">JURADOS</h1>
-	    <div class="container-judges">
-	      <div class="judge" data-name="Omar Flórez">
-	        <img src="/images/judges/omar.jpg" class="responsive-img" />
-	        <div class="info">
-	          <div class="profession">PhD. Computer Science</div>
-	        </div>
-	      </div>
-	      <div class="judge" data-name="Omar Flórez">
-	        <img src="/images/judges/omar.jpg" class="responsive-img" />
-	        <div class="info">
-	          <div class="profession">PhD. Computer Science</div>
-	        </div>
-	      </div>
+	  	<div class="container">
+		    <h1 class="title-main" id="title-section-two">JURADOS</h1>
+		    <div class="container-judges">
+		      <div class="judge" data-name="Omar Flórez">
+		        <img src="/images/judges/omar.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge" data-name="Omar Flórez">
+		        <img src="/images/judges/omar.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		    </div>
 	    </div>
 	  </section>
   </div>
@@ -111,5 +115,107 @@
 </script>
 
 <style lang="scss" scoped>
- 
+@import "~@";
+
+.box-register {
+  background: #2e2d2d;
+  padding: 1em;
+  position: relative;
+  &:before {
+    content: '';
+    width: 100%;
+    left: 0;
+    position: absolute;
+    height: 25px;
+    top: -24px;
+    background: #222122;
+  }
+}
+
+.content-register {
+  padding: 0 1em;
+  text-align: center;
+}
+
+.button-register {
+  display: inline-block;
+  padding: .5em 1em;
+  line-height: inherit;
+  font-size: inherit;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 5px;
+  color: $button;
+  background-color: #1b1b1b;
+  border: 0;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  &:active {
+    color: #343233;
+    background-color: darken($button, 40);
+    transform: translateY(2px);
+  }
+  &:hover {
+    color: #343233;
+    background-color: darken($button, 10);
+  }
+  &:focus {
+    background-color: darken($button, 20);
+  }
+}
+
+.icon-caracter {
+  margin: auto;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
+  border: 1px solid;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  background: #222122;
+}
+
+.description-text {
+  margin: 0 0 1em 0;
+  text-align: left;
+  font-size: 1.2rem;
+}
+
+.fill-caracter-icon {
+  fill: $button
+}
+
+.container-judges {
+  display: flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  & .judge {
+    opacity: 0;
+    display: inline-block;
+    position: relative;
+    padding: 0 1em 1em 1em;
+    background: #222122;
+    border-radius: 0 0 5px 5px;
+    text-align: center;
+    &:before {
+      content: attr(data-name);
+      position: absolute;
+      text-align: center;
+      width: 100%;
+      height: 25px;
+      top: -25px;
+      left: 0;
+      background: #222122;
+      border-radius: 5px 5px 0 0;
+    }
+  }
+  & img {
+    width: 150px;
+    max-width: 150px;
+    border-radius: 50%;
+  }
+}
 </style>

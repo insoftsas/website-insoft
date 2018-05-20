@@ -4574,7 +4574,7 @@
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(5)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)(module)))
 
 /***/ }),
 /* 1 */
@@ -4583,7 +4583,7 @@
 "use strict";
 
 
-var bind = __webpack_require__(129);
+var bind = __webpack_require__(131);
 var isBuffer = __webpack_require__(150);
 
 /*global toString:true*/
@@ -4937,10 +4937,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(131);
+    adapter = __webpack_require__(133);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(131);
+    adapter = __webpack_require__(133);
   }
   return adapter;
 }
@@ -5015,7 +5015,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(130)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(132)))
 
 /***/ }),
 /* 4 */
@@ -7808,6 +7808,343 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 /* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+  Modified by Evan You @yyx990803
+*/
+
+var hasDocument = typeof document !== 'undefined'
+
+if (typeof DEBUG !== 'undefined' && DEBUG) {
+  if (!hasDocument) {
+    throw new Error(
+    'vue-style-loader cannot be used in a non-browser environment. ' +
+    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
+  ) }
+}
+
+var listToStyles = __webpack_require__(177)
+
+/*
+type StyleObject = {
+  id: number;
+  parts: Array<StyleObjectPart>
+}
+
+type StyleObjectPart = {
+  css: string;
+  media: string;
+  sourceMap: ?string
+}
+*/
+
+var stylesInDom = {/*
+  [id: number]: {
+    id: number,
+    refs: number,
+    parts: Array<(obj?: StyleObjectPart) => void>
+  }
+*/}
+
+var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
+var singletonElement = null
+var singletonCounter = 0
+var isProduction = false
+var noop = function () {}
+var options = null
+var ssrIdKey = 'data-vue-ssr-id'
+
+// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+// tags it will allow on a page
+var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+
+module.exports = function (parentId, list, _isProduction, _options) {
+  isProduction = _isProduction
+
+  options = _options || {}
+
+  var styles = listToStyles(parentId, list)
+  addStylesToDom(styles)
+
+  return function update (newList) {
+    var mayRemove = []
+    for (var i = 0; i < styles.length; i++) {
+      var item = styles[i]
+      var domStyle = stylesInDom[item.id]
+      domStyle.refs--
+      mayRemove.push(domStyle)
+    }
+    if (newList) {
+      styles = listToStyles(parentId, newList)
+      addStylesToDom(styles)
+    } else {
+      styles = []
+    }
+    for (var i = 0; i < mayRemove.length; i++) {
+      var domStyle = mayRemove[i]
+      if (domStyle.refs === 0) {
+        for (var j = 0; j < domStyle.parts.length; j++) {
+          domStyle.parts[j]()
+        }
+        delete stylesInDom[domStyle.id]
+      }
+    }
+  }
+}
+
+function addStylesToDom (styles /* Array<StyleObject> */) {
+  for (var i = 0; i < styles.length; i++) {
+    var item = styles[i]
+    var domStyle = stylesInDom[item.id]
+    if (domStyle) {
+      domStyle.refs++
+      for (var j = 0; j < domStyle.parts.length; j++) {
+        domStyle.parts[j](item.parts[j])
+      }
+      for (; j < item.parts.length; j++) {
+        domStyle.parts.push(addStyle(item.parts[j]))
+      }
+      if (domStyle.parts.length > item.parts.length) {
+        domStyle.parts.length = item.parts.length
+      }
+    } else {
+      var parts = []
+      for (var j = 0; j < item.parts.length; j++) {
+        parts.push(addStyle(item.parts[j]))
+      }
+      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
+    }
+  }
+}
+
+function createStyleElement () {
+  var styleElement = document.createElement('style')
+  styleElement.type = 'text/css'
+  head.appendChild(styleElement)
+  return styleElement
+}
+
+function addStyle (obj /* StyleObjectPart */) {
+  var update, remove
+  var styleElement = document.querySelector('style[' + ssrIdKey + '~="' + obj.id + '"]')
+
+  if (styleElement) {
+    if (isProduction) {
+      // has SSR styles and in production mode.
+      // simply do nothing.
+      return noop
+    } else {
+      // has SSR styles but in dev mode.
+      // for some reason Chrome can't handle source map in server-rendered
+      // style tags - source maps in <style> only works if the style tag is
+      // created and inserted dynamically. So we remove the server rendered
+      // styles and inject new ones.
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  if (isOldIE) {
+    // use singleton mode for IE9.
+    var styleIndex = singletonCounter++
+    styleElement = singletonElement || (singletonElement = createStyleElement())
+    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
+    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
+  } else {
+    // use multi-style-tag mode in all other cases
+    styleElement = createStyleElement()
+    update = applyToTag.bind(null, styleElement)
+    remove = function () {
+      styleElement.parentNode.removeChild(styleElement)
+    }
+  }
+
+  update(obj)
+
+  return function updateStyle (newObj /* StyleObjectPart */) {
+    if (newObj) {
+      if (newObj.css === obj.css &&
+          newObj.media === obj.media &&
+          newObj.sourceMap === obj.sourceMap) {
+        return
+      }
+      update(obj = newObj)
+    } else {
+      remove()
+    }
+  }
+}
+
+var replaceText = (function () {
+  var textStore = []
+
+  return function (index, replacement) {
+    textStore[index] = replacement
+    return textStore.filter(Boolean).join('\n')
+  }
+})()
+
+function applyToSingletonTag (styleElement, index, remove, obj) {
+  var css = remove ? '' : obj.css
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = replaceText(index, css)
+  } else {
+    var cssNode = document.createTextNode(css)
+    var childNodes = styleElement.childNodes
+    if (childNodes[index]) styleElement.removeChild(childNodes[index])
+    if (childNodes.length) {
+      styleElement.insertBefore(cssNode, childNodes[index])
+    } else {
+      styleElement.appendChild(cssNode)
+    }
+  }
+}
+
+function applyToTag (styleElement, obj) {
+  var css = obj.css
+  var media = obj.media
+  var sourceMap = obj.sourceMap
+
+  if (media) {
+    styleElement.setAttribute('media', media)
+  }
+  if (options.ssrId) {
+    styleElement.setAttribute(ssrIdKey, obj.id)
+  }
+
+  if (sourceMap) {
+    // https://developer.chrome.com/devtools/docs/javascript-debugging
+    // this makes source maps inside style tags work properly in Chrome
+    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
+    // http://stackoverflow.com/a/26603875
+    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
+  }
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild)
+    }
+    styleElement.appendChild(document.createTextNode(css))
+  }
+}
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports) {
+
+/* globals __VUE_SSR_CONTEXT__ */
+
+// IMPORTANT: Do NOT use ES2015 features in this file.
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
+
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier /* server only */
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
+
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
+  }
+
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+    options._compiled = true
+  }
+
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = injectStyles
+  }
+
+  if (hook) {
+    var functional = options.functional
+    var existing = functional
+      ? options.render
+      : options.beforeCreate
+
+    if (!functional) {
+      // inject component registration as beforeCreate hook
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    } else {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return existing(h, context)
+      }
+    }
+  }
+
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
+  }
+}
+
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -7835,7 +8172,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -7912,7 +8249,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8051,7 +8388,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8114,7 +8451,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8177,7 +8514,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8303,7 +8640,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8366,7 +8703,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8474,7 +8811,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8537,7 +8874,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8646,7 +8983,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8782,7 +9119,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8876,7 +9213,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -8938,7 +9275,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9061,7 +9398,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9184,7 +9521,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9296,7 +9633,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9451,7 +9788,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9543,7 +9880,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9726,7 +10063,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9793,7 +10130,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9877,7 +10214,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -9941,7 +10278,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10021,7 +10358,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10101,7 +10438,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10181,7 +10518,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10284,7 +10621,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10388,7 +10725,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10459,7 +10796,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10526,7 +10863,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 34 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10597,7 +10934,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 35 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10668,7 +11005,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 36 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10734,7 +11071,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 37 */
+/* 39 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10805,7 +11142,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 38 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10880,7 +11217,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 39 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -10976,7 +11313,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11072,7 +11409,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 41 */
+/* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11159,7 +11496,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 42 */
+/* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11243,7 +11580,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 43 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11313,7 +11650,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 44 */
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11423,7 +11760,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 45 */
+/* 47 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11536,7 +11873,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 46 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11600,7 +11937,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 47 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11687,7 +12024,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 48 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11765,7 +12102,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 49 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11847,7 +12184,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 50 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -11926,7 +12263,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 51 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12006,7 +12343,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 52 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12087,7 +12424,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 53 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12214,7 +12551,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 54 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12342,7 +12679,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 55 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12443,7 +12780,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 56 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12571,7 +12908,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 57 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12729,7 +13066,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 58 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12843,7 +13180,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 59 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -12942,7 +13279,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 60 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13028,7 +13365,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 61 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13164,7 +13501,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 62 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13237,7 +13574,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13333,7 +13670,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13419,7 +13756,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13512,7 +13849,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13603,7 +13940,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13717,7 +14054,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13847,7 +14184,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -13932,7 +14269,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14023,7 +14360,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 71 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14163,7 +14500,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14237,7 +14574,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14359,7 +14696,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14460,7 +14797,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14576,7 +14913,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14644,7 +14981,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14738,7 +15075,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14823,7 +15160,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -14931,7 +15268,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15095,7 +15432,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15181,7 +15518,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15267,7 +15604,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15331,7 +15668,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15428,7 +15765,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15494,7 +15831,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15621,7 +15958,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15712,7 +16049,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15803,7 +16140,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15867,7 +16204,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 90 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -15995,7 +16332,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 91 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16125,7 +16462,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 92 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16194,7 +16531,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 93 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16259,7 +16596,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 94 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16338,7 +16675,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 95 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16524,7 +16861,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 96 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16626,7 +16963,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 97 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16690,7 +17027,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 98 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16765,7 +17102,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 99 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -16925,7 +17262,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 100 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17102,7 +17439,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 101 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17174,7 +17511,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 102 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17289,7 +17626,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 103 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17404,7 +17741,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 104 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17496,7 +17833,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 105 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17569,7 +17906,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 106 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17632,7 +17969,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 107 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17765,7 +18102,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 108 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17858,7 +18195,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 109 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -17929,7 +18266,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 110 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18049,7 +18386,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 111 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18120,7 +18457,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 112 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18186,7 +18523,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 113 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18312,7 +18649,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 114 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -18410,7 +18747,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 115 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18505,7 +18842,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 116 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18567,7 +18904,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 117 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18629,7 +18966,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 118 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js language configuration
@@ -18752,7 +19089,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 119 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -18907,7 +19244,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 120 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19009,7 +19346,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 121 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19071,7 +19408,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 122 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19133,7 +19470,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 123 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19216,7 +19553,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 124 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19288,7 +19625,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 125 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19352,7 +19689,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 126 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19466,7 +19803,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 127 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19573,7 +19910,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 128 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 //! moment.js locale configuration
@@ -19680,7 +20017,7 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 129 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19698,7 +20035,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 130 */
+/* 132 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -19888,7 +20225,7 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 131 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19899,7 +20236,7 @@ var settle = __webpack_require__(153);
 var buildURL = __webpack_require__(155);
 var parseHeaders = __webpack_require__(156);
 var isURLSameOrigin = __webpack_require__(157);
-var createError = __webpack_require__(132);
+var createError = __webpack_require__(134);
 var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(158);
 
 module.exports = function xhrAdapter(config) {
@@ -20075,7 +20412,7 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 132 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20100,7 +20437,7 @@ module.exports = function createError(message, config, code, request, response) 
 
 
 /***/ }),
-/* 133 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20112,7 +20449,7 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 134 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20138,7 +20475,7 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 135 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -28122,7 +28459,7 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 136 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -30071,7 +30408,7 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
 
 /***/ }),
-/* 137 */
+/* 139 */
 /***/ (function(module, exports) {
 
 /*
@@ -30153,348 +30490,11 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 138 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-  Modified by Evan You @yyx990803
-*/
-
-var hasDocument = typeof document !== 'undefined'
-
-if (typeof DEBUG !== 'undefined' && DEBUG) {
-  if (!hasDocument) {
-    throw new Error(
-    'vue-style-loader cannot be used in a non-browser environment. ' +
-    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
-  ) }
-}
-
-var listToStyles = __webpack_require__(175)
-
-/*
-type StyleObject = {
-  id: number;
-  parts: Array<StyleObjectPart>
-}
-
-type StyleObjectPart = {
-  css: string;
-  media: string;
-  sourceMap: ?string
-}
-*/
-
-var stylesInDom = {/*
-  [id: number]: {
-    id: number,
-    refs: number,
-    parts: Array<(obj?: StyleObjectPart) => void>
-  }
-*/}
-
-var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
-var singletonElement = null
-var singletonCounter = 0
-var isProduction = false
-var noop = function () {}
-var options = null
-var ssrIdKey = 'data-vue-ssr-id'
-
-// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-// tags it will allow on a page
-var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
-
-module.exports = function (parentId, list, _isProduction, _options) {
-  isProduction = _isProduction
-
-  options = _options || {}
-
-  var styles = listToStyles(parentId, list)
-  addStylesToDom(styles)
-
-  return function update (newList) {
-    var mayRemove = []
-    for (var i = 0; i < styles.length; i++) {
-      var item = styles[i]
-      var domStyle = stylesInDom[item.id]
-      domStyle.refs--
-      mayRemove.push(domStyle)
-    }
-    if (newList) {
-      styles = listToStyles(parentId, newList)
-      addStylesToDom(styles)
-    } else {
-      styles = []
-    }
-    for (var i = 0; i < mayRemove.length; i++) {
-      var domStyle = mayRemove[i]
-      if (domStyle.refs === 0) {
-        for (var j = 0; j < domStyle.parts.length; j++) {
-          domStyle.parts[j]()
-        }
-        delete stylesInDom[domStyle.id]
-      }
-    }
-  }
-}
-
-function addStylesToDom (styles /* Array<StyleObject> */) {
-  for (var i = 0; i < styles.length; i++) {
-    var item = styles[i]
-    var domStyle = stylesInDom[item.id]
-    if (domStyle) {
-      domStyle.refs++
-      for (var j = 0; j < domStyle.parts.length; j++) {
-        domStyle.parts[j](item.parts[j])
-      }
-      for (; j < item.parts.length; j++) {
-        domStyle.parts.push(addStyle(item.parts[j]))
-      }
-      if (domStyle.parts.length > item.parts.length) {
-        domStyle.parts.length = item.parts.length
-      }
-    } else {
-      var parts = []
-      for (var j = 0; j < item.parts.length; j++) {
-        parts.push(addStyle(item.parts[j]))
-      }
-      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
-    }
-  }
-}
-
-function createStyleElement () {
-  var styleElement = document.createElement('style')
-  styleElement.type = 'text/css'
-  head.appendChild(styleElement)
-  return styleElement
-}
-
-function addStyle (obj /* StyleObjectPart */) {
-  var update, remove
-  var styleElement = document.querySelector('style[' + ssrIdKey + '~="' + obj.id + '"]')
-
-  if (styleElement) {
-    if (isProduction) {
-      // has SSR styles and in production mode.
-      // simply do nothing.
-      return noop
-    } else {
-      // has SSR styles but in dev mode.
-      // for some reason Chrome can't handle source map in server-rendered
-      // style tags - source maps in <style> only works if the style tag is
-      // created and inserted dynamically. So we remove the server rendered
-      // styles and inject new ones.
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  if (isOldIE) {
-    // use singleton mode for IE9.
-    var styleIndex = singletonCounter++
-    styleElement = singletonElement || (singletonElement = createStyleElement())
-    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
-    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
-  } else {
-    // use multi-style-tag mode in all other cases
-    styleElement = createStyleElement()
-    update = applyToTag.bind(null, styleElement)
-    remove = function () {
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  update(obj)
-
-  return function updateStyle (newObj /* StyleObjectPart */) {
-    if (newObj) {
-      if (newObj.css === obj.css &&
-          newObj.media === obj.media &&
-          newObj.sourceMap === obj.sourceMap) {
-        return
-      }
-      update(obj = newObj)
-    } else {
-      remove()
-    }
-  }
-}
-
-var replaceText = (function () {
-  var textStore = []
-
-  return function (index, replacement) {
-    textStore[index] = replacement
-    return textStore.filter(Boolean).join('\n')
-  }
-})()
-
-function applyToSingletonTag (styleElement, index, remove, obj) {
-  var css = remove ? '' : obj.css
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = replaceText(index, css)
-  } else {
-    var cssNode = document.createTextNode(css)
-    var childNodes = styleElement.childNodes
-    if (childNodes[index]) styleElement.removeChild(childNodes[index])
-    if (childNodes.length) {
-      styleElement.insertBefore(cssNode, childNodes[index])
-    } else {
-      styleElement.appendChild(cssNode)
-    }
-  }
-}
-
-function applyToTag (styleElement, obj) {
-  var css = obj.css
-  var media = obj.media
-  var sourceMap = obj.sourceMap
-
-  if (media) {
-    styleElement.setAttribute('media', media)
-  }
-  if (options.ssrId) {
-    styleElement.setAttribute(ssrIdKey, obj.id)
-  }
-
-  if (sourceMap) {
-    // https://developer.chrome.com/devtools/docs/javascript-debugging
-    // this makes source maps inside style tags work properly in Chrome
-    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
-    // http://stackoverflow.com/a/26603875
-    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
-  }
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = css
-  } else {
-    while (styleElement.firstChild) {
-      styleElement.removeChild(styleElement.firstChild)
-    }
-    styleElement.appendChild(document.createTextNode(css))
-  }
-}
-
-
-/***/ }),
-/* 139 */
-/***/ (function(module, exports) {
-
-/* globals __VUE_SSR_CONTEXT__ */
-
-// IMPORTANT: Do NOT use ES2015 features in this file.
-// This module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle.
-
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  functionalTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier /* server only */
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
-
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
-  }
-
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
-    options._compiled = true
-  }
-
-  // functional template
-  if (functionalTemplate) {
-    options.functional = true
-  }
-
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
-  }
-
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
-    }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = injectStyles
-  }
-
-  if (hook) {
-    var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
-
-    if (!functional) {
-      // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    } else {
-      // for template-only hot-reload because in that case the render fn doesn't
-      // go through the normalizer
-      options._injectStyles = hook
-      // register for functioal component in vue file
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return existing(h, context)
-      }
-    }
-  }
-
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
-  }
-}
-
-
-/***/ }),
 /* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(141);
-module.exports = __webpack_require__(185);
+module.exports = __webpack_require__(192);
 
 
 /***/ }),
@@ -30503,8 +30503,8 @@ module.exports = __webpack_require__(185);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(200);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__routes__ = __webpack_require__(202);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(172);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__routes__ = __webpack_require__(173);
 __webpack_require__(142);
 
 window.Vue = __webpack_require__(169);
@@ -30514,8 +30514,8 @@ window.Vue = __webpack_require__(169);
 
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]);
 
-Vue.component('main-app', __webpack_require__(203));
-Vue.component('word-writing', __webpack_require__(172));
+Vue.component('main-app', __webpack_require__(180));
+Vue.component('word-writing', __webpack_require__(185));
 
 var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
   routes: __WEBPACK_IMPORTED_MODULE_1__routes__["a" /* default */]
@@ -30536,13 +30536,13 @@ var app = new Vue({
   mounted: function mounted() {}
 });
 
-__webpack_require__(184);
+__webpack_require__(191);
 //.setClassToggle('#trigger' ,'rotateScreenInLeft')
 var controller = new ScrollMagic.Controller();
 
 // tweens
-var tween_1 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0' }), TweenMax.to("#title-section-two", 0.5, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' })]);
-var tween_2 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1100px)', backgroundPositionY: 'center' })]);
+var tween_1 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0' }), TweenMax.to("#title-section-two", 0.5, { opacity: 1 }), TweenMax.to(".judge", 0.5, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' })]);
+var tween_2 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' })]);
 
 // scenes
 var scene_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 400 }).setTween(tween_1).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
@@ -30577,7 +30577,7 @@ if (token) {
 
 window.ScrollMagic = __webpack_require__(4);
 __webpack_require__(167);
-window.TweenMax = __webpack_require__(135);
+window.TweenMax = __webpack_require__(137);
 
 /***/ }),
 /* 143 */
@@ -47690,7 +47690,7 @@ window.TweenMax = __webpack_require__(135);
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(5)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(7)(module)))
 
 /***/ }),
 /* 144 */
@@ -50226,252 +50226,252 @@ Popper.Defaults = Defaults;
 /***/ (function(module, exports, __webpack_require__) {
 
 var map = {
-	"./af": 6,
-	"./af.js": 6,
-	"./ar": 7,
-	"./ar-dz": 8,
-	"./ar-dz.js": 8,
-	"./ar-kw": 9,
-	"./ar-kw.js": 9,
-	"./ar-ly": 10,
-	"./ar-ly.js": 10,
-	"./ar-ma": 11,
-	"./ar-ma.js": 11,
-	"./ar-sa": 12,
-	"./ar-sa.js": 12,
-	"./ar-tn": 13,
-	"./ar-tn.js": 13,
-	"./ar.js": 7,
-	"./az": 14,
-	"./az.js": 14,
-	"./be": 15,
-	"./be.js": 15,
-	"./bg": 16,
-	"./bg.js": 16,
-	"./bm": 17,
-	"./bm.js": 17,
-	"./bn": 18,
-	"./bn.js": 18,
-	"./bo": 19,
-	"./bo.js": 19,
-	"./br": 20,
-	"./br.js": 20,
-	"./bs": 21,
-	"./bs.js": 21,
-	"./ca": 22,
-	"./ca.js": 22,
-	"./cs": 23,
-	"./cs.js": 23,
-	"./cv": 24,
-	"./cv.js": 24,
-	"./cy": 25,
-	"./cy.js": 25,
-	"./da": 26,
-	"./da.js": 26,
-	"./de": 27,
-	"./de-at": 28,
-	"./de-at.js": 28,
-	"./de-ch": 29,
-	"./de-ch.js": 29,
-	"./de.js": 27,
-	"./dv": 30,
-	"./dv.js": 30,
-	"./el": 31,
-	"./el.js": 31,
-	"./en-au": 32,
-	"./en-au.js": 32,
-	"./en-ca": 33,
-	"./en-ca.js": 33,
-	"./en-gb": 34,
-	"./en-gb.js": 34,
-	"./en-ie": 35,
-	"./en-ie.js": 35,
-	"./en-il": 36,
-	"./en-il.js": 36,
-	"./en-nz": 37,
-	"./en-nz.js": 37,
-	"./eo": 38,
-	"./eo.js": 38,
-	"./es": 39,
-	"./es-do": 40,
-	"./es-do.js": 40,
-	"./es-us": 41,
-	"./es-us.js": 41,
-	"./es.js": 39,
-	"./et": 42,
-	"./et.js": 42,
-	"./eu": 43,
-	"./eu.js": 43,
-	"./fa": 44,
-	"./fa.js": 44,
-	"./fi": 45,
-	"./fi.js": 45,
-	"./fo": 46,
-	"./fo.js": 46,
-	"./fr": 47,
-	"./fr-ca": 48,
-	"./fr-ca.js": 48,
-	"./fr-ch": 49,
-	"./fr-ch.js": 49,
-	"./fr.js": 47,
-	"./fy": 50,
-	"./fy.js": 50,
-	"./gd": 51,
-	"./gd.js": 51,
-	"./gl": 52,
-	"./gl.js": 52,
-	"./gom-latn": 53,
-	"./gom-latn.js": 53,
-	"./gu": 54,
-	"./gu.js": 54,
-	"./he": 55,
-	"./he.js": 55,
-	"./hi": 56,
-	"./hi.js": 56,
-	"./hr": 57,
-	"./hr.js": 57,
-	"./hu": 58,
-	"./hu.js": 58,
-	"./hy-am": 59,
-	"./hy-am.js": 59,
-	"./id": 60,
-	"./id.js": 60,
-	"./is": 61,
-	"./is.js": 61,
-	"./it": 62,
-	"./it.js": 62,
-	"./ja": 63,
-	"./ja.js": 63,
-	"./jv": 64,
-	"./jv.js": 64,
-	"./ka": 65,
-	"./ka.js": 65,
-	"./kk": 66,
-	"./kk.js": 66,
-	"./km": 67,
-	"./km.js": 67,
-	"./kn": 68,
-	"./kn.js": 68,
-	"./ko": 69,
-	"./ko.js": 69,
-	"./ky": 70,
-	"./ky.js": 70,
-	"./lb": 71,
-	"./lb.js": 71,
-	"./lo": 72,
-	"./lo.js": 72,
-	"./lt": 73,
-	"./lt.js": 73,
-	"./lv": 74,
-	"./lv.js": 74,
-	"./me": 75,
-	"./me.js": 75,
-	"./mi": 76,
-	"./mi.js": 76,
-	"./mk": 77,
-	"./mk.js": 77,
-	"./ml": 78,
-	"./ml.js": 78,
-	"./mn": 79,
-	"./mn.js": 79,
-	"./mr": 80,
-	"./mr.js": 80,
-	"./ms": 81,
-	"./ms-my": 82,
-	"./ms-my.js": 82,
-	"./ms.js": 81,
-	"./mt": 83,
-	"./mt.js": 83,
-	"./my": 84,
-	"./my.js": 84,
-	"./nb": 85,
-	"./nb.js": 85,
-	"./ne": 86,
-	"./ne.js": 86,
-	"./nl": 87,
-	"./nl-be": 88,
-	"./nl-be.js": 88,
-	"./nl.js": 87,
-	"./nn": 89,
-	"./nn.js": 89,
-	"./pa-in": 90,
-	"./pa-in.js": 90,
-	"./pl": 91,
-	"./pl.js": 91,
-	"./pt": 92,
-	"./pt-br": 93,
-	"./pt-br.js": 93,
-	"./pt.js": 92,
-	"./ro": 94,
-	"./ro.js": 94,
-	"./ru": 95,
-	"./ru.js": 95,
-	"./sd": 96,
-	"./sd.js": 96,
-	"./se": 97,
-	"./se.js": 97,
-	"./si": 98,
-	"./si.js": 98,
-	"./sk": 99,
-	"./sk.js": 99,
-	"./sl": 100,
-	"./sl.js": 100,
-	"./sq": 101,
-	"./sq.js": 101,
-	"./sr": 102,
-	"./sr-cyrl": 103,
-	"./sr-cyrl.js": 103,
-	"./sr.js": 102,
-	"./ss": 104,
-	"./ss.js": 104,
-	"./sv": 105,
-	"./sv.js": 105,
-	"./sw": 106,
-	"./sw.js": 106,
-	"./ta": 107,
-	"./ta.js": 107,
-	"./te": 108,
-	"./te.js": 108,
-	"./tet": 109,
-	"./tet.js": 109,
-	"./tg": 110,
-	"./tg.js": 110,
-	"./th": 111,
-	"./th.js": 111,
-	"./tl-ph": 112,
-	"./tl-ph.js": 112,
-	"./tlh": 113,
-	"./tlh.js": 113,
-	"./tr": 114,
-	"./tr.js": 114,
-	"./tzl": 115,
-	"./tzl.js": 115,
-	"./tzm": 116,
-	"./tzm-latn": 117,
-	"./tzm-latn.js": 117,
-	"./tzm.js": 116,
-	"./ug-cn": 118,
-	"./ug-cn.js": 118,
-	"./uk": 119,
-	"./uk.js": 119,
-	"./ur": 120,
-	"./ur.js": 120,
-	"./uz": 121,
-	"./uz-latn": 122,
-	"./uz-latn.js": 122,
-	"./uz.js": 121,
-	"./vi": 123,
-	"./vi.js": 123,
-	"./x-pseudo": 124,
-	"./x-pseudo.js": 124,
-	"./yo": 125,
-	"./yo.js": 125,
-	"./zh-cn": 126,
-	"./zh-cn.js": 126,
-	"./zh-hk": 127,
-	"./zh-hk.js": 127,
-	"./zh-tw": 128,
-	"./zh-tw.js": 128
+	"./af": 8,
+	"./af.js": 8,
+	"./ar": 9,
+	"./ar-dz": 10,
+	"./ar-dz.js": 10,
+	"./ar-kw": 11,
+	"./ar-kw.js": 11,
+	"./ar-ly": 12,
+	"./ar-ly.js": 12,
+	"./ar-ma": 13,
+	"./ar-ma.js": 13,
+	"./ar-sa": 14,
+	"./ar-sa.js": 14,
+	"./ar-tn": 15,
+	"./ar-tn.js": 15,
+	"./ar.js": 9,
+	"./az": 16,
+	"./az.js": 16,
+	"./be": 17,
+	"./be.js": 17,
+	"./bg": 18,
+	"./bg.js": 18,
+	"./bm": 19,
+	"./bm.js": 19,
+	"./bn": 20,
+	"./bn.js": 20,
+	"./bo": 21,
+	"./bo.js": 21,
+	"./br": 22,
+	"./br.js": 22,
+	"./bs": 23,
+	"./bs.js": 23,
+	"./ca": 24,
+	"./ca.js": 24,
+	"./cs": 25,
+	"./cs.js": 25,
+	"./cv": 26,
+	"./cv.js": 26,
+	"./cy": 27,
+	"./cy.js": 27,
+	"./da": 28,
+	"./da.js": 28,
+	"./de": 29,
+	"./de-at": 30,
+	"./de-at.js": 30,
+	"./de-ch": 31,
+	"./de-ch.js": 31,
+	"./de.js": 29,
+	"./dv": 32,
+	"./dv.js": 32,
+	"./el": 33,
+	"./el.js": 33,
+	"./en-au": 34,
+	"./en-au.js": 34,
+	"./en-ca": 35,
+	"./en-ca.js": 35,
+	"./en-gb": 36,
+	"./en-gb.js": 36,
+	"./en-ie": 37,
+	"./en-ie.js": 37,
+	"./en-il": 38,
+	"./en-il.js": 38,
+	"./en-nz": 39,
+	"./en-nz.js": 39,
+	"./eo": 40,
+	"./eo.js": 40,
+	"./es": 41,
+	"./es-do": 42,
+	"./es-do.js": 42,
+	"./es-us": 43,
+	"./es-us.js": 43,
+	"./es.js": 41,
+	"./et": 44,
+	"./et.js": 44,
+	"./eu": 45,
+	"./eu.js": 45,
+	"./fa": 46,
+	"./fa.js": 46,
+	"./fi": 47,
+	"./fi.js": 47,
+	"./fo": 48,
+	"./fo.js": 48,
+	"./fr": 49,
+	"./fr-ca": 50,
+	"./fr-ca.js": 50,
+	"./fr-ch": 51,
+	"./fr-ch.js": 51,
+	"./fr.js": 49,
+	"./fy": 52,
+	"./fy.js": 52,
+	"./gd": 53,
+	"./gd.js": 53,
+	"./gl": 54,
+	"./gl.js": 54,
+	"./gom-latn": 55,
+	"./gom-latn.js": 55,
+	"./gu": 56,
+	"./gu.js": 56,
+	"./he": 57,
+	"./he.js": 57,
+	"./hi": 58,
+	"./hi.js": 58,
+	"./hr": 59,
+	"./hr.js": 59,
+	"./hu": 60,
+	"./hu.js": 60,
+	"./hy-am": 61,
+	"./hy-am.js": 61,
+	"./id": 62,
+	"./id.js": 62,
+	"./is": 63,
+	"./is.js": 63,
+	"./it": 64,
+	"./it.js": 64,
+	"./ja": 65,
+	"./ja.js": 65,
+	"./jv": 66,
+	"./jv.js": 66,
+	"./ka": 67,
+	"./ka.js": 67,
+	"./kk": 68,
+	"./kk.js": 68,
+	"./km": 69,
+	"./km.js": 69,
+	"./kn": 70,
+	"./kn.js": 70,
+	"./ko": 71,
+	"./ko.js": 71,
+	"./ky": 72,
+	"./ky.js": 72,
+	"./lb": 73,
+	"./lb.js": 73,
+	"./lo": 74,
+	"./lo.js": 74,
+	"./lt": 75,
+	"./lt.js": 75,
+	"./lv": 76,
+	"./lv.js": 76,
+	"./me": 77,
+	"./me.js": 77,
+	"./mi": 78,
+	"./mi.js": 78,
+	"./mk": 79,
+	"./mk.js": 79,
+	"./ml": 80,
+	"./ml.js": 80,
+	"./mn": 81,
+	"./mn.js": 81,
+	"./mr": 82,
+	"./mr.js": 82,
+	"./ms": 83,
+	"./ms-my": 84,
+	"./ms-my.js": 84,
+	"./ms.js": 83,
+	"./mt": 85,
+	"./mt.js": 85,
+	"./my": 86,
+	"./my.js": 86,
+	"./nb": 87,
+	"./nb.js": 87,
+	"./ne": 88,
+	"./ne.js": 88,
+	"./nl": 89,
+	"./nl-be": 90,
+	"./nl-be.js": 90,
+	"./nl.js": 89,
+	"./nn": 91,
+	"./nn.js": 91,
+	"./pa-in": 92,
+	"./pa-in.js": 92,
+	"./pl": 93,
+	"./pl.js": 93,
+	"./pt": 94,
+	"./pt-br": 95,
+	"./pt-br.js": 95,
+	"./pt.js": 94,
+	"./ro": 96,
+	"./ro.js": 96,
+	"./ru": 97,
+	"./ru.js": 97,
+	"./sd": 98,
+	"./sd.js": 98,
+	"./se": 99,
+	"./se.js": 99,
+	"./si": 100,
+	"./si.js": 100,
+	"./sk": 101,
+	"./sk.js": 101,
+	"./sl": 102,
+	"./sl.js": 102,
+	"./sq": 103,
+	"./sq.js": 103,
+	"./sr": 104,
+	"./sr-cyrl": 105,
+	"./sr-cyrl.js": 105,
+	"./sr.js": 104,
+	"./ss": 106,
+	"./ss.js": 106,
+	"./sv": 107,
+	"./sv.js": 107,
+	"./sw": 108,
+	"./sw.js": 108,
+	"./ta": 109,
+	"./ta.js": 109,
+	"./te": 110,
+	"./te.js": 110,
+	"./tet": 111,
+	"./tet.js": 111,
+	"./tg": 112,
+	"./tg.js": 112,
+	"./th": 113,
+	"./th.js": 113,
+	"./tl-ph": 114,
+	"./tl-ph.js": 114,
+	"./tlh": 115,
+	"./tlh.js": 115,
+	"./tr": 116,
+	"./tr.js": 116,
+	"./tzl": 117,
+	"./tzl.js": 117,
+	"./tzm": 118,
+	"./tzm-latn": 119,
+	"./tzm-latn.js": 119,
+	"./tzm.js": 118,
+	"./ug-cn": 120,
+	"./ug-cn.js": 120,
+	"./uk": 121,
+	"./uk.js": 121,
+	"./ur": 122,
+	"./ur.js": 122,
+	"./uz": 123,
+	"./uz-latn": 124,
+	"./uz-latn.js": 124,
+	"./uz.js": 123,
+	"./vi": 125,
+	"./vi.js": 125,
+	"./x-pseudo": 126,
+	"./x-pseudo.js": 126,
+	"./yo": 127,
+	"./yo.js": 127,
+	"./zh-cn": 128,
+	"./zh-cn.js": 128,
+	"./zh-hk": 129,
+	"./zh-hk.js": 129,
+	"./zh-tw": 130,
+	"./zh-tw.js": 130
 };
 function webpackContext(req) {
 	return __webpack_require__(webpackContextResolve(req));
@@ -73219,7 +73219,7 @@ module.exports = __webpack_require__(149);
 
 
 var utils = __webpack_require__(1);
-var bind = __webpack_require__(129);
+var bind = __webpack_require__(131);
 var Axios = __webpack_require__(151);
 var defaults = __webpack_require__(3);
 
@@ -73254,9 +73254,9 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(134);
+axios.Cancel = __webpack_require__(136);
 axios.CancelToken = __webpack_require__(165);
-axios.isCancel = __webpack_require__(133);
+axios.isCancel = __webpack_require__(135);
 
 // Expose all/spread
 axios.all = function all(promises) {
@@ -73409,7 +73409,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 "use strict";
 
 
-var createError = __webpack_require__(132);
+var createError = __webpack_require__(134);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -73842,7 +73842,7 @@ module.exports = InterceptorManager;
 
 var utils = __webpack_require__(1);
 var transformData = __webpack_require__(162);
-var isCancel = __webpack_require__(133);
+var isCancel = __webpack_require__(135);
 var defaults = __webpack_require__(3);
 var isAbsoluteURL = __webpack_require__(163);
 var combineURLs = __webpack_require__(164);
@@ -74002,7 +74002,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 "use strict";
 
 
-var Cancel = __webpack_require__(134);
+var Cancel = __webpack_require__(136);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -74127,7 +74127,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 (function (root, factory) {
 	if (true) {
 		// AMD. Register as an anonymous module.
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4), __webpack_require__(135), __webpack_require__(168)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4), __webpack_require__(137), __webpack_require__(168)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -75725,10 +75725,10 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		return (_gsScope.GreenSockGlobals || _gsScope)[name];
 	};
 	if (typeof(module) !== "undefined" && module.exports) { //node
-		__webpack_require__(136); //dependency
+		__webpack_require__(138); //dependency
 		module.exports = getGlobal();
 	} else if (true) { //AMD
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(136)], __WEBPACK_AMD_DEFINE_FACTORY__ = (getGlobal),
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(138)], __WEBPACK_AMD_DEFINE_FACTORY__ = (getGlobal),
 				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
 				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
@@ -86963,1215 +86963,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(130)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(132)))
 
 /***/ }),
 /* 172 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(173)
-}
-var normalizeComponent = __webpack_require__(139)
-/* script */
-var __vue_script__ = __webpack_require__(176)
-/* template */
-var __vue_template__ = __webpack_require__(178)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-7da5dfcb"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\WordWriting.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-7da5dfcb", Component.options)
-  } else {
-    hotAPI.reload("data-v-7da5dfcb", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 173 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(174);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(138)("7d7e69ed", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7da5dfcb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./WordWriting.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7da5dfcb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./WordWriting.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 174 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(137)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n.word-text[data-v-7da5dfcb] {\n  position: relative;\n  padding-right: 11px;\n}\n.slash[data-v-7da5dfcb] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.write-mode[data-v-7da5dfcb] {\n  font-weight: 400;\n  font-size: 1.5rem;\n  margin: auto;\n  display: block;\n}\n.write-mode #word[data-v-7da5dfcb] {\n    margin-right: 6px;\n    width: 120px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-7da5dfcb] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-7da5dfcb] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.console[data-v-7da5dfcb] {\n  background: #222122;\n  padding: 0 10px;\n  border-radius: 3px;\n  position: relative;\n}\nheader[data-v-7da5dfcb] {\n  padding: 2px 5px;\n  content: '';\n  position: absolute;\n  width: 100%;\n  height: 25px;\n  top: -24px;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.button-navbar-mac[data-v-7da5dfcb] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-7da5dfcb] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-7da5dfcb] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-7da5dfcb] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 175 */
-/***/ (function(module, exports) {
-
-/**
- * Translates the list format produced by css-loader into something
- * easier to manipulate.
- */
-module.exports = function listToStyles (parentId, list) {
-  var styles = []
-  var newStyles = {}
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i]
-    var id = item[0]
-    var css = item[1]
-    var media = item[2]
-    var sourceMap = item[3]
-    var part = {
-      id: parentId + ':' + i,
-      css: css,
-      media: media,
-      sourceMap: sourceMap
-    }
-    if (!newStyles[id]) {
-      styles.push(newStyles[id] = { id: id, parts: [part] })
-    } else {
-      newStyles[id].parts.push(part)
-    }
-  }
-  return styles
-}
-
-
-/***/ }),
-/* 176 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_resize__ = __webpack_require__(177);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      word: 'crear',
-      step: 1
-    };
-  },
-
-  methods: {
-    changeWords: function changeWords() {
-      switch (this.step) {
-        case 1:
-          this.word = 'crear';
-          break;
-        case 2:
-          this.word = 'explorar';
-          break;
-        case 3:
-          this.word = 'imaginar';
-          break;
-      }
-      if (this.step == 3) {
-        this.step = 0;
-      }
-    },
-    handleResize: function handleResize() {
-      var s = document.getElementById('slash');
-      var w = document.getElementById('width-word');
-      if (s.offsetWidth >= w.offsetWidth) {
-        this.step++;
-        this.changeWords();
-      }
-    }
-  },
-  computed: {
-    date: function date() {
-      return moment().format('LLLL');
-    }
-  },
-  mounted: function mounted() {
-    var vm = this;
-  }
-});
-
-/***/ }),
-/* 177 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {/* unused harmony export install */
-/* unused harmony export ResizeObserver */
-function getInternetExplorerVersion() {
-	var ua = window.navigator.userAgent;
-
-	var msie = ua.indexOf('MSIE ');
-	if (msie > 0) {
-		// IE 10 or older => return version number
-		return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-	}
-
-	var trident = ua.indexOf('Trident/');
-	if (trident > 0) {
-		// IE 11 => return version number
-		var rv = ua.indexOf('rv:');
-		return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-	}
-
-	var edge = ua.indexOf('Edge/');
-	if (edge > 0) {
-		// Edge (IE 12+) => return version number
-		return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-	}
-
-	// other browser
-	return -1;
-}
-
-var isIE = void 0;
-
-function initCompat() {
-	if (!initCompat.init) {
-		initCompat.init = true;
-		isIE = getInternetExplorerVersion() !== -1;
-	}
-}
-
-var ResizeObserver = { render: function render() {
-		var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "resize-observer", attrs: { "tabindex": "-1" } });
-	}, staticRenderFns: [], _scopeId: 'data-v-b329ee4c',
-	name: 'resize-observer',
-
-	methods: {
-		notify: function notify() {
-			this.$emit('notify');
-		},
-		addResizeHandlers: function addResizeHandlers() {
-			this._resizeObject.contentDocument.defaultView.addEventListener('resize', this.notify);
-			if (this._w !== this.$el.offsetWidth || this._h !== this.$el.offsetHeight) {
-				this.notify();
-			}
-		},
-		removeResizeHandlers: function removeResizeHandlers() {
-			if (this._resizeObject && this._resizeObject.onload) {
-				if (!isIE && this._resizeObject.contentDocument) {
-					this._resizeObject.contentDocument.defaultView.removeEventListener('resize', this.notify);
-				}
-				delete this._resizeObject.onload;
-			}
-		}
-	},
-
-	mounted: function mounted() {
-		var _this = this;
-
-		initCompat();
-		this.$nextTick(function () {
-			_this._w = _this.$el.offsetWidth;
-			_this._h = _this.$el.offsetHeight;
-		});
-		var object = document.createElement('object');
-		this._resizeObject = object;
-		object.setAttribute('style', 'display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;');
-		object.setAttribute('aria-hidden', 'true');
-		object.setAttribute('tabindex', -1);
-		object.onload = this.addResizeHandlers;
-		object.type = 'text/html';
-		if (isIE) {
-			this.$el.appendChild(object);
-		}
-		object.data = 'about:blank';
-		if (!isIE) {
-			this.$el.appendChild(object);
-		}
-	},
-	beforeDestroy: function beforeDestroy() {
-		this.removeResizeHandlers();
-	}
-};
-
-// Install the components
-function install(Vue) {
-	Vue.component('resize-observer', ResizeObserver);
-	/* -- Add more components here -- */
-}
-
-/* -- Plugin definition & Auto-install -- */
-/* You shouldn't have to modify the code below */
-
-// Plugin
-var plugin = {
-	// eslint-disable-next-line no-undef
-	version: "0.4.4",
-	install: install
-};
-
-// Auto-install
-var GlobalVue = null;
-if (typeof window !== 'undefined') {
-	GlobalVue = window.Vue;
-} else if (typeof global !== 'undefined') {
-	GlobalVue = global.Vue;
-}
-if (GlobalVue) {
-	GlobalVue.use(plugin);
-}
-
-
-/* unused harmony default export */ var _unused_webpack_default_export = (plugin);
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
-
-/***/ }),
-/* 178 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "console" }, [
-    _vm._m(0),
-    _vm._v(" "),
-    _c("span", { staticClass: "write-mode" }, [
-      _vm._v("Ultimo acceso: " + _vm._s(_vm.date))
-    ]),
-    _vm._v(" "),
-    _c("span", { staticClass: "write-mode" }, [
-      _vm._v("El evento donde podrás\n    "),
-      _c(
-        "span",
-        { staticClass: "container-word", attrs: { id: "width-word" } },
-        [
-          _c("div", { attrs: { id: "word" } }, [
-            _c("span", { staticClass: "word-text" }, [
-              _vm._v(_vm._s(_vm.word)),
-              _c("span", { staticClass: "slash" })
-            ])
-          ]),
-          _vm._v(" "),
-          _c(
-            "resize-observer",
-            { attrs: { id: "slash" }, on: { notify: _vm.handleResize } },
-            [_vm._v(" ")]
-          )
-        ],
-        1
-      )
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "container-algorithm-icon" }, [
-      _c(
-        "svg",
-        {
-          attrs: { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 64 64" }
-        },
-        [
-          _c("path", {
-            staticClass: "sun",
-            attrs: {
-              d:
-                "m17 32c0-1.51 2.19-2.656 2.633-4.019.458-1.412-.624-3.623.231-4.8s3.308-.837 4.5-1.7 1.592-3.292 3-3.75c1.362-.443 3.126 1.269 4.636 1.269s3.274-1.712 4.637-1.269c1.412.458 1.829 2.895 3 3.751s3.631.513 4.5 1.7-.227 3.387.231 4.8c.442 1.362 2.632 2.508 2.632 4.018s-2.19 2.656-2.633 4.019c-.458 1.412.624 3.623-.231 4.8s-3.308.837-4.5 1.7-1.592 3.292-3 3.75c-1.362.443-3.126-1.269-4.636-1.269s-3.274 1.712-4.637 1.269c-1.412-.458-1.829-2.895-3-3.751s-3.631-.513-4.5-1.7.227-3.387-.231-4.8c-.442-1.362-2.632-2.508-2.632-4.018z",
-              fill: "#fcf05a"
-            }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            attrs: { cx: "32", cy: "32", fill: "#fdbd40", r: "10" }
-          }),
-          _vm._v(" "),
-          _c("path", {
-            staticClass: "st0-solar half-saucer",
-            attrs: {
-              d:
-                "m32 54a22 22 0 1 1 14.667-5.6l-1.334-1.49a19.948 19.948 0 1 0 -10.475 4.89l.284 1.98a22.186 22.186 0 0 1 -3.142.22z"
-            }
-          }),
-          _vm._v(" "),
-          _c("path", {
-            staticClass: "st0-solar dish-outside",
-            attrs: {
-              d:
-                "m32 60a28.008 28.008 0 0 1 -24.546-41.482l1.752.964a26 26 0 1 0 48.349 7.7l1.966-.368a28.025 28.025 0 0 1 -27.521 33.186z"
-            }
-          }),
-          _vm._v(" "),
-          _c("path", {
-            staticClass: "st0-solar dish-outside",
-            attrs: {
-              d:
-                "m51.379 14.667a26.008 26.008 0 0 0 -33-4.815l-1.049-1.7a28.012 28.012 0 0 1 35.54 5.181z"
-            }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            staticClass: "dish-outside",
-            attrs: { cx: "12", cy: "13", fill: "#84f03c", r: "3" }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            staticClass: "half-saucer",
-            attrs: { cx: "41", cy: "51", fill: "#7fcac9", r: "2" }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            staticClass: "dish-outside",
-            attrs: { cx: "57", cy: "20", fill: "#fdbd40", r: "4" }
-          }),
-          _vm._v(" "),
-          _c("g", { attrs: { fill: "#7d8d9c" } }, [
-            _c("path", {
-              staticClass: "rect-anim-one",
-              attrs: { d: "m52 4h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-two",
-              attrs: { d: "m56 6h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-three",
-              attrs: { d: "m2 54h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-two",
-              attrs: { d: "m6 56h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-four",
-              attrs: { d: "m54 54h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-five",
-              attrs: { d: "m58 56h2v2h-2z" }
-            })
-          ])
-        ]
-      )
-    ])
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("header", [
-      _c("div", { staticClass: "close button-navbar-mac" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "minify button-navbar-mac" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "maximize button-navbar-mac" })
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-7da5dfcb", module.exports)
-  }
-}
-
-/***/ }),
-/* 179 */,
-/* 180 */,
-/* 181 */,
-/* 182 */,
-/* 183 */,
-/* 184 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * ScrollMagic v2.0.5 (2015-04-29)
- * The javascript library for magical scroll interactions.
- * (c) 2015 Jan Paepke (@janpaepke)
- * Project Website: http://scrollmagic.io
- * 
- * @version 2.0.5
- * @license Dual licensed under MIT license and GPL.
- * @author Jan Paepke - e-mail@janpaepke.de
- *
- * @file Debug Extension for ScrollMagic.
- */
-/**
- * This plugin was formerly known as the ScrollMagic debug extension.
- *
- * It enables you to add visual indicators to your page, to be able to see exactly when a scene is triggered.
- *
- * To have access to this extension, please include `plugins/debug.addIndicators.js`.
- * @mixin debug.addIndicators
- */
-(function (root, factory) {
-	if (true) {
-		// AMD. Register as an anonymous module.
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	} else if (typeof exports === 'object') {
-		// CommonJS
-		factory(require('scrollmagic'));
-	} else {
-		// no browser global export needed, just execute
-		factory(root.ScrollMagic || (root.jQuery && root.jQuery.ScrollMagic));
-	}
-}(this, function (ScrollMagic) {
-	"use strict";
-	var NAMESPACE = "debug.addIndicators";
-
-	var
-	console = window.console || {},
-		err = Function.prototype.bind.call(console.error || console.log ||
-		function () {}, console);
-	if (!ScrollMagic) {
-		err("(" + NAMESPACE + ") -> ERROR: The ScrollMagic main module could not be found. Please make sure it's loaded before this plugin or use an asynchronous loader like requirejs.");
-	}
-
-	// plugin settings
-	var
-	FONT_SIZE = "0.85em",
-		ZINDEX = "9999",
-		EDGE_OFFSET = 15; // minimum edge distance, added to indentation
-
-	// overall vars
-	var
-	_util = ScrollMagic._util,
-		_autoindex = 0;
-
-
-
-	ScrollMagic.Scene.extend(function () {
-		var
-		Scene = this,
-			_indicator;
-
-		var log = function () {
-			if (Scene._log) { // not available, when main source minified
-				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
-				Scene._log.apply(this, arguments);
-			}
-		};
-
-		/**
-		 * Add visual indicators for a ScrollMagic.Scene.  
-		 * @memberof! debug.addIndicators#
-		 *
-		 * @example
-		 * // add basic indicators
-		 * scene.addIndicators()
-		 *
-		 * // passing options
-		 * scene.addIndicators({name: "pin scene", colorEnd: "#FFFFFF"});
-		 *
-		 * @param {object} [options] - An object containing one or more options for the indicators.
-		 * @param {(string|object)} [options.parent=undefined] - A selector, DOM Object or a jQuery object that the indicators should be added to.  
-		 If undefined, the controller's container will be used.
-		 * @param {number} [options.name=""] - This string will be displayed at the start and end indicators of the scene for identification purposes. If no name is supplied an automatic index will be used.
-		 * @param {number} [options.indent=0] - Additional position offset for the indicators (useful, when having multiple scenes starting at the same position).
-		 * @param {string} [options.colorStart=green] - CSS color definition for the start indicator.
-		 * @param {string} [options.colorEnd=red] - CSS color definition for the end indicator.
-		 * @param {string} [options.colorTrigger=blue] - CSS color definition for the trigger indicator.
-		 */
-		Scene.addIndicators = function (options) {
-			if (!_indicator) {
-				var
-				DEFAULT_OPTIONS = {
-					name: "",
-					indent: 0,
-					parent: undefined,
-					colorStart: "green",
-					colorEnd: "red",
-					colorTrigger: "blue",
-				};
-
-				options = _util.extend({}, DEFAULT_OPTIONS, options);
-
-				_autoindex++;
-				_indicator = new Indicator(Scene, options);
-
-				Scene.on("add.plugin_addIndicators", _indicator.add);
-				Scene.on("remove.plugin_addIndicators", _indicator.remove);
-				Scene.on("destroy.plugin_addIndicators", Scene.removeIndicators);
-
-				// it the scene already has a controller we can start right away.
-				if (Scene.controller()) {
-					_indicator.add();
-				}
-			}
-			return Scene;
-		};
-
-		/**
-		 * Removes visual indicators from a ScrollMagic.Scene.
-		 * @memberof! debug.addIndicators#
-		 *
-		 * @example
-		 * // remove previously added indicators
-		 * scene.removeIndicators()
-		 *
-		 */
-		Scene.removeIndicators = function () {
-			if (_indicator) {
-				_indicator.remove();
-				this.off("*.plugin_addIndicators");
-				_indicator = undefined;
-			}
-			return Scene;
-		};
-
-	});
-
-
-/*
-	 * ----------------------------------------------------------------
-	 * Extension for controller to store and update related indicators
-	 * ----------------------------------------------------------------
-	 */
-	// add option to globally auto-add indicators to scenes
-	/**
-	 * Every ScrollMagic.Controller instance now accepts an additional option.  
-	 * See {@link ScrollMagic.Controller} for a complete list of the standard options.
-	 * @memberof! debug.addIndicators#
-	 * @method new ScrollMagic.Controller(options)
-	 * @example
-	 * // make a controller and add indicators to all scenes attached
-	 * var controller = new ScrollMagic.Controller({addIndicators: true});
-	 * // this scene will automatically have indicators added to it
-	 * new ScrollMagic.Scene()
-	 *                .addTo(controller);
-	 *
-	 * @param {object} [options] - Options for the Controller.
-	 * @param {boolean} [options.addIndicators=false] - If set to `true` every scene that is added to the controller will automatically get indicators added to it.
-	 */
-	ScrollMagic.Controller.addOption("addIndicators", false);
-	// extend Controller
-	ScrollMagic.Controller.extend(function () {
-		var
-		Controller = this,
-			_info = Controller.info(),
-			_container = _info.container,
-			_isDocument = _info.isDocument,
-			_vertical = _info.vertical,
-			_indicators = { // container for all indicators and methods
-				groups: []
-			};
-
-		var log = function () {
-			if (Controller._log) { // not available, when main source minified
-				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
-				Controller._log.apply(this, arguments);
-			}
-		};
-		if (Controller._indicators) {
-			log(2, "WARNING: Scene already has a property '_indicators', which will be overwritten by plugin.");
-		}
-
-		// add indicators container
-		this._indicators = _indicators;
-/*
-			needed updates:
-			+++++++++++++++
-			start/end position on scene shift (handled in Indicator class)
-			trigger parameters on triggerHook value change (handled in Indicator class)
-			bounds position on container scroll or resize (to keep alignment to bottom/right)
-			trigger position on container resize, window resize (if container isn't document) and window scroll (if container isn't document)
-		*/
-
-		// event handler for when associated bounds markers need to be repositioned
-		var handleBoundsPositionChange = function () {
-			_indicators.updateBoundsPositions();
-		};
-
-		// event handler for when associated trigger groups need to be repositioned
-		var handleTriggerPositionChange = function () {
-			_indicators.updateTriggerGroupPositions();
-		};
-
-		_container.addEventListener("resize", handleTriggerPositionChange);
-		if (!_isDocument) {
-			window.addEventListener("resize", handleTriggerPositionChange);
-			window.addEventListener("scroll", handleTriggerPositionChange);
-		}
-		// update all related bounds containers
-		_container.addEventListener("resize", handleBoundsPositionChange);
-		_container.addEventListener("scroll", handleBoundsPositionChange);
-
-
-		// updates the position of the bounds container to aligned to the right for vertical containers and to the bottom for horizontal
-		this._indicators.updateBoundsPositions = function (specificIndicator) {
-			var // constant for all bounds
-			groups = specificIndicator ? [_util.extend({}, specificIndicator.triggerGroup, {
-				members: [specificIndicator]
-			})] : // create a group with only one element
-			_indicators.groups,
-				// use all
-				g = groups.length,
-				css = {},
-				paramPos = _vertical ? "left" : "top",
-				paramDimension = _vertical ? "width" : "height",
-				edge = _vertical ? _util.get.scrollLeft(_container) + _util.get.width(_container) - EDGE_OFFSET : _util.get.scrollTop(_container) + _util.get.height(_container) - EDGE_OFFSET,
-				b, triggerSize, group;
-			while (g--) { // group loop
-				group = groups[g];
-				b = group.members.length;
-				triggerSize = _util.get[paramDimension](group.element.firstChild);
-				while (b--) { // indicators loop
-					css[paramPos] = edge - triggerSize;
-					_util.css(group.members[b].bounds, css);
-				}
-			}
-		};
-
-		// updates the positions of all trigger groups attached to a controller or a specific one, if provided
-		this._indicators.updateTriggerGroupPositions = function (specificGroup) {
-			var // constant vars
-			groups = specificGroup ? [specificGroup] : _indicators.groups,
-				i = groups.length,
-				container = _isDocument ? document.body : _container,
-				containerOffset = _isDocument ? {
-					top: 0,
-					left: 0
-				} : _util.get.offset(container, true),
-				edge = _vertical ? _util.get.width(_container) - EDGE_OFFSET : _util.get.height(_container) - EDGE_OFFSET,
-				paramDimension = _vertical ? "width" : "height",
-				paramTransform = _vertical ? "Y" : "X";
-			var // changing vars
-			group, elem, pos, elemSize, transform;
-			while (i--) {
-				group = groups[i];
-				elem = group.element;
-				pos = group.triggerHook * Controller.info("size");
-				elemSize = _util.get[paramDimension](elem.firstChild.firstChild);
-				transform = pos > elemSize ? "translate" + paramTransform + "(-100%)" : "";
-
-				_util.css(elem, {
-					top: containerOffset.top + (_vertical ? pos : edge - group.members[0].options.indent),
-					left: containerOffset.left + (_vertical ? edge - group.members[0].options.indent : pos)
-				});
-				_util.css(elem.firstChild.firstChild, {
-					"-ms-transform": transform,
-					"-webkit-transform": transform,
-					"transform": transform
-				});
-			}
-		};
-
-		// updates the label for the group to contain the name, if it only has one member
-		this._indicators.updateTriggerGroupLabel = function (group) {
-			var
-			text = "trigger" + (group.members.length > 1 ? "" : " " + group.members[0].options.name),
-				elem = group.element.firstChild.firstChild,
-				doUpdate = elem.textContent !== text;
-			if (doUpdate) {
-				elem.textContent = text;
-				if (_vertical) { // bounds position is dependent on text length, so update
-					_indicators.updateBoundsPositions();
-				}
-			}
-		};
-
-		// add indicators if global option is set
-		this.addScene = function (newScene) {
-
-			if (this._options.addIndicators && newScene instanceof ScrollMagic.Scene && newScene.controller() === Controller) {
-				newScene.addIndicators();
-			}
-			// call original destroy method
-			this.$super.addScene.apply(this, arguments);
-		};
-
-		// remove all previously set listeners on destroy
-		this.destroy = function () {
-			_container.removeEventListener("resize", handleTriggerPositionChange);
-			if (!_isDocument) {
-				window.removeEventListener("resize", handleTriggerPositionChange);
-				window.removeEventListener("scroll", handleTriggerPositionChange);
-			}
-			_container.removeEventListener("resize", handleBoundsPositionChange);
-			_container.removeEventListener("scroll", handleBoundsPositionChange);
-			// call original destroy method
-			this.$super.destroy.apply(this, arguments);
-		};
-		return Controller;
-
-	});
-
-/*
-	 * ----------------------------------------------------------------
-	 * Internal class for the construction of Indicators
-	 * ----------------------------------------------------------------
-	 */
-	var Indicator = function (Scene, options) {
-		var
-		Indicator = this,
-			_elemBounds = TPL.bounds(),
-			_elemStart = TPL.start(options.colorStart),
-			_elemEnd = TPL.end(options.colorEnd),
-			_boundsContainer = options.parent && _util.get.elements(options.parent)[0],
-			_vertical, _ctrl;
-
-		var log = function () {
-			if (Scene._log) { // not available, when main source minified
-				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
-				Scene._log.apply(this, arguments);
-			}
-		};
-
-		options.name = options.name || _autoindex;
-
-		// prepare bounds elements
-		_elemStart.firstChild.textContent += " " + options.name;
-		_elemEnd.textContent += " " + options.name;
-		_elemBounds.appendChild(_elemStart);
-		_elemBounds.appendChild(_elemEnd);
-
-		// set public variables
-		Indicator.options = options;
-		Indicator.bounds = _elemBounds;
-		// will be set later
-		Indicator.triggerGroup = undefined;
-
-		// add indicators to DOM
-		this.add = function () {
-			_ctrl = Scene.controller();
-			_vertical = _ctrl.info("vertical");
-
-			var isDocument = _ctrl.info("isDocument");
-
-			if (!_boundsContainer) {
-				// no parent supplied or doesnt exist
-				_boundsContainer = isDocument ? document.body : _ctrl.info("container"); // check if window/document (then use body)
-			}
-			if (!isDocument && _util.css(_boundsContainer, "position") === 'static') {
-				// position mode needed for correct positioning of indicators
-				_util.css(_boundsContainer, {
-					position: "relative"
-				});
-			}
-
-			// add listeners for updates
-			Scene.on("change.plugin_addIndicators", handleTriggerParamsChange);
-			Scene.on("shift.plugin_addIndicators", handleBoundsParamsChange);
-
-			// updates trigger & bounds (will add elements if needed)
-			updateTriggerGroup();
-			updateBounds();
-
-			setTimeout(function () { // do after all execution is finished otherwise sometimes size calculations are off
-				_ctrl._indicators.updateBoundsPositions(Indicator);
-			}, 0);
-
-			log(3, "added indicators");
-		};
-
-		// remove indicators from DOM
-		this.remove = function () {
-			if (Indicator.triggerGroup) { // if not set there's nothing to remove
-				Scene.off("change.plugin_addIndicators", handleTriggerParamsChange);
-				Scene.off("shift.plugin_addIndicators", handleBoundsParamsChange);
-
-				if (Indicator.triggerGroup.members.length > 1) {
-					// just remove from memberlist of old group
-					var group = Indicator.triggerGroup;
-					group.members.splice(group.members.indexOf(Indicator), 1);
-					_ctrl._indicators.updateTriggerGroupLabel(group);
-					_ctrl._indicators.updateTriggerGroupPositions(group);
-					Indicator.triggerGroup = undefined;
-				} else {
-					// remove complete group
-					removeTriggerGroup();
-				}
-				removeBounds();
-
-				log(3, "removed indicators");
-			}
-		};
-
-/*
-		 * ----------------------------------------------------------------
-		 * internal Event Handlers
-		 * ----------------------------------------------------------------
-		 */
-
-		// event handler for when bounds params change
-		var handleBoundsParamsChange = function () {
-			updateBounds();
-		};
-
-		// event handler for when trigger params change
-		var handleTriggerParamsChange = function (e) {
-			if (e.what === "triggerHook") {
-				updateTriggerGroup();
-			}
-		};
-
-/*
-		 * ----------------------------------------------------------------
-		 * Bounds (start / stop) management
-		 * ----------------------------------------------------------------
-		 */
-
-		// adds an new bounds elements to the array and to the DOM
-		var addBounds = function () {
-			var v = _ctrl.info("vertical");
-			// apply stuff we didn't know before...
-			_util.css(_elemStart.firstChild, {
-				"border-bottom-width": v ? 1 : 0,
-				"border-right-width": v ? 0 : 1,
-				"bottom": v ? -1 : options.indent,
-				"right": v ? options.indent : -1,
-				"padding": v ? "0 8px" : "2px 4px",
-			});
-			_util.css(_elemEnd, {
-				"border-top-width": v ? 1 : 0,
-				"border-left-width": v ? 0 : 1,
-				"top": v ? "100%" : "",
-				"right": v ? options.indent : "",
-				"bottom": v ? "" : options.indent,
-				"left": v ? "" : "100%",
-				"padding": v ? "0 8px" : "2px 4px"
-			});
-			// append
-			_boundsContainer.appendChild(_elemBounds);
-		};
-
-		// remove bounds from list and DOM
-		var removeBounds = function () {
-			_elemBounds.parentNode.removeChild(_elemBounds);
-		};
-
-		// update the start and end positions of the scene
-		var updateBounds = function () {
-			if (_elemBounds.parentNode !== _boundsContainer) {
-				addBounds(); // Add Bounds elements (start/end)
-			}
-			var css = {};
-			css[_vertical ? "top" : "left"] = Scene.triggerPosition();
-			css[_vertical ? "height" : "width"] = Scene.duration();
-			_util.css(_elemBounds, css);
-			_util.css(_elemEnd, {
-				display: Scene.duration() > 0 ? "" : "none"
-			});
-		};
-
-/*
-		 * ----------------------------------------------------------------
-		 * trigger and trigger group management
-		 * ----------------------------------------------------------------
-		 */
-
-		// adds an new trigger group to the array and to the DOM
-		var addTriggerGroup = function () {
-			var triggerElem = TPL.trigger(options.colorTrigger); // new trigger element
-			var css = {};
-			css[_vertical ? "right" : "bottom"] = 0;
-			css[_vertical ? "border-top-width" : "border-left-width"] = 1;
-			_util.css(triggerElem.firstChild, css);
-			_util.css(triggerElem.firstChild.firstChild, {
-				padding: _vertical ? "0 8px 3px 8px" : "3px 4px"
-			});
-			document.body.appendChild(triggerElem); // directly add to body
-			var newGroup = {
-				triggerHook: Scene.triggerHook(),
-				element: triggerElem,
-				members: [Indicator]
-			};
-			_ctrl._indicators.groups.push(newGroup);
-			Indicator.triggerGroup = newGroup;
-			// update right away
-			_ctrl._indicators.updateTriggerGroupLabel(newGroup);
-			_ctrl._indicators.updateTriggerGroupPositions(newGroup);
-		};
-
-		var removeTriggerGroup = function () {
-			_ctrl._indicators.groups.splice(_ctrl._indicators.groups.indexOf(Indicator.triggerGroup), 1);
-			Indicator.triggerGroup.element.parentNode.removeChild(Indicator.triggerGroup.element);
-			Indicator.triggerGroup = undefined;
-		};
-
-		// updates the trigger group -> either join existing or add new one
-/*	
-		 * Logic:
-		 * 1 if a trigger group exist, check if it's in sync with Scene settings – if so, nothing else needs to happen
-		 * 2 try to find an existing one that matches Scene parameters
-		 * 	 2.1 If a match is found check if already assigned to an existing group
-		 *			 If so:
-		 *       A: it was the last member of existing group -> kill whole group
-		 *       B: the existing group has other members -> just remove from member list
-		 *	 2.2 Assign to matching group
-		 * 3 if no new match could be found, check if assigned to existing group
-		 *   A: yes, and it's the only member -> just update parameters and positions and keep using this group
-		 *   B: yes but there are other members -> remove from member list and create a new one
-		 *   C: no, so create a new one
-		 */
-		var updateTriggerGroup = function () {
-			var
-			triggerHook = Scene.triggerHook(),
-				closeEnough = 0.0001;
-
-			// Have a group, check if it still matches
-			if (Indicator.triggerGroup) {
-				if (Math.abs(Indicator.triggerGroup.triggerHook - triggerHook) < closeEnough) {
-					// _util.log(0, "trigger", options.name, "->", "no need to change, still in sync");
-					return; // all good
-				}
-			}
-			// Don't have a group, check if a matching one exists
-			// _util.log(0, "trigger", options.name, "->", "out of sync!");
-			var
-			groups = _ctrl._indicators.groups,
-				group, i = groups.length;
-			while (i--) {
-				group = groups[i];
-				if (Math.abs(group.triggerHook - triggerHook) < closeEnough) {
-					// found a match!
-					// _util.log(0, "trigger", options.name, "->", "found match");
-					if (Indicator.triggerGroup) { // do I have an old group that is out of sync?
-						if (Indicator.triggerGroup.members.length === 1) { // is it the only remaining group?
-							// _util.log(0, "trigger", options.name, "->", "kill");
-							// was the last member, remove the whole group
-							removeTriggerGroup();
-						} else {
-							Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
-							_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
-							_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
-							// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
-						}
-					}
-					// join new group
-					group.members.push(Indicator);
-					Indicator.triggerGroup = group;
-					_ctrl._indicators.updateTriggerGroupLabel(group);
-					return;
-				}
-			}
-
-			// at this point I am obviously out of sync and don't match any other group
-			if (Indicator.triggerGroup) {
-				if (Indicator.triggerGroup.members.length === 1) {
-					// _util.log(0, "trigger", options.name, "->", "updating existing");
-					// out of sync but i'm the only member => just change and update
-					Indicator.triggerGroup.triggerHook = triggerHook;
-					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
-					return;
-				} else {
-					// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
-					Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
-					_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
-					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
-					Indicator.triggerGroup = undefined; // need a brand new group...
-				}
-			}
-			// _util.log(0, "trigger", options.name, "->", "add a new one");
-			// did not find any match, make new trigger group
-			addTriggerGroup();
-		};
-	};
-
-/*
-	 * ----------------------------------------------------------------
-	 * Templates for the indicators
-	 * ----------------------------------------------------------------
-	 */
-	var TPL = {
-		start: function (color) {
-			// inner element (for bottom offset -1, while keeping top position 0)
-			var inner = document.createElement("div");
-			inner.textContent = "start";
-			_util.css(inner, {
-				position: "absolute",
-				overflow: "visible",
-				"border-width": 0,
-				"border-style": "solid",
-				color: color,
-				"border-color": color
-			});
-			var e = document.createElement('div');
-			// wrapper
-			_util.css(e, {
-				position: "absolute",
-				overflow: "visible",
-				width: 0,
-				height: 0
-			});
-			e.appendChild(inner);
-			return e;
-		},
-		end: function (color) {
-			var e = document.createElement('div');
-			e.textContent = "end";
-			_util.css(e, {
-				position: "absolute",
-				overflow: "visible",
-				"border-width": 0,
-				"border-style": "solid",
-				color: color,
-				"border-color": color
-			});
-			return e;
-		},
-		bounds: function () {
-			var e = document.createElement('div');
-			_util.css(e, {
-				position: "absolute",
-				overflow: "visible",
-				"white-space": "nowrap",
-				"pointer-events": "none",
-				"font-size": FONT_SIZE
-			});
-			e.style.zIndex = ZINDEX;
-			return e;
-		},
-		trigger: function (color) {
-			// inner to be above or below line but keep position
-			var inner = document.createElement('div');
-			inner.textContent = "trigger";
-			_util.css(inner, {
-				position: "relative",
-			});
-			// inner wrapper for right: 0 and main element has no size
-			var w = document.createElement('div');
-			_util.css(w, {
-				position: "absolute",
-				overflow: "visible",
-				"border-width": 0,
-				"border-style": "solid",
-				color: color,
-				"border-color": color
-			});
-			w.appendChild(inner);
-			// wrapper
-			var e = document.createElement('div');
-			_util.css(e, {
-				position: "fixed",
-				overflow: "visible",
-				"white-space": "nowrap",
-				"pointer-events": "none",
-				"font-size": FONT_SIZE
-			});
-			e.style.zIndex = ZINDEX;
-			e.appendChild(w);
-			return e;
-		},
-	};
-
-}));
-
-/***/ }),
-/* 185 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 186 */,
-/* 187 */,
-/* 188 */,
-/* 189 */,
-/* 190 */,
-/* 191 */,
-/* 192 */,
-/* 193 */,
-/* 194 */,
-/* 195 */,
-/* 196 */,
-/* 197 */,
-/* 198 */,
-/* 199 */,
-/* 200 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -90801,12 +89596,11 @@ if (inBrowser && window.Vue) {
 
 
 /***/ }),
-/* 201 */,
-/* 202 */
+/* 173 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Index_vue__ = __webpack_require__(208);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Index_vue__ = __webpack_require__(174);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Index_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_Index_vue__);
 
 
@@ -90815,151 +89609,19 @@ var routes = [{ path: '/', component: __WEBPACK_IMPORTED_MODULE_0__components_In
 /* harmony default export */ __webpack_exports__["a"] = (routes);
 
 /***/ }),
-/* 203 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var disposed = false
 function injectStyle (ssrContext) {
   if (disposed) return
-  __webpack_require__(204)
+  __webpack_require__(175)
 }
-var normalizeComponent = __webpack_require__(139)
+var normalizeComponent = __webpack_require__(6)
 /* script */
-var __vue_script__ = __webpack_require__(206)
+var __vue_script__ = __webpack_require__(178)
 /* template */
-var __vue_template__ = __webpack_require__(207)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-117390fa"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\App.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-117390fa", Component.options)
-  } else {
-    hotAPI.reload("data-v-117390fa", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 204 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(205);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(138)("57d36db9", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 205 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(137)(false);
-// imports
-
-
-// module
-exports.push([module.i, "", ""]);
-
-// exports
-
-
-/***/ }),
-/* 206 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {};
-  },
-
-  methods: {},
-  mounted: function mounted() {}
-});
-
-/***/ }),
-/* 207 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "row" }, [_c("router-view")], 1)
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-117390fa", module.exports)
-  }
-}
-
-/***/ }),
-/* 208 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(209)
-}
-var normalizeComponent = __webpack_require__(139)
-/* script */
-var __vue_script__ = __webpack_require__(211)
-/* template */
-var __vue_template__ = __webpack_require__(212)
+var __vue_template__ = __webpack_require__(179)
 /* template functional */
 var __vue_template_functional__ = false
 /* styles */
@@ -90998,17 +89660,17 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 209 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(210);
+var content = __webpack_require__(176);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(138)("9e1cdd34", content, false, {});
+var update = __webpack_require__(5)("9e1cdd34", content, false, {});
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -91024,25 +89686,62 @@ if(false) {
 }
 
 /***/ }),
-/* 210 */
+/* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(137)(false);
+exports = module.exports = __webpack_require__(139)(false);
 // imports
 
 
 // module
-exports.push([module.i, "", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #2e2d2d;\n  padding: 1em;\n  position: relative;\n}\n.box-register[data-v-384052eb]:before {\n    content: '';\n    width: 100%;\n    left: 0;\n    position: absolute;\n    height: 25px;\n    top: -24px;\n    background: #222122;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 500;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: 1rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-judges[data-v-384052eb] {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: row;\n          flex-direction: row;\n  -ms-flex-wrap: wrap;\n      flex-wrap: wrap;\n  -webkit-box-pack: justify;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n}\n.container-judges .judge[data-v-384052eb] {\n    opacity: 0;\n    display: inline-block;\n    position: relative;\n    padding: 0 1em 1em 1em;\n    background: #222122;\n    border-radius: 0 0 5px 5px;\n    text-align: center;\n}\n.container-judges .judge[data-v-384052eb]:before {\n      content: attr(data-name);\n      position: absolute;\n      text-align: center;\n      width: 100%;\n      height: 25px;\n      top: -25px;\n      left: 0;\n      background: #222122;\n      border-radius: 5px 5px 0 0;\n}\n.container-judges img[data-v-384052eb] {\n    width: 150px;\n    max-width: 150px;\n    border-radius: 50%;\n}\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 211 */
+/* 177 */
+/***/ (function(module, exports) {
+
+/**
+ * Translates the list format produced by css-loader into something
+ * easier to manipulate.
+ */
+module.exports = function listToStyles (parentId, list) {
+  var styles = []
+  var newStyles = {}
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i]
+    var id = item[0]
+    var css = item[1]
+    var media = item[2]
+    var sourceMap = item[3]
+    var part = {
+      id: parentId + ':' + i,
+      css: css,
+      media: media,
+      sourceMap: sourceMap
+    }
+    if (!newStyles[id]) {
+      styles.push(newStyles[id] = { id: id, parts: [part] })
+    } else {
+      newStyles[id].parts.push(part)
+    }
+  }
+  return styles
+}
+
+
+/***/ }),
+/* 178 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
 //
 //
 //
@@ -91151,7 +89850,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 212 */
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var render = function() {
@@ -91220,128 +89919,132 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c("section", { attrs: { id: "home" } }, [
-      _c("h1", { staticClass: "title-main" }, [_vm._v("Hackathon Montería")]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col s12 m5" }, [
-        _c("div", { staticClass: "box-register" }, [
-          _vm._m(0),
-          _vm._v(" "),
-          _c("div", { staticClass: "content-register" }, [
-            _c("div", { staticClass: "row" }, [
-              _vm._m(1),
-              _vm._v(" "),
-              _c("div", { staticClass: "col s12 m6" }, [
-                _c("button", { staticClass: "button-register" }, [
-                  _c("div", { staticClass: "icon-caracter" }, [
-                    _c(
-                      "svg",
-                      {
-                        staticStyle: {
-                          "enable-background": "new 0 0 25.916 25.916"
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("Hackathon Montería")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col s12 m5" }, [
+          _c("div", { staticClass: "box-register" }, [
+            _vm._m(0),
+            _vm._v(" "),
+            _c("div", { staticClass: "content-register" }, [
+              _c("div", { staticClass: "row" }, [
+                _vm._m(1),
+                _vm._v(" "),
+                _c("div", { staticClass: "col s12 m6" }, [
+                  _c("button", { staticClass: "button-register" }, [
+                    _c("div", { staticClass: "icon-caracter" }, [
+                      _c(
+                        "svg",
+                        {
+                          staticStyle: {
+                            "enable-background": "new 0 0 25.916 25.916"
+                          },
+                          attrs: {
+                            version: "1.1",
+                            id: "businessman",
+                            xmlns: "http://www.w3.org/2000/svg",
+                            "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                            x: "0px",
+                            y: "0px",
+                            viewBox: "0 0 25.916 25.916",
+                            "xml:space": "preserve"
+                          }
                         },
-                        attrs: {
-                          version: "1.1",
-                          id: "businessman",
-                          xmlns: "http://www.w3.org/2000/svg",
-                          "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                          x: "0px",
-                          y: "0px",
-                          viewBox: "0 0 25.916 25.916",
-                          "xml:space": "preserve"
-                        }
-                      },
-                      [
-                        _c("g", { staticClass: "fill-caracter-icon" }, [
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M7.938,8.13c0.09,0.414,0.228,0.682,0.389,0.849c0.383,2.666,2.776,4.938,4.698,4.843\n\t\t                  \t\t\tc2.445-0.12,4.178-2.755,4.567-4.843c0.161-0.166,0.316-0.521,0.409-0.938c0.104-0.479,0.216-1.201-0.072-1.583\n\t\t                  \t\t\tc-0.017-0.02-0.127-0.121-0.146-0.138c0.275-0.992,0.879-2.762-0.625-4.353c-0.815-0.862-1.947-1.295-2.97-1.637\n\t\t                  \t\t\tc-3.02-1.009-5.152,0.406-6.136,2.759C7.981,3.256,7.522,4.313,8.078,6.32C8.024,6.356,7.975,6.402,7.934,6.458\n\t\t                  \t\t\tC7.645,6.839,7.833,7.651,7.938,8.13z"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M23.557,22.792c-0.084-1.835-0.188-4.743-1.791-7.122c0,0-0.457-0.623-1.541-1.037\n\t\t                  \t\t\tc0,0-2.354-0.717-3.438-1.492l-0.495,0.339l0.055,3.218l-2.972,7.934c-0.065,0.174-0.231,0.289-0.416,0.289\n\t\t                  \t\t\ts-0.351-0.115-0.416-0.289l-2.971-7.934c0,0,0.055-3.208,0.054-3.218c0.007,0.027-0.496-0.339-0.496-0.339\n\t\t                  \t\t\tc-1.082,0.775-3.437,1.492-3.437,1.492c-1.084,0.414-1.541,1.037-1.541,1.037c-1.602,2.379-1.708,5.287-1.792,7.122\n\t\t                  \t\t\tc-0.058,1.268,0.208,1.741,0.542,1.876c4.146,1.664,15.965,1.664,20.112,0C23.35,24.534,23.614,24.06,23.557,22.792z"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M13.065,14.847l-0.134,0.003c-0.432,0-0.868-0.084-1.296-0.232l1.178,1.803l-1.057,1.02\n\t\t                  \t\t\tl1.088,6.607c0.009,0.057,0.058,0.098,0.116,0.098c0.057,0,0.106-0.041,0.116-0.098l1.088-6.607l-1.058-1.02l1.161-1.776\n\t\t                  \t\t\tC13.888,14.756,13.487,14.83,13.065,14.847z"
-                            }
-                          })
-                        ])
-                      ]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("span", [_vm._v("Empresario")])
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col s12 m6" }, [
-                _c("button", { staticClass: "button-register" }, [
-                  _c("div", { staticClass: "icon-caracter" }, [
-                    _c(
-                      "svg",
-                      {
-                        staticStyle: { "enable-background": "new 0 0 512 512" },
-                        attrs: {
-                          version: "1.1",
-                          id: "developer",
-                          xmlns: "http://www.w3.org/2000/svg",
-                          "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                          x: "0px",
-                          y: "0px",
-                          viewBox: "0 0 512 512",
-                          "xml:space": "preserve"
-                        }
-                      },
-                      [
-                        _c("g", { staticClass: "fill-caracter-icon" }, [
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M441.217,235.868l-37.982-8.802l12.093-37.912l-0.879-0.293c-14.881-4.96-31.125-9.049-48.264-12.282\n\t\t                  \t\t\tc-6.656,54.889-53.528,97.558-110.184,97.558c-55.875,0-102.231-41.501-109.884-95.295c-17.267,3.639-33.567,8.144-48.424,13.509\n\t\t                  \t\t\tl11.073,34.715l-38.004,8.807L0,366.342v79.397h84.333V311.805h343.333V445.74H512v-80.103L441.217,235.868z"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M380.972,81.566c-18.27-40.058-54.956-69.109-98.135-77.711c-17.809-3.548-35.865-3.548-53.674,0\n\t\t                  \t\t\tc-43.179,8.602-79.865,37.653-98.135,77.711l-36.553,80.144c44.649-14.98,101.279-23.544,160.609-24.199\n\t\t                  \t\t\tc58.917-0.643,115.535,6.531,160.653,20.281L380.972,81.566z"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M175.696,173.584c5.143,39.744,39.182,70.554,80.304,70.554c41.688,0,76.11-31.66,80.513-72.196\n\t\t                  \t\t\tC284.593,165.404,227.333,165.99,175.696,173.584z"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c("path", {
-                            attrs: {
-                              d:
-                                "M114.333,510.805h283.333v-169H114.333V510.805z M256,405.091l21.213,21.213L256,447.518l-21.213-21.213L256,405.091z"
-                            }
-                          })
-                        ])
-                      ]
-                    )
-                  ]),
-                  _vm._v(" "),
-                  _c("span", [_vm._v("Desarrollador")])
+                        [
+                          _c("g", { staticClass: "fill-caracter-icon" }, [
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M7.938,8.13c0.09,0.414,0.228,0.682,0.389,0.849c0.383,2.666,2.776,4.938,4.698,4.843\n\t\t                  \t\t\tc2.445-0.12,4.178-2.755,4.567-4.843c0.161-0.166,0.316-0.521,0.409-0.938c0.104-0.479,0.216-1.201-0.072-1.583\n\t\t                  \t\t\tc-0.017-0.02-0.127-0.121-0.146-0.138c0.275-0.992,0.879-2.762-0.625-4.353c-0.815-0.862-1.947-1.295-2.97-1.637\n\t\t                  \t\t\tc-3.02-1.009-5.152,0.406-6.136,2.759C7.981,3.256,7.522,4.313,8.078,6.32C8.024,6.356,7.975,6.402,7.934,6.458\n\t\t                  \t\t\tC7.645,6.839,7.833,7.651,7.938,8.13z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M23.557,22.792c-0.084-1.835-0.188-4.743-1.791-7.122c0,0-0.457-0.623-1.541-1.037\n\t\t                  \t\t\tc0,0-2.354-0.717-3.438-1.492l-0.495,0.339l0.055,3.218l-2.972,7.934c-0.065,0.174-0.231,0.289-0.416,0.289\n\t\t                  \t\t\ts-0.351-0.115-0.416-0.289l-2.971-7.934c0,0,0.055-3.208,0.054-3.218c0.007,0.027-0.496-0.339-0.496-0.339\n\t\t                  \t\t\tc-1.082,0.775-3.437,1.492-3.437,1.492c-1.084,0.414-1.541,1.037-1.541,1.037c-1.602,2.379-1.708,5.287-1.792,7.122\n\t\t                  \t\t\tc-0.058,1.268,0.208,1.741,0.542,1.876c4.146,1.664,15.965,1.664,20.112,0C23.35,24.534,23.614,24.06,23.557,22.792z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M13.065,14.847l-0.134,0.003c-0.432,0-0.868-0.084-1.296-0.232l1.178,1.803l-1.057,1.02\n\t\t                  \t\t\tl1.088,6.607c0.009,0.057,0.058,0.098,0.116,0.098c0.057,0,0.106-0.041,0.116-0.098l1.088-6.607l-1.058-1.02l1.161-1.776\n\t\t                  \t\t\tC13.888,14.756,13.487,14.83,13.065,14.847z"
+                              }
+                            })
+                          ])
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("span", [_vm._v("Empresario")])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "col s12 m6" }, [
+                  _c("button", { staticClass: "button-register" }, [
+                    _c("div", { staticClass: "icon-caracter" }, [
+                      _c(
+                        "svg",
+                        {
+                          staticStyle: {
+                            "enable-background": "new 0 0 512 512"
+                          },
+                          attrs: {
+                            version: "1.1",
+                            id: "developer",
+                            xmlns: "http://www.w3.org/2000/svg",
+                            "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                            x: "0px",
+                            y: "0px",
+                            viewBox: "0 0 512 512",
+                            "xml:space": "preserve"
+                          }
+                        },
+                        [
+                          _c("g", { staticClass: "fill-caracter-icon" }, [
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M441.217,235.868l-37.982-8.802l12.093-37.912l-0.879-0.293c-14.881-4.96-31.125-9.049-48.264-12.282\n\t\t                  \t\t\tc-6.656,54.889-53.528,97.558-110.184,97.558c-55.875,0-102.231-41.501-109.884-95.295c-17.267,3.639-33.567,8.144-48.424,13.509\n\t\t                  \t\t\tl11.073,34.715l-38.004,8.807L0,366.342v79.397h84.333V311.805h343.333V445.74H512v-80.103L441.217,235.868z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M380.972,81.566c-18.27-40.058-54.956-69.109-98.135-77.711c-17.809-3.548-35.865-3.548-53.674,0\n\t\t                  \t\t\tc-43.179,8.602-79.865,37.653-98.135,77.711l-36.553,80.144c44.649-14.98,101.279-23.544,160.609-24.199\n\t\t                  \t\t\tc58.917-0.643,115.535,6.531,160.653,20.281L380.972,81.566z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M175.696,173.584c5.143,39.744,39.182,70.554,80.304,70.554c41.688,0,76.11-31.66,80.513-72.196\n\t\t                  \t\t\tC284.593,165.404,227.333,165.99,175.696,173.584z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              attrs: {
+                                d:
+                                  "M114.333,510.805h283.333v-169H114.333V510.805z M256,405.091l21.213,21.213L256,447.518l-21.213-21.213L256,405.091z"
+                              }
+                            })
+                          ])
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("span", [_vm._v("Desarrollador")])
+                  ])
                 ])
               ])
             ])
           ])
-        ])
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "col s12 m7" }, [_c("word-writing")], 1)
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col s12 m7" }, [_c("word-writing")], 1)
+      ])
     ]),
     _vm._v(" "),
     _vm._m(2)
@@ -91377,46 +90080,48 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "judges" } }, [
-      _c(
-        "h1",
-        { staticClass: "title-main", attrs: { id: "title-section-two" } },
-        [_vm._v("JURADOS")]
-      ),
-      _vm._v(" "),
-      _c("div", { staticClass: "container-judges" }, [
+      _c("div", { staticClass: "container" }, [
         _c(
-          "div",
-          { staticClass: "judge", attrs: { "data-name": "Omar Flórez" } },
-          [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/omar.jpg" }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
-              ])
-            ])
-          ]
+          "h1",
+          { staticClass: "title-main", attrs: { id: "title-section-two" } },
+          [_vm._v("JURADOS")]
         ),
         _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "judge", attrs: { "data-name": "Omar Flórez" } },
-          [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/omar.jpg" }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
+        _c("div", { staticClass: "container-judges" }, [
+          _c(
+            "div",
+            { staticClass: "judge", attrs: { "data-name": "Omar Flórez" } },
+            [
+              _c("img", {
+                staticClass: "responsive-img",
+                attrs: { src: "/images/judges/omar.jpg" }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "info" }, [
+                _c("div", { staticClass: "profession" }, [
+                  _vm._v("PhD. Computer Science")
+                ])
               ])
-            ])
-          ]
-        )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "judge", attrs: { "data-name": "Omar Flórez" } },
+            [
+              _c("img", {
+                staticClass: "responsive-img",
+                attrs: { src: "/images/judges/omar.jpg" }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "info" }, [
+                _c("div", { staticClass: "profession" }, [
+                  _vm._v("PhD. Computer Science")
+                ])
+              ])
+            ]
+          )
+        ])
       ])
     ])
   }
@@ -91429,6 +90134,1291 @@ if (false) {
     require("vue-hot-reload-api")      .rerender("data-v-384052eb", module.exports)
   }
 }
+
+/***/ }),
+/* 180 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(181)
+}
+var normalizeComponent = __webpack_require__(6)
+/* script */
+var __vue_script__ = __webpack_require__(183)
+/* template */
+var __vue_template__ = __webpack_require__(184)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-117390fa"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\App.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-117390fa", Component.options)
+  } else {
+    hotAPI.reload("data-v-117390fa", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 181 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(182);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("57d36db9", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 182 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(139)(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/***/ }),
+/* 183 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {};
+  },
+
+  methods: {},
+  mounted: function mounted() {}
+});
+
+/***/ }),
+/* 184 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "row" }, [_c("router-view")], 1)
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-117390fa", module.exports)
+  }
+}
+
+/***/ }),
+/* 185 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(186)
+}
+var normalizeComponent = __webpack_require__(6)
+/* script */
+var __vue_script__ = __webpack_require__(188)
+/* template */
+var __vue_template__ = __webpack_require__(190)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-7da5dfcb"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\WordWriting.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-7da5dfcb", Component.options)
+  } else {
+    hotAPI.reload("data-v-7da5dfcb", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 186 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(187);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("7d7e69ed", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7da5dfcb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./WordWriting.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-7da5dfcb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./WordWriting.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 187 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(139)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.word-text[data-v-7da5dfcb] {\n  position: relative;\n  padding-right: 11px;\n}\n.slash[data-v-7da5dfcb] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.write-mode[data-v-7da5dfcb] {\n  font-weight: 400;\n  font-size: 1.5rem;\n  margin: auto;\n  display: block;\n}\n.write-mode #word[data-v-7da5dfcb] {\n    margin-right: 6px;\n    width: 120px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-7da5dfcb] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-7da5dfcb] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.console[data-v-7da5dfcb] {\n  background: #222122;\n  padding: 0 10px;\n  border-radius: 3px;\n  position: relative;\n}\nheader[data-v-7da5dfcb] {\n  padding: 2px 5px;\n  content: '';\n  position: absolute;\n  width: 100%;\n  height: 25px;\n  top: -24px;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.button-navbar-mac[data-v-7da5dfcb] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-7da5dfcb] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-7da5dfcb] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-7da5dfcb] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 188 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_resize__ = __webpack_require__(189);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      word: 'crear',
+      step: 1
+    };
+  },
+
+  methods: {
+    changeWords: function changeWords() {
+      switch (this.step) {
+        case 1:
+          this.word = 'crear';
+          break;
+        case 2:
+          this.word = 'explorar';
+          break;
+        case 3:
+          this.word = 'imaginar';
+          break;
+      }
+      if (this.step == 3) {
+        this.step = 0;
+      }
+    },
+    handleResize: function handleResize() {
+      var s = document.getElementById('slash');
+      var w = document.getElementById('width-word');
+      if (s.offsetWidth >= w.offsetWidth) {
+        this.step++;
+        this.changeWords();
+      }
+    }
+  },
+  computed: {
+    date: function date() {
+      return moment().format('LLLL');
+    }
+  },
+  mounted: function mounted() {
+    var vm = this;
+  }
+});
+
+/***/ }),
+/* 189 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {/* unused harmony export install */
+/* unused harmony export ResizeObserver */
+function getInternetExplorerVersion() {
+	var ua = window.navigator.userAgent;
+
+	var msie = ua.indexOf('MSIE ');
+	if (msie > 0) {
+		// IE 10 or older => return version number
+		return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+	}
+
+	var trident = ua.indexOf('Trident/');
+	if (trident > 0) {
+		// IE 11 => return version number
+		var rv = ua.indexOf('rv:');
+		return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+	}
+
+	var edge = ua.indexOf('Edge/');
+	if (edge > 0) {
+		// Edge (IE 12+) => return version number
+		return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+	}
+
+	// other browser
+	return -1;
+}
+
+var isIE = void 0;
+
+function initCompat() {
+	if (!initCompat.init) {
+		initCompat.init = true;
+		isIE = getInternetExplorerVersion() !== -1;
+	}
+}
+
+var ResizeObserver = { render: function render() {
+		var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "resize-observer", attrs: { "tabindex": "-1" } });
+	}, staticRenderFns: [], _scopeId: 'data-v-b329ee4c',
+	name: 'resize-observer',
+
+	methods: {
+		notify: function notify() {
+			this.$emit('notify');
+		},
+		addResizeHandlers: function addResizeHandlers() {
+			this._resizeObject.contentDocument.defaultView.addEventListener('resize', this.notify);
+			if (this._w !== this.$el.offsetWidth || this._h !== this.$el.offsetHeight) {
+				this.notify();
+			}
+		},
+		removeResizeHandlers: function removeResizeHandlers() {
+			if (this._resizeObject && this._resizeObject.onload) {
+				if (!isIE && this._resizeObject.contentDocument) {
+					this._resizeObject.contentDocument.defaultView.removeEventListener('resize', this.notify);
+				}
+				delete this._resizeObject.onload;
+			}
+		}
+	},
+
+	mounted: function mounted() {
+		var _this = this;
+
+		initCompat();
+		this.$nextTick(function () {
+			_this._w = _this.$el.offsetWidth;
+			_this._h = _this.$el.offsetHeight;
+		});
+		var object = document.createElement('object');
+		this._resizeObject = object;
+		object.setAttribute('style', 'display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;');
+		object.setAttribute('aria-hidden', 'true');
+		object.setAttribute('tabindex', -1);
+		object.onload = this.addResizeHandlers;
+		object.type = 'text/html';
+		if (isIE) {
+			this.$el.appendChild(object);
+		}
+		object.data = 'about:blank';
+		if (!isIE) {
+			this.$el.appendChild(object);
+		}
+	},
+	beforeDestroy: function beforeDestroy() {
+		this.removeResizeHandlers();
+	}
+};
+
+// Install the components
+function install(Vue) {
+	Vue.component('resize-observer', ResizeObserver);
+	/* -- Add more components here -- */
+}
+
+/* -- Plugin definition & Auto-install -- */
+/* You shouldn't have to modify the code below */
+
+// Plugin
+var plugin = {
+	// eslint-disable-next-line no-undef
+	version: "0.4.4",
+	install: install
+};
+
+// Auto-install
+var GlobalVue = null;
+if (typeof window !== 'undefined') {
+	GlobalVue = window.Vue;
+} else if (typeof global !== 'undefined') {
+	GlobalVue = global.Vue;
+}
+if (GlobalVue) {
+	GlobalVue.use(plugin);
+}
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (plugin);
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+
+/***/ }),
+/* 190 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "console" }, [
+    _vm._m(0),
+    _vm._v(" "),
+    _c("span", { staticClass: "write-mode" }, [
+      _vm._v("Ultimo acceso: " + _vm._s(_vm.date))
+    ]),
+    _vm._v(" "),
+    _c("span", { staticClass: "write-mode" }, [
+      _vm._v("El evento donde podrás\n    "),
+      _c(
+        "span",
+        { staticClass: "container-word", attrs: { id: "width-word" } },
+        [
+          _c("div", { attrs: { id: "word" } }, [
+            _c("span", { staticClass: "word-text" }, [
+              _vm._v(_vm._s(_vm.word)),
+              _c("span", { staticClass: "slash" })
+            ])
+          ]),
+          _vm._v(" "),
+          _c(
+            "resize-observer",
+            { attrs: { id: "slash" }, on: { notify: _vm.handleResize } },
+            [_vm._v(" ")]
+          )
+        ],
+        1
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", { staticClass: "container-algorithm-icon" }, [
+      _c(
+        "svg",
+        {
+          attrs: { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 64 64" }
+        },
+        [
+          _c("path", {
+            staticClass: "sun",
+            attrs: {
+              d:
+                "m17 32c0-1.51 2.19-2.656 2.633-4.019.458-1.412-.624-3.623.231-4.8s3.308-.837 4.5-1.7 1.592-3.292 3-3.75c1.362-.443 3.126 1.269 4.636 1.269s3.274-1.712 4.637-1.269c1.412.458 1.829 2.895 3 3.751s3.631.513 4.5 1.7-.227 3.387.231 4.8c.442 1.362 2.632 2.508 2.632 4.018s-2.19 2.656-2.633 4.019c-.458 1.412.624 3.623-.231 4.8s-3.308.837-4.5 1.7-1.592 3.292-3 3.75c-1.362.443-3.126-1.269-4.636-1.269s-3.274 1.712-4.637 1.269c-1.412-.458-1.829-2.895-3-3.751s-3.631-.513-4.5-1.7.227-3.387-.231-4.8c-.442-1.362-2.632-2.508-2.632-4.018z",
+              fill: "#fcf05a"
+            }
+          }),
+          _vm._v(" "),
+          _c("circle", {
+            attrs: { cx: "32", cy: "32", fill: "#fdbd40", r: "10" }
+          }),
+          _vm._v(" "),
+          _c("path", {
+            staticClass: "st0-solar half-saucer",
+            attrs: {
+              d:
+                "m32 54a22 22 0 1 1 14.667-5.6l-1.334-1.49a19.948 19.948 0 1 0 -10.475 4.89l.284 1.98a22.186 22.186 0 0 1 -3.142.22z"
+            }
+          }),
+          _vm._v(" "),
+          _c("path", {
+            staticClass: "st0-solar dish-outside",
+            attrs: {
+              d:
+                "m32 60a28.008 28.008 0 0 1 -24.546-41.482l1.752.964a26 26 0 1 0 48.349 7.7l1.966-.368a28.025 28.025 0 0 1 -27.521 33.186z"
+            }
+          }),
+          _vm._v(" "),
+          _c("path", {
+            staticClass: "st0-solar dish-outside",
+            attrs: {
+              d:
+                "m51.379 14.667a26.008 26.008 0 0 0 -33-4.815l-1.049-1.7a28.012 28.012 0 0 1 35.54 5.181z"
+            }
+          }),
+          _vm._v(" "),
+          _c("circle", {
+            staticClass: "dish-outside",
+            attrs: { cx: "12", cy: "13", fill: "#84f03c", r: "3" }
+          }),
+          _vm._v(" "),
+          _c("circle", {
+            staticClass: "half-saucer",
+            attrs: { cx: "41", cy: "51", fill: "#7fcac9", r: "2" }
+          }),
+          _vm._v(" "),
+          _c("circle", {
+            staticClass: "dish-outside",
+            attrs: { cx: "57", cy: "20", fill: "#fdbd40", r: "4" }
+          }),
+          _vm._v(" "),
+          _c("g", { attrs: { fill: "#7d8d9c" } }, [
+            _c("path", {
+              staticClass: "rect-anim-one",
+              attrs: { d: "m52 4h2v2h-2z" }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "rect-anim-two",
+              attrs: { d: "m56 6h2v2h-2z" }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "rect-anim-three",
+              attrs: { d: "m2 54h2v2h-2z" }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "rect-anim-two",
+              attrs: { d: "m6 56h2v2h-2z" }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "rect-anim-four",
+              attrs: { d: "m54 54h2v2h-2z" }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "rect-anim-five",
+              attrs: { d: "m58 56h2v2h-2z" }
+            })
+          ])
+        ]
+      )
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("header", [
+      _c("div", { staticClass: "close button-navbar-mac" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "minify button-navbar-mac" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "maximize button-navbar-mac" })
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-7da5dfcb", module.exports)
+  }
+}
+
+/***/ }),
+/* 191 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * ScrollMagic v2.0.5 (2015-04-29)
+ * The javascript library for magical scroll interactions.
+ * (c) 2015 Jan Paepke (@janpaepke)
+ * Project Website: http://scrollmagic.io
+ * 
+ * @version 2.0.5
+ * @license Dual licensed under MIT license and GPL.
+ * @author Jan Paepke - e-mail@janpaepke.de
+ *
+ * @file Debug Extension for ScrollMagic.
+ */
+/**
+ * This plugin was formerly known as the ScrollMagic debug extension.
+ *
+ * It enables you to add visual indicators to your page, to be able to see exactly when a scene is triggered.
+ *
+ * To have access to this extension, please include `plugins/debug.addIndicators.js`.
+ * @mixin debug.addIndicators
+ */
+(function (root, factory) {
+	if (true) {
+		// AMD. Register as an anonymous module.
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(4)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else if (typeof exports === 'object') {
+		// CommonJS
+		factory(require('scrollmagic'));
+	} else {
+		// no browser global export needed, just execute
+		factory(root.ScrollMagic || (root.jQuery && root.jQuery.ScrollMagic));
+	}
+}(this, function (ScrollMagic) {
+	"use strict";
+	var NAMESPACE = "debug.addIndicators";
+
+	var
+	console = window.console || {},
+		err = Function.prototype.bind.call(console.error || console.log ||
+		function () {}, console);
+	if (!ScrollMagic) {
+		err("(" + NAMESPACE + ") -> ERROR: The ScrollMagic main module could not be found. Please make sure it's loaded before this plugin or use an asynchronous loader like requirejs.");
+	}
+
+	// plugin settings
+	var
+	FONT_SIZE = "0.85em",
+		ZINDEX = "9999",
+		EDGE_OFFSET = 15; // minimum edge distance, added to indentation
+
+	// overall vars
+	var
+	_util = ScrollMagic._util,
+		_autoindex = 0;
+
+
+
+	ScrollMagic.Scene.extend(function () {
+		var
+		Scene = this,
+			_indicator;
+
+		var log = function () {
+			if (Scene._log) { // not available, when main source minified
+				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
+				Scene._log.apply(this, arguments);
+			}
+		};
+
+		/**
+		 * Add visual indicators for a ScrollMagic.Scene.  
+		 * @memberof! debug.addIndicators#
+		 *
+		 * @example
+		 * // add basic indicators
+		 * scene.addIndicators()
+		 *
+		 * // passing options
+		 * scene.addIndicators({name: "pin scene", colorEnd: "#FFFFFF"});
+		 *
+		 * @param {object} [options] - An object containing one or more options for the indicators.
+		 * @param {(string|object)} [options.parent=undefined] - A selector, DOM Object or a jQuery object that the indicators should be added to.  
+		 If undefined, the controller's container will be used.
+		 * @param {number} [options.name=""] - This string will be displayed at the start and end indicators of the scene for identification purposes. If no name is supplied an automatic index will be used.
+		 * @param {number} [options.indent=0] - Additional position offset for the indicators (useful, when having multiple scenes starting at the same position).
+		 * @param {string} [options.colorStart=green] - CSS color definition for the start indicator.
+		 * @param {string} [options.colorEnd=red] - CSS color definition for the end indicator.
+		 * @param {string} [options.colorTrigger=blue] - CSS color definition for the trigger indicator.
+		 */
+		Scene.addIndicators = function (options) {
+			if (!_indicator) {
+				var
+				DEFAULT_OPTIONS = {
+					name: "",
+					indent: 0,
+					parent: undefined,
+					colorStart: "green",
+					colorEnd: "red",
+					colorTrigger: "blue",
+				};
+
+				options = _util.extend({}, DEFAULT_OPTIONS, options);
+
+				_autoindex++;
+				_indicator = new Indicator(Scene, options);
+
+				Scene.on("add.plugin_addIndicators", _indicator.add);
+				Scene.on("remove.plugin_addIndicators", _indicator.remove);
+				Scene.on("destroy.plugin_addIndicators", Scene.removeIndicators);
+
+				// it the scene already has a controller we can start right away.
+				if (Scene.controller()) {
+					_indicator.add();
+				}
+			}
+			return Scene;
+		};
+
+		/**
+		 * Removes visual indicators from a ScrollMagic.Scene.
+		 * @memberof! debug.addIndicators#
+		 *
+		 * @example
+		 * // remove previously added indicators
+		 * scene.removeIndicators()
+		 *
+		 */
+		Scene.removeIndicators = function () {
+			if (_indicator) {
+				_indicator.remove();
+				this.off("*.plugin_addIndicators");
+				_indicator = undefined;
+			}
+			return Scene;
+		};
+
+	});
+
+
+/*
+	 * ----------------------------------------------------------------
+	 * Extension for controller to store and update related indicators
+	 * ----------------------------------------------------------------
+	 */
+	// add option to globally auto-add indicators to scenes
+	/**
+	 * Every ScrollMagic.Controller instance now accepts an additional option.  
+	 * See {@link ScrollMagic.Controller} for a complete list of the standard options.
+	 * @memberof! debug.addIndicators#
+	 * @method new ScrollMagic.Controller(options)
+	 * @example
+	 * // make a controller and add indicators to all scenes attached
+	 * var controller = new ScrollMagic.Controller({addIndicators: true});
+	 * // this scene will automatically have indicators added to it
+	 * new ScrollMagic.Scene()
+	 *                .addTo(controller);
+	 *
+	 * @param {object} [options] - Options for the Controller.
+	 * @param {boolean} [options.addIndicators=false] - If set to `true` every scene that is added to the controller will automatically get indicators added to it.
+	 */
+	ScrollMagic.Controller.addOption("addIndicators", false);
+	// extend Controller
+	ScrollMagic.Controller.extend(function () {
+		var
+		Controller = this,
+			_info = Controller.info(),
+			_container = _info.container,
+			_isDocument = _info.isDocument,
+			_vertical = _info.vertical,
+			_indicators = { // container for all indicators and methods
+				groups: []
+			};
+
+		var log = function () {
+			if (Controller._log) { // not available, when main source minified
+				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
+				Controller._log.apply(this, arguments);
+			}
+		};
+		if (Controller._indicators) {
+			log(2, "WARNING: Scene already has a property '_indicators', which will be overwritten by plugin.");
+		}
+
+		// add indicators container
+		this._indicators = _indicators;
+/*
+			needed updates:
+			+++++++++++++++
+			start/end position on scene shift (handled in Indicator class)
+			trigger parameters on triggerHook value change (handled in Indicator class)
+			bounds position on container scroll or resize (to keep alignment to bottom/right)
+			trigger position on container resize, window resize (if container isn't document) and window scroll (if container isn't document)
+		*/
+
+		// event handler for when associated bounds markers need to be repositioned
+		var handleBoundsPositionChange = function () {
+			_indicators.updateBoundsPositions();
+		};
+
+		// event handler for when associated trigger groups need to be repositioned
+		var handleTriggerPositionChange = function () {
+			_indicators.updateTriggerGroupPositions();
+		};
+
+		_container.addEventListener("resize", handleTriggerPositionChange);
+		if (!_isDocument) {
+			window.addEventListener("resize", handleTriggerPositionChange);
+			window.addEventListener("scroll", handleTriggerPositionChange);
+		}
+		// update all related bounds containers
+		_container.addEventListener("resize", handleBoundsPositionChange);
+		_container.addEventListener("scroll", handleBoundsPositionChange);
+
+
+		// updates the position of the bounds container to aligned to the right for vertical containers and to the bottom for horizontal
+		this._indicators.updateBoundsPositions = function (specificIndicator) {
+			var // constant for all bounds
+			groups = specificIndicator ? [_util.extend({}, specificIndicator.triggerGroup, {
+				members: [specificIndicator]
+			})] : // create a group with only one element
+			_indicators.groups,
+				// use all
+				g = groups.length,
+				css = {},
+				paramPos = _vertical ? "left" : "top",
+				paramDimension = _vertical ? "width" : "height",
+				edge = _vertical ? _util.get.scrollLeft(_container) + _util.get.width(_container) - EDGE_OFFSET : _util.get.scrollTop(_container) + _util.get.height(_container) - EDGE_OFFSET,
+				b, triggerSize, group;
+			while (g--) { // group loop
+				group = groups[g];
+				b = group.members.length;
+				triggerSize = _util.get[paramDimension](group.element.firstChild);
+				while (b--) { // indicators loop
+					css[paramPos] = edge - triggerSize;
+					_util.css(group.members[b].bounds, css);
+				}
+			}
+		};
+
+		// updates the positions of all trigger groups attached to a controller or a specific one, if provided
+		this._indicators.updateTriggerGroupPositions = function (specificGroup) {
+			var // constant vars
+			groups = specificGroup ? [specificGroup] : _indicators.groups,
+				i = groups.length,
+				container = _isDocument ? document.body : _container,
+				containerOffset = _isDocument ? {
+					top: 0,
+					left: 0
+				} : _util.get.offset(container, true),
+				edge = _vertical ? _util.get.width(_container) - EDGE_OFFSET : _util.get.height(_container) - EDGE_OFFSET,
+				paramDimension = _vertical ? "width" : "height",
+				paramTransform = _vertical ? "Y" : "X";
+			var // changing vars
+			group, elem, pos, elemSize, transform;
+			while (i--) {
+				group = groups[i];
+				elem = group.element;
+				pos = group.triggerHook * Controller.info("size");
+				elemSize = _util.get[paramDimension](elem.firstChild.firstChild);
+				transform = pos > elemSize ? "translate" + paramTransform + "(-100%)" : "";
+
+				_util.css(elem, {
+					top: containerOffset.top + (_vertical ? pos : edge - group.members[0].options.indent),
+					left: containerOffset.left + (_vertical ? edge - group.members[0].options.indent : pos)
+				});
+				_util.css(elem.firstChild.firstChild, {
+					"-ms-transform": transform,
+					"-webkit-transform": transform,
+					"transform": transform
+				});
+			}
+		};
+
+		// updates the label for the group to contain the name, if it only has one member
+		this._indicators.updateTriggerGroupLabel = function (group) {
+			var
+			text = "trigger" + (group.members.length > 1 ? "" : " " + group.members[0].options.name),
+				elem = group.element.firstChild.firstChild,
+				doUpdate = elem.textContent !== text;
+			if (doUpdate) {
+				elem.textContent = text;
+				if (_vertical) { // bounds position is dependent on text length, so update
+					_indicators.updateBoundsPositions();
+				}
+			}
+		};
+
+		// add indicators if global option is set
+		this.addScene = function (newScene) {
+
+			if (this._options.addIndicators && newScene instanceof ScrollMagic.Scene && newScene.controller() === Controller) {
+				newScene.addIndicators();
+			}
+			// call original destroy method
+			this.$super.addScene.apply(this, arguments);
+		};
+
+		// remove all previously set listeners on destroy
+		this.destroy = function () {
+			_container.removeEventListener("resize", handleTriggerPositionChange);
+			if (!_isDocument) {
+				window.removeEventListener("resize", handleTriggerPositionChange);
+				window.removeEventListener("scroll", handleTriggerPositionChange);
+			}
+			_container.removeEventListener("resize", handleBoundsPositionChange);
+			_container.removeEventListener("scroll", handleBoundsPositionChange);
+			// call original destroy method
+			this.$super.destroy.apply(this, arguments);
+		};
+		return Controller;
+
+	});
+
+/*
+	 * ----------------------------------------------------------------
+	 * Internal class for the construction of Indicators
+	 * ----------------------------------------------------------------
+	 */
+	var Indicator = function (Scene, options) {
+		var
+		Indicator = this,
+			_elemBounds = TPL.bounds(),
+			_elemStart = TPL.start(options.colorStart),
+			_elemEnd = TPL.end(options.colorEnd),
+			_boundsContainer = options.parent && _util.get.elements(options.parent)[0],
+			_vertical, _ctrl;
+
+		var log = function () {
+			if (Scene._log) { // not available, when main source minified
+				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
+				Scene._log.apply(this, arguments);
+			}
+		};
+
+		options.name = options.name || _autoindex;
+
+		// prepare bounds elements
+		_elemStart.firstChild.textContent += " " + options.name;
+		_elemEnd.textContent += " " + options.name;
+		_elemBounds.appendChild(_elemStart);
+		_elemBounds.appendChild(_elemEnd);
+
+		// set public variables
+		Indicator.options = options;
+		Indicator.bounds = _elemBounds;
+		// will be set later
+		Indicator.triggerGroup = undefined;
+
+		// add indicators to DOM
+		this.add = function () {
+			_ctrl = Scene.controller();
+			_vertical = _ctrl.info("vertical");
+
+			var isDocument = _ctrl.info("isDocument");
+
+			if (!_boundsContainer) {
+				// no parent supplied or doesnt exist
+				_boundsContainer = isDocument ? document.body : _ctrl.info("container"); // check if window/document (then use body)
+			}
+			if (!isDocument && _util.css(_boundsContainer, "position") === 'static') {
+				// position mode needed for correct positioning of indicators
+				_util.css(_boundsContainer, {
+					position: "relative"
+				});
+			}
+
+			// add listeners for updates
+			Scene.on("change.plugin_addIndicators", handleTriggerParamsChange);
+			Scene.on("shift.plugin_addIndicators", handleBoundsParamsChange);
+
+			// updates trigger & bounds (will add elements if needed)
+			updateTriggerGroup();
+			updateBounds();
+
+			setTimeout(function () { // do after all execution is finished otherwise sometimes size calculations are off
+				_ctrl._indicators.updateBoundsPositions(Indicator);
+			}, 0);
+
+			log(3, "added indicators");
+		};
+
+		// remove indicators from DOM
+		this.remove = function () {
+			if (Indicator.triggerGroup) { // if not set there's nothing to remove
+				Scene.off("change.plugin_addIndicators", handleTriggerParamsChange);
+				Scene.off("shift.plugin_addIndicators", handleBoundsParamsChange);
+
+				if (Indicator.triggerGroup.members.length > 1) {
+					// just remove from memberlist of old group
+					var group = Indicator.triggerGroup;
+					group.members.splice(group.members.indexOf(Indicator), 1);
+					_ctrl._indicators.updateTriggerGroupLabel(group);
+					_ctrl._indicators.updateTriggerGroupPositions(group);
+					Indicator.triggerGroup = undefined;
+				} else {
+					// remove complete group
+					removeTriggerGroup();
+				}
+				removeBounds();
+
+				log(3, "removed indicators");
+			}
+		};
+
+/*
+		 * ----------------------------------------------------------------
+		 * internal Event Handlers
+		 * ----------------------------------------------------------------
+		 */
+
+		// event handler for when bounds params change
+		var handleBoundsParamsChange = function () {
+			updateBounds();
+		};
+
+		// event handler for when trigger params change
+		var handleTriggerParamsChange = function (e) {
+			if (e.what === "triggerHook") {
+				updateTriggerGroup();
+			}
+		};
+
+/*
+		 * ----------------------------------------------------------------
+		 * Bounds (start / stop) management
+		 * ----------------------------------------------------------------
+		 */
+
+		// adds an new bounds elements to the array and to the DOM
+		var addBounds = function () {
+			var v = _ctrl.info("vertical");
+			// apply stuff we didn't know before...
+			_util.css(_elemStart.firstChild, {
+				"border-bottom-width": v ? 1 : 0,
+				"border-right-width": v ? 0 : 1,
+				"bottom": v ? -1 : options.indent,
+				"right": v ? options.indent : -1,
+				"padding": v ? "0 8px" : "2px 4px",
+			});
+			_util.css(_elemEnd, {
+				"border-top-width": v ? 1 : 0,
+				"border-left-width": v ? 0 : 1,
+				"top": v ? "100%" : "",
+				"right": v ? options.indent : "",
+				"bottom": v ? "" : options.indent,
+				"left": v ? "" : "100%",
+				"padding": v ? "0 8px" : "2px 4px"
+			});
+			// append
+			_boundsContainer.appendChild(_elemBounds);
+		};
+
+		// remove bounds from list and DOM
+		var removeBounds = function () {
+			_elemBounds.parentNode.removeChild(_elemBounds);
+		};
+
+		// update the start and end positions of the scene
+		var updateBounds = function () {
+			if (_elemBounds.parentNode !== _boundsContainer) {
+				addBounds(); // Add Bounds elements (start/end)
+			}
+			var css = {};
+			css[_vertical ? "top" : "left"] = Scene.triggerPosition();
+			css[_vertical ? "height" : "width"] = Scene.duration();
+			_util.css(_elemBounds, css);
+			_util.css(_elemEnd, {
+				display: Scene.duration() > 0 ? "" : "none"
+			});
+		};
+
+/*
+		 * ----------------------------------------------------------------
+		 * trigger and trigger group management
+		 * ----------------------------------------------------------------
+		 */
+
+		// adds an new trigger group to the array and to the DOM
+		var addTriggerGroup = function () {
+			var triggerElem = TPL.trigger(options.colorTrigger); // new trigger element
+			var css = {};
+			css[_vertical ? "right" : "bottom"] = 0;
+			css[_vertical ? "border-top-width" : "border-left-width"] = 1;
+			_util.css(triggerElem.firstChild, css);
+			_util.css(triggerElem.firstChild.firstChild, {
+				padding: _vertical ? "0 8px 3px 8px" : "3px 4px"
+			});
+			document.body.appendChild(triggerElem); // directly add to body
+			var newGroup = {
+				triggerHook: Scene.triggerHook(),
+				element: triggerElem,
+				members: [Indicator]
+			};
+			_ctrl._indicators.groups.push(newGroup);
+			Indicator.triggerGroup = newGroup;
+			// update right away
+			_ctrl._indicators.updateTriggerGroupLabel(newGroup);
+			_ctrl._indicators.updateTriggerGroupPositions(newGroup);
+		};
+
+		var removeTriggerGroup = function () {
+			_ctrl._indicators.groups.splice(_ctrl._indicators.groups.indexOf(Indicator.triggerGroup), 1);
+			Indicator.triggerGroup.element.parentNode.removeChild(Indicator.triggerGroup.element);
+			Indicator.triggerGroup = undefined;
+		};
+
+		// updates the trigger group -> either join existing or add new one
+/*	
+		 * Logic:
+		 * 1 if a trigger group exist, check if it's in sync with Scene settings – if so, nothing else needs to happen
+		 * 2 try to find an existing one that matches Scene parameters
+		 * 	 2.1 If a match is found check if already assigned to an existing group
+		 *			 If so:
+		 *       A: it was the last member of existing group -> kill whole group
+		 *       B: the existing group has other members -> just remove from member list
+		 *	 2.2 Assign to matching group
+		 * 3 if no new match could be found, check if assigned to existing group
+		 *   A: yes, and it's the only member -> just update parameters and positions and keep using this group
+		 *   B: yes but there are other members -> remove from member list and create a new one
+		 *   C: no, so create a new one
+		 */
+		var updateTriggerGroup = function () {
+			var
+			triggerHook = Scene.triggerHook(),
+				closeEnough = 0.0001;
+
+			// Have a group, check if it still matches
+			if (Indicator.triggerGroup) {
+				if (Math.abs(Indicator.triggerGroup.triggerHook - triggerHook) < closeEnough) {
+					// _util.log(0, "trigger", options.name, "->", "no need to change, still in sync");
+					return; // all good
+				}
+			}
+			// Don't have a group, check if a matching one exists
+			// _util.log(0, "trigger", options.name, "->", "out of sync!");
+			var
+			groups = _ctrl._indicators.groups,
+				group, i = groups.length;
+			while (i--) {
+				group = groups[i];
+				if (Math.abs(group.triggerHook - triggerHook) < closeEnough) {
+					// found a match!
+					// _util.log(0, "trigger", options.name, "->", "found match");
+					if (Indicator.triggerGroup) { // do I have an old group that is out of sync?
+						if (Indicator.triggerGroup.members.length === 1) { // is it the only remaining group?
+							// _util.log(0, "trigger", options.name, "->", "kill");
+							// was the last member, remove the whole group
+							removeTriggerGroup();
+						} else {
+							Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
+							_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
+							_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
+							// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
+						}
+					}
+					// join new group
+					group.members.push(Indicator);
+					Indicator.triggerGroup = group;
+					_ctrl._indicators.updateTriggerGroupLabel(group);
+					return;
+				}
+			}
+
+			// at this point I am obviously out of sync and don't match any other group
+			if (Indicator.triggerGroup) {
+				if (Indicator.triggerGroup.members.length === 1) {
+					// _util.log(0, "trigger", options.name, "->", "updating existing");
+					// out of sync but i'm the only member => just change and update
+					Indicator.triggerGroup.triggerHook = triggerHook;
+					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
+					return;
+				} else {
+					// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
+					Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
+					_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
+					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
+					Indicator.triggerGroup = undefined; // need a brand new group...
+				}
+			}
+			// _util.log(0, "trigger", options.name, "->", "add a new one");
+			// did not find any match, make new trigger group
+			addTriggerGroup();
+		};
+	};
+
+/*
+	 * ----------------------------------------------------------------
+	 * Templates for the indicators
+	 * ----------------------------------------------------------------
+	 */
+	var TPL = {
+		start: function (color) {
+			// inner element (for bottom offset -1, while keeping top position 0)
+			var inner = document.createElement("div");
+			inner.textContent = "start";
+			_util.css(inner, {
+				position: "absolute",
+				overflow: "visible",
+				"border-width": 0,
+				"border-style": "solid",
+				color: color,
+				"border-color": color
+			});
+			var e = document.createElement('div');
+			// wrapper
+			_util.css(e, {
+				position: "absolute",
+				overflow: "visible",
+				width: 0,
+				height: 0
+			});
+			e.appendChild(inner);
+			return e;
+		},
+		end: function (color) {
+			var e = document.createElement('div');
+			e.textContent = "end";
+			_util.css(e, {
+				position: "absolute",
+				overflow: "visible",
+				"border-width": 0,
+				"border-style": "solid",
+				color: color,
+				"border-color": color
+			});
+			return e;
+		},
+		bounds: function () {
+			var e = document.createElement('div');
+			_util.css(e, {
+				position: "absolute",
+				overflow: "visible",
+				"white-space": "nowrap",
+				"pointer-events": "none",
+				"font-size": FONT_SIZE
+			});
+			e.style.zIndex = ZINDEX;
+			return e;
+		},
+		trigger: function (color) {
+			// inner to be above or below line but keep position
+			var inner = document.createElement('div');
+			inner.textContent = "trigger";
+			_util.css(inner, {
+				position: "relative",
+			});
+			// inner wrapper for right: 0 and main element has no size
+			var w = document.createElement('div');
+			_util.css(w, {
+				position: "absolute",
+				overflow: "visible",
+				"border-width": 0,
+				"border-style": "solid",
+				color: color,
+				"border-color": color
+			});
+			w.appendChild(inner);
+			// wrapper
+			var e = document.createElement('div');
+			_util.css(e, {
+				position: "fixed",
+				overflow: "visible",
+				"white-space": "nowrap",
+				"pointer-events": "none",
+				"font-size": FONT_SIZE
+			});
+			e.style.zIndex = ZINDEX;
+			e.appendChild(w);
+			return e;
+		},
+	};
+
+}));
+
+/***/ }),
+/* 192 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);
