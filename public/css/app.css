@@ -9583,6 +9583,11 @@ body {
           animation: parpadeoY 1s step-end infinite;
 }
 
+.navbar-items .item.right {
+  position: absolute;
+  right: 0px;
+}
+
 .navbar-items .item.active {
   color: #03A9F4;
 }
