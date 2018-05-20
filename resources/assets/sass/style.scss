@@ -41,6 +41,10 @@ body {
         animation: parpadeoY 1s step-end infinite;
       }
     }
+    &.right{
+      position: absolute;
+      right: 0px;
+    }
     &.active {
       color: $primary-color;
       &:before {

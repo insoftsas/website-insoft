@@ -10,7 +10,10 @@
 	    <div class="item" id="quota-item" @click.prevent="$root.goToView('quotas')">Cupos</div>
 	    <div class="item" id="inscription-item" @click.prevent="$root.goToView('inscriptions')">Inscripción</div>
 	    <div class="item" id="challenge-item" @click.prevent="$root.goToView('challenges')">Retos</div>
-	    <router-link to="/login" class="item">Login</router-link>
+	    <div>
+		    <router-link to="/login" class="item right" v-if="!$root.auth">Login</router-link>
+		    <router-link to="/dashboard" class="item right" v-else>Dashboard</router-link>
+	    </div>
 	  </div>
 	  <section id="home">
 	  	<div class="container">
@@ -217,10 +220,6 @@
     top: -24px;
     background: #222122;
   }
-}
-a.item{
-	position: absolute;
-	right: 0px;
 }
 .content-register {
   padding: 0 1em;

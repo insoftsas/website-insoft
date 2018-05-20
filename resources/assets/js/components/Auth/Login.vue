@@ -92,7 +92,8 @@
             vm.pwObj.name="";
             vm.nameObj.name="";
             vm.resetPacman();
-            vm.getUser();
+            //vm.getUser();
+            window.location.reload();
           })
           .catch(function(error){
             vm.resetPacman();
@@ -130,6 +131,9 @@
     mounted() {
       window.addEventListener("resize", this.setWidth);
       this.setWidth()
+      if(this.$root.auth){
+        vm.$router.push("/dashboard");
+      }
     }
   }
 </script>

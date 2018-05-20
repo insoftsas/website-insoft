@@ -29,7 +29,9 @@ const app = new Vue({
         auth: false,
         user: {
 
-        }
+        },
+        loading: false,
+        loaded: false
       }
     },
     methods: {
@@ -38,17 +40,35 @@ const app = new Vue({
       },
       getUser: function (){
         var vm=this;
+        vm.loading = true;
         axios.get(vm.apiMap.user)
         .then(function(response){
           vm.auth = true;
           vm.user = response.data.data;
+          if(vm.$route.name == "Login"){
+            vm.$router.push("/dashboard");
+          }
         })
         .catch(function(error){
           vm.auth = false;
+        }).then(() => {
+          vm.loading = false;
+          vm.loaded = true;
+        });
+      },
+      logout: function (){
+        var vm=this;
+        axios.get(vm.apiMap.logout)
+        .then(function(response){
+          vm.auth = false;
+          //vm.$router.push("/");
+          window.location.reload();
+        })
+        .catch(function(error){
         });
       }
     },
     mounted() {
-
+      this.getUser();
     }
 });
