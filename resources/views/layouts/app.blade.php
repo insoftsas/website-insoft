@@ -10,22 +10,21 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{!! asset('css/app.css') !!}?={{ rand() }}" />
   </head>
-  <body>
+  <body id="body-app">
     <main id="app">
-      <div class="content-menu-icon">
+      <div class="content-menu-icon show-on-medium-and-down hide-on-med-and-up">
         <transition name="slide-fade">
           <svg class="menu-bar" version="1.1" @click="$root.handleMenu" v-if="!$root.show_menu" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
           	 viewBox="0 0 294.843 294.843" style="enable-background:new 0 0 294.843 294.843;" xml:space="preserve">
-          	<g fill="#fff">
+          	<g class="fill-menu-icon" id="open-menu-icon">
           		<path d="M84.185,90.185h126.473c3.313,0,6-2.687,6-6s-2.687-6-6-6H84.185c-3.313,0-6,2.687-6,6S80.872,90.185,84.185,90.185z"/>
           		<path d="M84.185,153.421h126.473c3.313,0,6-2.687,6-6s-2.687-6-6-6H84.185c-3.313,0-6,2.687-6,6S80.872,153.421,84.185,153.421z"/>
           		<path d="M216.658,210.658c0-3.313-2.687-6-6-6H84.185c-3.313,0-6,2.687-6,6s2.687,6,6,6h126.473
           			C213.971,216.658,216.658,213.971,216.658,210.658z"/>
           	</g>
           </svg>
-          <svg class="menu-bar" version="1.1" @click="$root.handleMenu" v-else xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-  	 viewBox="0 0 294.843 294.843" style="enable-background:new 0 0 294.843 294.843;" xml:space="preserve">
-            <g fill="#fff">
+          <svg class="menu-bar" version="1.1" @click="$root.handleMenu" v-else xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 294.843 294.843" style="enable-background:new 0 0 294.843 294.843;" xml:space="preserve">
+            <g class="fill-menu-icon" id="close-menu-icon">
             	<path d="M167.619,160.134c-2.37-2.319-6.168-2.277-8.485,0.09c-2.318,2.368-2.277,6.167,0.09,8.485l47.236,46.236
             		c1.168,1.143,2.683,1.712,4.197,1.712c1.557,0,3.113-0.603,4.288-1.803c2.318-2.368,2.277-6.167-0.09-8.485L167.619,160.134z"/>
             	<path d="M125.178,133.663c1.171,1.171,2.707,1.757,4.243,1.757s3.071-0.586,4.243-1.757c2.343-2.343,2.343-6.142,0-8.485
@@ -36,6 +35,17 @@
           </svg>
         </transition>
         <menu-options></menu-options>
+      </div>
+      <div class="navbar-items hide-on-med-and-down">
+        <div class="item" id="home-item" @click.prevent="$root.goToView('home')">Inicio</div>
+        <div class="item" id="judge-item" @click.prevent="$root.goToView('judges')">Jurados</div>
+        <div class="item" id="hom-item">Capacitadores</div>
+        <div class="item" id="hom-item">Ruta del proyecto</div>
+        <div class="item" id="hom-item">Lugar evento</div>
+        <div class="item" id="hom-item">¿Cómo llegar?</div>
+        <div class="item" id="hom-item">Cupos</div>
+        <div class="item" id="hom-item">Inscripción</div>
+        <div class="item" id="hom-item">Retos</div>
       </div>
       <div class="container">
       @yield('content')

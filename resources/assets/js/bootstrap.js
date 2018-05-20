@@ -1,7 +1,8 @@
 
 window._ = require('lodash');
 window.Popper = require('popper.js').default;
-
+window.moment = require('moment')
+moment.locale('es')
 try {
     window.$ = window.jQuery = require('jquery');
     require('materialize-css');
@@ -18,4 +19,7 @@ if (token) {
 } else {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
-window.ScrollMagic = require('scrollmagic')
+
+window.ScrollMagic = require('ScrollMagic');
+require('animation.gsap');
+window.TweenMax = require('TweenMax');
