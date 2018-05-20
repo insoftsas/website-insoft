@@ -48,7 +48,9 @@ const tween_1 = new TimelineMax()
                     ])
 const tween_2 = new TimelineMax()
                     .add([
-                      TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' })
+                      TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }),
+                      TweenMax.staggerFromTo(".box-register", 2, {right: 0}, {right: '120%', ease: Back.ease}, 0),
+                      TweenMax.staggerFromTo(".word-writing", 2, {left: 0}, {left: '120%', ease: Back.ease}, 0)
                     ])
 
 // scenes
@@ -63,3 +65,9 @@ const scene_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 400
                              .addTo(controller)
                              .addIndicators()
                              .setClassToggle("#judge-item", 'active')
+
+const scene_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: 400})
+                             //.setTween(tween_3)
+                             .addTo(controller)
+                             .addIndicators()
+                             .setClassToggle("#trainer-item", 'active')                            

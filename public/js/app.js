@@ -30542,12 +30542,16 @@ var controller = new ScrollMagic.Controller();
 
 // tweens
 var tween_1 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0', backgroundImage: 'linear-gradient(#343233, #007496)' }), TweenMax.to("#title-section-two", 0.5, { opacity: 1 }), TweenMax.to(".judge", 0.5, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: '120%' }, { top: 0, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
-var tween_2 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' })]);
+var tween_2 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0 }, { right: '120%', ease: Back.ease }, 0), TweenMax.staggerFromTo(".word-writing", 2, { left: 0 }, { left: '120%', ease: Back.ease }, 0)]);
 
 // scenes
 var scene_2 = new ScrollMagic.Scene({ offset: -1, duration: 300 }).setTween(tween_2).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
 
 var scene_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 400 }).setTween(tween_1).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
+
+var scene_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: 400 })
+//.setTween(tween_3)
+.addTo(controller).addIndicators().setClassToggle("#trainer-item", 'active');
 
 /***/ }),
 /* 142 */
@@ -89856,6 +89860,41 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
@@ -89906,9 +89945,20 @@ var render = function() {
         [_vm._v("Jurados")]
       ),
       _vm._v(" "),
-      _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
-        _vm._v("Capacitadores")
-      ]),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "trainer-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("trainers")
+            }
+          }
+        },
+        [_vm._v("Capacitadores")]
+      ),
       _vm._v(" "),
       _c("div", { staticClass: "item", attrs: { id: "hom-item" } }, [
         _vm._v("Ruta del proyecto")
@@ -90060,11 +90110,18 @@ var render = function() {
           ])
         ]),
         _vm._v(" "),
-        _c("div", { staticClass: "col s12 m7" }, [_c("word-writing")], 1)
+        _c(
+          "div",
+          { staticClass: "col s12 m7" },
+          [_c("word-writing", { staticClass: "word-writing" })],
+          1
+        )
       ])
     ]),
     _vm._v(" "),
-    _vm._m(2)
+    _vm._m(2),
+    _vm._v(" "),
+    _vm._m(3)
   ])
 }
 var staticRenderFns = [
@@ -90168,6 +90225,78 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("p", { staticClass: "center black-text" }, [
           _vm._v("Los jurados xd")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "trainers" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("CAPACITADORES")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "container-judges" }, [
+          _c("div", { staticClass: "judge" }, [
+            _c("span", { staticClass: "name" }, [_vm._v("Omar Flórez")]),
+            _vm._v(" "),
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/judges/omar.jpg" }
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "info" }, [
+              _c("div", { staticClass: "profession" }, [
+                _vm._v("PhD. Computer Science")
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "judge" }, [
+            _c("span", { staticClass: "name" }, [_vm._v("Sergio Molina")]),
+            _vm._v(" "),
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/judges/sergio.jpg" }
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "info" }, [
+              _c("div", { staticClass: "profession" }, [
+                _vm._v("PhD. Computer Science")
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "judge" }, [
+            _c("span", { staticClass: "name" }, [_vm._v("Cheo")]),
+            _vm._v(" "),
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/judges/cheo.jpg" }
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "info" }, [
+              _c("div", { staticClass: "profession" }, [
+                _vm._v("PhD. Computer Science")
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "judge" }, [
+            _c("span", { staticClass: "name" }, [_vm._v("Uribe")]),
+            _vm._v(" "),
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/judges/uribe.png" }
+            }),
+            _vm._v(" "),
+            _c("div", { staticClass: "info" }, [
+              _c("div", { staticClass: "profession" }, [
+                _vm._v("PhD. Computer Science")
+              ])
+            ])
+          ])
         ])
       ])
     ])

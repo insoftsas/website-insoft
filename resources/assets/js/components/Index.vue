@@ -3,7 +3,7 @@
 		<div class="navbar-items">
 	    <div class="item" id="home-item" @click.prevent="$root.goToView('home')">Inicio</div>
 	    <div class="item" id="judge-item" @click.prevent="$root.goToView('judges')">Jurados</div>
-	    <div class="item" id="hom-item">Capacitadores</div>
+	    <div class="item" id="trainer-item" @click.prevent="$root.goToView('trainers')">Capacitadores</div>
 	    <div class="item" id="hom-item">Ruta del proyecto</div>
 	    <div class="item" id="hom-item">Lugar evento</div>
 	    <div class="item" id="hom-item">¿Cómo llegar?</div>
@@ -74,7 +74,7 @@
 		      </div>
 		    </div>
 		    <div class="col s12 m7">
-		      <word-writing></word-writing>
+		      <word-writing class="word-writing"></word-writing>
 		    </div>
 	    </div>
 	  </section>
@@ -112,6 +112,41 @@
 		      </div>
 		    </div>
 		    <p class="center black-text">Los jurados xd</p>
+	    </div>
+	  </section>
+	  <section id="trainers">
+	  	<div class="container">
+		    <h1 class="title-main">CAPACITADORES</h1>
+		    <div class="container-judges">
+		      <div class="judge">
+		      	<span class="name">Omar Flórez</span>
+		        <img src="/images/judges/omar.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Sergio Molina</span>
+		        <img src="/images/judges/sergio.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Cheo</span>
+		        <img src="/images/judges/cheo.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Uribe</span>
+		        <img src="/images/judges/uribe.png" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		    </div>
 	    </div>
 	  </section>
   </div>
