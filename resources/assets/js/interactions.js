@@ -5,7 +5,7 @@ const tween_1 = new TimelineMax()
                     .add([
                       TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0', backgroundImage: 'linear-gradient(#343233, #007496)' }),
                       TweenMax.to("#title-section-two", 0.5, { opacity: 1 }),
-                      TweenMax.to(".judge", 0.5, { opacity: 1 }),
+                      TweenMax.to(".judge", 0.2, { opacity: 1 }),
                       TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }),
                       TweenMax.staggerFromTo(".judge", 0.5, {top: '120%'}, {top: 0, ease: Back.ease}, 0),
                       TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })

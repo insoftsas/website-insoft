@@ -91770,7 +91770,7 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 var controller = new ScrollMagic.Controller();
 
 // tweens
-var tween_1 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0', backgroundImage: 'linear-gradient(#343233, #007496)' }), TweenMax.to("#title-section-two", 0.5, { opacity: 1 }), TweenMax.to(".judge", 0.5, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: '120%' }, { top: 0, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
+var tween_1 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0', backgroundImage: 'linear-gradient(#343233, #007496)' }), TweenMax.to("#title-section-two", 0.5, { opacity: 1 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: '120%' }, { top: 0, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
 var tween_2 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0 }, { right: '120%', ease: Back.ease }, 0), TweenMax.staggerFromTo(".word-writing", 2, { left: 0 }, { left: '120%', ease: Back.ease }, 0)]);
 
 // scenes
