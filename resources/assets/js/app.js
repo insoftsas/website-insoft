@@ -2,11 +2,21 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+import VueRouter from 'vue-router';
+import routes from './routes';
+
+Vue.use(VueRouter);
+
 Vue.component('word-writing', require('./components/WordWriting.vue'));
 Vue.component('menu-options', require('./components/Menu.vue'));
 
+const router = new VueRouter({
+    routes
+});
+
 const app = new Vue({
     el: '#app',
+    router,
     data() {
       return {
         show_menu: false
@@ -42,7 +52,7 @@ const controller = new ScrollMagic.Controller()
 // tweens
 const tween_1 = new TimelineMax()
                     .add([
-                      TweenMax.to("#body-app", 0.5, { backgroundColor: '#fefe53' }),
+                      TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0' }),
                       TweenMax.to("#title-section-two", 0.5, { opacity: 1 }),
                       TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' })
                     ])

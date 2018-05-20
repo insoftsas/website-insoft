@@ -6,18 +6,19 @@
     <h1 class="title-main">Hackathon Montería</h1>
     <div class="col s12 m5">
       <div class="box-register">
-        <h2 class="title-sub center">Registrate <span class="y-text">aquí</span></h2>
+        <h2 class="title-sub center">Inscríbete <span class="y-text">aquí</span></h2>
         <div class="content-register">
           <div class="row">
             <div class="col s12">
-              <p class="description-text">Es muy facíl solo selecciona tu rol.</p>
+              <img src="{{ asset('images/logo.png') }}" class="responsive-img" width="200" />
+              <p class="description-text">Es muy facíl, selecciona tu rol:</p>
             </div>
             <div class="col s12 m6">
               <button class="button-register">
                 <div class="icon-caracter">
                   <svg version="1.1" id="businessman" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                 	 viewBox="0 0 25.916 25.916" style="enable-background:new 0 0 25.916 25.916;" xml:space="preserve">
-                    <g style="fill:#343233;">
+                    <g class="fill-caracter-icon">
                   		<path d="M7.938,8.13c0.09,0.414,0.228,0.682,0.389,0.849c0.383,2.666,2.776,4.938,4.698,4.843
                   			c2.445-0.12,4.178-2.755,4.567-4.843c0.161-0.166,0.316-0.521,0.409-0.938c0.104-0.479,0.216-1.201-0.072-1.583
                   			c-0.017-0.02-0.127-0.121-0.146-0.138c0.275-0.992,0.879-2.762-0.625-4.353c-0.815-0.862-1.947-1.295-2.97-1.637
@@ -34,7 +35,7 @@
                     </g>
                   </svg>
                 </div>
-                <span>Soy empresario</span>
+                <span>Empresario</span>
               </button>
             </div>
             <div class="col s12 m6">
@@ -42,7 +43,7 @@
                 <div class="icon-caracter">
                   <svg version="1.1" id="developer" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                   	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
-                    <g style="fill:#343233;">
+                    <g class="fill-caracter-icon">
                   		<path d="M441.217,235.868l-37.982-8.802l12.093-37.912l-0.879-0.293c-14.881-4.96-31.125-9.049-48.264-12.282
                   			c-6.656,54.889-53.528,97.558-110.184,97.558c-55.875,0-102.231-41.501-109.884-95.295c-17.267,3.639-33.567,8.144-48.424,13.509
                   			l11.073,34.715l-38.004,8.807L0,366.342v79.397h84.333V311.805h343.333V445.74H512v-80.103L441.217,235.868z"/>
@@ -55,7 +56,7 @@
                     </g>
                   </svg>
                 </div>
-                <span>Soy desarrollador</span>
+                <span>Desarrollador</span>
               </button>
             </div>
           </div>
@@ -68,6 +69,11 @@
   </section>
   <section id="judges">
     <h1 class="title-main" id="title-section-two">JURADOS</h1>
+    <div class="container-judges">
+      <div class="judge">
+        <img src="{{ asset('images/judges/omar.jpg') }}" width="200" class="responsive-img" />
+      </div>
+    </div>
   </section>
 </div>
 @endsection

@@ -1,5 +1,5 @@
 section {
-  color: #efdab9;
+  color: #c5d6da;
   height: 100vh;
   position: relative;
   overflow: hidden;
@@ -108,7 +108,7 @@ body {
     color: #a4a4a4;
     cursor: pointer;
     &:hover {
-      color: #FFEB3B;
+      color: $primary-color;
       &:before {
         content: '';
         border-left: 6px solid;
@@ -117,10 +117,10 @@ body {
       }
     }
     &.active {
-      color: #FFEB3B;
+      color: $primary-color;
       &:before {
         content: '';
-        border-left-color: #FFEB3B;
+        border-left-color: $primary-color;
         border-left-style: solid;
         border-left-width: 6px;
         padding-left: 7px;
@@ -149,7 +149,7 @@ body {
   margin: 0 1em;
   color: #fff;
   & .y-text {
-    color: yellow;
+    color: $primary-color;
   }
 }
 
@@ -169,7 +169,7 @@ body {
 }
 
 .content-register {
-  padding: 1em;
+  padding: 0 1em;
   text-align: center;
 }
 
@@ -181,35 +181,50 @@ body {
   font-weight: 500;
   text-decoration: none;
   border-radius: 5px;
-  color: #343233;
-  background-color: #ffd152;
+  color: $button;
+  background-color: #1b1b1b;
   border: 0;
   cursor: pointer;
   width: 100%;
-  font-size: .9rem;
+  font-size: 1rem;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
   &:active {
     color: #343233;
-    background-color: #ebac00;
+    background-color: darken($button, 40);
     transform: translateY(2px);
   }
   &:hover {
     color: #343233;
-    background-color: #ffc31f;
+    background-color: darken($button, 10);
   }
   &:focus {
-    background-color: #ebac00;
+    background-color: darken($button, 20);
   }
 }
 
 .icon-caracter {
   margin: auto;
-  display: inline-block;
-  width: 20px;
-  vertical-align: middle;
+  width: 40px;
+  height: 40px;
+  padding: 7px;
+  border: 1px solid;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  background: #222122;
 }
 
 .description-text {
   margin: 0 0 1em 0;
   text-align: left;
   font-size: 1.2rem;
+}
+
+.fill-caracter-icon {
+  fill: $button
+}
+
+.container-judges {
+  & .judge {
+    display: inline-block;
+  }
 }

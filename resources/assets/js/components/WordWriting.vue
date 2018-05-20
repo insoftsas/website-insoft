@@ -103,7 +103,7 @@
   }
   .write-mode {
     font-weight: 400;
-    font-size: 1.7rem;
+    font-size: 1.5rem;
     margin: auto;
     display: block;
     #word {
