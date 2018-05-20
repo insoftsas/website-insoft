@@ -16,6 +16,7 @@ mix.js('resources/assets/js/app.js', 'public/js')
    .webpackConfig({
         resolve: {
             alias: {
+              '@': path.resolve('resources/assets/sass/_variables.scss'),
               "TweenLite": path.resolve('node_modules', 'gsap/src/uncompressed/TweenLite.js'),
               "TweenMax": path.resolve('node_modules', 'gsap/src/uncompressed/TweenMax.js'),
               "TimelineLite": path.resolve('node_modules', 'gsap/src/uncompressed/TimelineLite.js'),
