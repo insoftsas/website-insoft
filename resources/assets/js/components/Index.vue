@@ -3,13 +3,13 @@
 		<div class="navbar-items">
 	    <div class="item" id="home-item" @click.prevent="$root.goToView('home')">Inicio</div>
 	    <div class="item" id="judge-item" @click.prevent="$root.goToView('judges')">Jurados</div>
-	    <div class="item" id="hom-item">Capacitadores</div>
-	    <div class="item" id="hom-item">Ruta del proyecto</div>
-	    <div class="item" id="hom-item">Lugar evento</div>
-	    <div class="item" id="hom-item">¿Cómo llegar?</div>
-	    <div class="item" id="hom-item">Cupos</div>
-	    <div class="item" id="hom-item">Inscripción</div>
-	    <div class="item" id="hom-item">Retos</div>
+	    <div class="item" id="trainer-item" @click.prevent="$root.goToView('trainers')">Capacitadores</div>
+	    <div class="item" id="project-route-item" @click.prevent="$root.goToView('project-route')">Ruta del proyecto</div>
+	    <div class="item" id="place-item" @click.prevent="$root.goToView('places')">Lugar evento</div>
+	    <div class="item" id="how-to-get-item" @click.prevent="$root.goToView('how-to-get')">¿Cómo llegar?</div>
+	    <div class="item" id="quota-item" @click.prevent="$root.goToView('quotas')">Cupos</div>
+	    <div class="item" id="inscription-item" @click.prevent="$root.goToView('inscriptions')">Inscripción</div>
+	    <div class="item" id="challenge-item" @click.prevent="$root.goToView('challenges')">Retos</div>
 	    <router-link to="/login" class="item">Login</router-link>
 	  </div>
 	  <section id="home">
@@ -75,7 +75,7 @@
 		      </div>
 		    </div>
 		    <div class="col s12 m7">
-		      <word-writing></word-writing>
+		      <word-writing class="word-writing"></word-writing>
 		    </div>
 	    </div>
 	  </section>
@@ -83,14 +83,66 @@
 	  	<div class="container">
 		    <h1 class="title-main" id="title-section-two">JURADOS</h1>
 		    <div class="container-judges">
-		      <div class="judge" data-name="Omar Flórez">
+		      <div class="judge">
+		      	<span class="name">Omar Flórez</span>
 		        <img src="/images/judges/omar.jpg" class="responsive-img" />
 		        <div class="info">
 		          <div class="profession">PhD. Computer Science</div>
 		        </div>
 		      </div>
-		      <div class="judge" data-name="Omar Flórez">
+		      <div class="judge">
+		      	<span class="name">Sergio Molina</span>
+		        <img src="/images/judges/sergio.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Cheo</span>
+		        <img src="/images/judges/cheo.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Uribe</span>
+		        <img src="/images/judges/uribe.png" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		    </div>
+		    <p class="center black-text">Los jurados xd</p>
+	    </div>
+	  </section>
+	  <section id="trainers">
+	  	<div class="container">
+		    <h1 class="title-main">CAPACITADORES</h1>
+		    <div class="container-judges">
+		      <div class="judge">
+		      	<span class="name">Omar Flórez</span>
 		        <img src="/images/judges/omar.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Sergio Molina</span>
+		        <img src="/images/judges/sergio.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Cheo</span>
+		        <img src="/images/judges/cheo.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Uribe</span>
+		        <img src="/images/judges/uribe.png" class="responsive-img" />
 		        <div class="info">
 		          <div class="profession">PhD. Computer Science</div>
 		        </div>
@@ -98,9 +150,43 @@
 		    </div>
 	    </div>
 	  </section>
+	  <section id="project-route">
+	  	<div class="container">
+		    <h1 class="title-main">RUTA DEL PROYECTO</h1>
+	    </div>
+    </section>
+    <section id="places">
+	  	<div class="container">
+		    <h1 class="title-main">LUGAR</h1>
+	    </div>
+    </section>
+    <section id="how-to-get">
+	  	<div class="container">
+		    <h1 class="title-main">¿CÓMO LLEGAR?</h1>
+	    </div>
+    </section>
+    <section id="quotas">
+	  	<div class="container">
+		    <h1 class="title-main">CUPOS</h1>
+	    </div>
+    </section>
+		<section id="inscriptions">
+	  	<div class="container">
+		    <h1 class="title-main">INSCRIPCIÓN</h1>
+	    </div>
+    </section>
+		<section id="challenges">
+	  	<div class="container">
+		    <h1 class="title-main">RETOS</h1>
+	    </div>
+    </section>
   </div>
 </template>
 <script>
+	window.ScrollMagic = require('ScrollMagic');
+	require('animation.gsap');
+	window.TweenMax = require('TweenMax');
+	require('debug.addIndicators')
   export default {
     data() {
       return {
@@ -111,13 +197,13 @@
 
     },
     mounted() {
+    	require('../interactions')
     }
   }
 </script>
 
 <style lang="scss" scoped>
 @import "~@";
-
 .box-register {
   background: #2e2d2d;
   padding: 1em;
@@ -201,20 +287,25 @@ a.item{
     display: inline-block;
     position: relative;
     padding: 0 1em 1em 1em;
-    background: #222122;
-    border-radius: 0 0 5px 5px;
+    background: #4db2ce;
+    background-image: linear-gradient(#4db2ce, #086a86);
+    border-radius: 5px;
     text-align: center;
-    &:before {
-      content: attr(data-name);
-      position: absolute;
+    margin: 25px 20px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    & .name {
       text-align: center;
-      width: 100%;
-      height: 25px;
-      top: -25px;
-      left: 0;
-      background: #222122;
-      border-radius: 5px 5px 0 0;
+      height: 40px;
+	    line-height: 40px;
+	    font-size: 1.2rem;
+	    text-transform: uppercase;
+	    font-weight: 600;
+	    display: block;
+	    color: #fff;
     }
+    .profession {
+	    color: #fff;
+		}
   }
   & img {
     width: 150px;

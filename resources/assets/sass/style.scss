@@ -7,6 +7,7 @@ section {
 
 body {
   background-color: $background-welcome;
+  background-image: linear-gradient($background-welcome, #009688);
   background-size: 100%;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -67,6 +68,7 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   text-align: center;
+  color: #fff;
 }
 
 .container-algorithm-icon {
@@ -130,7 +132,7 @@ body {
 
 #title-section-two {
   opacity: 0;
-  color: $background-welcome;
+  color: #fff;
 }
 
 .fill-menu-icon {
@@ -140,7 +142,13 @@ body {
 #home {
   background-repeat: no-repeat;
   background-image: url(../images/teletype.svg);
-  background-position: calc(50% + -10px) center;
+  background-position: calc(50% + 10px) center;
+}
+
+#judges {
+  background-repeat: no-repeat;
+  background-image: url(../images/teletype-reverse.svg);
+  background-position: calc(50% - 1450px) center;
 }
 
 .title-sub {
