@@ -182,6 +182,10 @@
   </div>
 </template>
 <script>
+	window.ScrollMagic = require('ScrollMagic');
+	require('animation.gsap');
+	window.TweenMax = require('TweenMax');
+	require('debug.addIndicators')
   export default {
     data() {
       return {
@@ -192,6 +196,7 @@
 
     },
     mounted() {
+    	require('../interactions')
     }
   }
 </script>
