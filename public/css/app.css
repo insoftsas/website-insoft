@@ -5,39 +5,15 @@
 }
 
 @font-face {
-  font-family: "Helvetica Neue Italic";
-  src: url(/fonts/HelveticaNeueThinItalic.otf?3665f5ae29f23ef8492e7d69ef637d67) format("opentype");
-  font-weight: 300;
-}
-
-@font-face {
   font-family: "Helvetica Neue";
   src: url(/fonts/HelveticaNeueThin.otf?8625837a60ad14e4715c2908647e1342) format("opentype");
   font-weight: 300;
 }
 
 @font-face {
-  font-family: "Helvetica Neue Italic";
-  src: url(/fonts/HelveticaNeueLightItalic.ttf?704d3b2818c5e16ac5520094625bf87a) format("truetype");
-  font-weight: 400;
-}
-
-@font-face {
   font-family: "Helvetica Neue";
   src: url(/fonts/HelveticaNeueLight.ttf?9ce6b81d106aef68f9250c9247cf1d71) format("truetype");
   font-weight: 400;
-}
-
-@font-face {
-  font-family: "Helvetica Neue";
-  src: url(/fonts/HelveticaNeueLight.ttf?9ce6b81d106aef68f9250c9247cf1d71) format("truetype");
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: "Helvetica Neue Italic";
-  src: url(/fonts/HelveticaNeueBoldItalic.ttf?50ebaffda38591da934715cd8c22e99e) format("truetype");
-  font-weight: 500;
 }
 
 @font-face {
@@ -9557,6 +9533,8 @@ section {
 
 body {
   background-color: #343233;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#343233), to(#4cc0e0));
+  background-image: linear-gradient(#343233, #4cc0e0);
   background-size: 100%;
   background-repeat: no-repeat;
   background-attachment: fixed;

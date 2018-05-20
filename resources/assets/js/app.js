@@ -39,10 +39,11 @@ const controller = new ScrollMagic.Controller()
 // tweens
 const tween_1 = new TimelineMax()
                     .add([
-                      TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0' }),
+                      TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0', backgroundImage: 'linear-gradient(#4cc0e0, #536b77)' }),
                       TweenMax.to("#title-section-two", 0.5, { opacity: 1 }),
                       TweenMax.to(".judge", 0.5, { opacity: 1 }),
-                      TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' })
+                      TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }),
+                      TweenMax.staggerFromTo(".judge", 2, {top: '120%'}, {top: 0, ease: Back.ease}, 0)
                     ])
 const tween_2 = new TimelineMax()
                     .add([
@@ -50,14 +51,14 @@ const tween_2 = new TimelineMax()
                     ])
 
 // scenes
-const scene_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 400})
-                             .setTween(tween_1)
-                             .addTo(controller)
-                             .addIndicators()
-                             .setClassToggle("#judge-item", 'active')
-
 const scene_2 = new ScrollMagic.Scene({ offset: -1, duration: 300})
                             .setTween(tween_2)
                             .addTo(controller)
                             .addIndicators()
                             .setClassToggle("#home-item", 'active')
+
+const scene_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 400})
+                             .setTween(tween_1)
+                             .addTo(controller)
+                             .addIndicators()
+                             .setClassToggle("#judge-item", 'active')

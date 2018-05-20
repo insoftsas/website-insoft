@@ -82,19 +82,36 @@
 	  	<div class="container">
 		    <h1 class="title-main" id="title-section-two">JURADOS</h1>
 		    <div class="container-judges">
-		      <div class="judge" data-name="Omar Flórez">
+		      <div class="judge">
+		      	<span class="name">Omar Flórez</span>
 		        <img src="/images/judges/omar.jpg" class="responsive-img" />
 		        <div class="info">
 		          <div class="profession">PhD. Computer Science</div>
 		        </div>
 		      </div>
-		      <div class="judge" data-name="Omar Flórez">
-		        <img src="/images/judges/omar.jpg" class="responsive-img" />
+		      <div class="judge">
+		      	<span class="name">Sergio Molina</span>
+		        <img src="/images/judges/sergio.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Cheo</span>
+		        <img src="/images/judges/cheo.jpg" class="responsive-img" />
+		        <div class="info">
+		          <div class="profession">PhD. Computer Science</div>
+		        </div>
+		      </div>
+		      <div class="judge">
+		      	<span class="name">Uribe</span>
+		        <img src="/images/judges/uribe.png" class="responsive-img" />
 		        <div class="info">
 		          <div class="profession">PhD. Computer Science</div>
 		        </div>
 		      </div>
 		    </div>
+		    <p class="center black-text">Los jurados xd</p>
 	    </div>
 	  </section>
   </div>
@@ -116,7 +133,6 @@
 
 <style lang="scss" scoped>
 @import "~@";
-
 .box-register {
   background: #2e2d2d;
   padding: 1em;
@@ -197,19 +213,21 @@
     display: inline-block;
     position: relative;
     padding: 0 1em 1em 1em;
-    background: #222122;
-    border-radius: 0 0 5px 5px;
+    background: #4db2ce;
+    background-image: linear-gradient(#4db2ce, #232323);
+    border-radius: 5px;
     text-align: center;
-    &:before {
-      content: attr(data-name);
-      position: absolute;
+    margin: 25px 20px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    & .name {
       text-align: center;
-      width: 100%;
-      height: 25px;
-      top: -25px;
-      left: 0;
-      background: #222122;
-      border-radius: 5px 5px 0 0;
+      height: 40px;
+	    line-height: 40px;
+	    font-size: 1.2rem;
+	    text-transform: uppercase;
+	    font-weight: 600;
+	    display: block;
+	    color: #fff;
     }
   }
   & img {
