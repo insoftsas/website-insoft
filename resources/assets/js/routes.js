@@ -1,16 +1,9 @@
-/*import CreateNote from './components/CreateNote.vue'
-import List from './components/List.vue'
-import FavouriteList from './components/FavouriteList.vue'*/
+import Index from './components/Index.vue';
+
 const routes = [
-	{ path: '/', component: 'Index'},
-	{ path: '*', component: 'Error404'},
+    { path: '/', component: Index },
+    { path: '*', redirect: '/' }
 ];
-/*const routes = [
-    { path: '/', component: 'List' },
-    { path: '/create', component: 'CreateNote' },
-    { path: '/list', component: 'List' },
-    { path: '/favourite-list', component: 'FavouriteList' },
-    { path: '*', redirect: '/list' },
-];*/
+>>>>>>> bd2ab126cc56c025bb2075c0e679a34a9761d998
 
 export default routes;

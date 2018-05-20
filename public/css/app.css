@@ -9809,8 +9809,46 @@ body {
   fill: #c5d6da;
 }
 
+.container-judges {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
 .container-judges .judge {
   display: inline-block;
+  position: relative;
+  padding: 0 1em 1em 1em;
+  background: #222122;
+  border-radius: 0 0 5px 5px;
+  text-align: center;
+}
+
+.container-judges .judge:before {
+  content: attr(data-name);
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  height: 25px;
+  top: -25px;
+  left: 0;
+  background: #222122;
+  border-radius: 5px 5px 0 0;
+}
+
+.container-judges img {
+  width: 150px;
+  max-width: 150px;
+  border-radius: 50%;
 }
 
 /* Enter and leave animations can use different */
@@ -10155,6 +10193,14 @@ body {
   to {
     -webkit-transform: translateX(-2px);
             transform: translateX(-2px);
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .container-judges .judge {
+    width: 50%;
+    width: 100%;
+    margin-bottom: calc(25px + 20px);
   }
 }
 
