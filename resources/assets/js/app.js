@@ -7,6 +7,7 @@ import routes from './routes';
 
 Vue.use(VueRouter);
 
+Vue.component('main-app', require('./components/App.vue'));
 Vue.component('word-writing', require('./components/WordWriting.vue'));
 Vue.component('menu-options', require('./components/Menu.vue'));
 
