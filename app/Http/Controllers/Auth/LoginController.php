@@ -47,7 +47,9 @@ class LoginController extends AppBaseController
     protected function sendLoginResponse(Request $request)
     {
         $request->session()->regenerate();
+        
         $this->clearLoginAttempts($request);
+
         return $this->sendResponse($this->guard()->user(), 'User logged successfully');
     }
 
@@ -98,10 +100,6 @@ class LoginController extends AppBaseController
         $this->guard()->logout();
 
         $request->session()->invalidate();
-        if($request->ajax()){
-            $this->sendResponse("Ok", 'Logged Out Successfully');
-        }else{
-            return redirect('/');
-        }
+        $this->sendResponse("Ok", 'Logged Out Successfully');
     }
 }
