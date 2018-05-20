@@ -9,7 +9,6 @@ Vue.use(VueRouter);
 
 Vue.component('main-app', require('./components/App.vue'));
 Vue.component('word-writing', require('./components/WordWriting.vue'));
-Vue.component('menu-options', require('./components/Menu.vue'));
 
 const router = new VueRouter({
     routes
@@ -20,23 +19,10 @@ const app = new Vue({
     router,
     data() {
       return {
-        show_menu: false
-      }
-    },
-    watch: {
-      show_menu: function () {
-        const b = document.body
-        if (this.show_menu) {
-          b.style.overflow = 'hidden'
-        } else {
-          b.style.overflow = 'initial'
-        }
+
       }
     },
     methods: {
-      handleMenu: function () {
-        this.show_menu = !this.show_menu
-      },
       goToView: function (id) {
         document.getElementById(id).scrollIntoView({block: 'start', behavior: 'smooth'})
       }
