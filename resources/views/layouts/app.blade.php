@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="{{ config('app.locale') }}">
   <head>
-    <meta name="msapplication-TileColor" content="#5dc1b9">
-    <meta name="theme-color" content="#5dc1b9">
+    <meta name="msapplication-TileColor" content="#343233">
+    <meta name="theme-color" content="#343233">
     <meta charset="utf-8" />
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport' />
     @yield('metaSocial')

@@ -88132,7 +88132,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #2e2d2d;\n  padding: 1em;\n  position: relative;\n}\n.box-register[data-v-384052eb]:before {\n    content: '';\n    width: 100%;\n    left: 0;\n    position: absolute;\n    height: 25px;\n    top: -24px;\n    background: #222122;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 500;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: 1rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-judges[data-v-384052eb] {\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n      -ms-flex-direction: row;\n          flex-direction: row;\n  -ms-flex-wrap: wrap;\n      flex-wrap: wrap;\n  -webkit-box-pack: justify;\n      -ms-flex-pack: justify;\n          justify-content: space-between;\n}\n.container-judges .judge[data-v-384052eb] {\n    opacity: 0;\n    display: inline-block;\n    position: relative;\n    padding: 0 1em 1em 1em;\n    background: #4db2ce;\n    background-image: -webkit-gradient(linear, left top, left bottom, from(#4db2ce), to(#086a86));\n    background-image: linear-gradient(#4db2ce, #086a86);\n    border-radius: 5px;\n    text-align: center;\n    margin: 25px 20px;\n    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.container-judges .judge .name[data-v-384052eb] {\n      text-align: center;\n      height: 40px;\n      line-height: 40px;\n      font-size: 1.2rem;\n      text-transform: uppercase;\n      font-weight: 600;\n      display: block;\n      color: #fff;\n}\n.container-judges .judge .profession[data-v-384052eb] {\n      color: #fff;\n}\n.container-judges img[data-v-384052eb] {\n    width: 150px;\n    max-width: 150px;\n    border-radius: 50%;\n}\n", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #2e2d2d;\n  padding: 1em;\n  position: relative;\n}\n.box-register[data-v-384052eb]:before {\n    content: '';\n    width: 100%;\n    left: 0;\n    position: absolute;\n    height: 25px;\n    top: -24px;\n    background: #222122;\n}\n.box-register[data-v-384052eb]:hover {\n    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n", ""]);
 
 // exports
 
@@ -88176,6 +88176,8 @@ module.exports = function listToStyles (parentId, list) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
 //
 //
 //
@@ -90708,43 +90710,61 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 var controller = new ScrollMagic.Controller();
 
-// tweens
-var tween_1 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#4cc0e0', backgroundImage: 'linear-gradient(#343233, #007496)' }), TweenMax.to("#title-section-two", 0.5, { opacity: 1 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: '120%' }, { top: 0, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
-var tween_2 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0 }, { right: '120%', ease: Back.ease }, 0), TweenMax.staggerFromTo(".word-writing", 2, { left: 0 }, { left: '120%', ease: Back.ease }, 0)]);
+// tweens backgrounds
+var tween_bg_2 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#343233', backgroundImage: 'linear-gradient(#343233, #007496)' })]);
+var tween_bg_3 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#343233', backgroundImage: 'linear-gradient(#343233, #673330)' })]);
 
-// scenes
-var scene_2 = new ScrollMagic.Scene({ offset: -1, duration: 300 }).setTween(tween_2).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
+// backgounds scenes
+var bg_2 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 300 }).setTween(tween_bg_2).addTo(controller).addIndicators();
+var bg_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: 300 }).setTween(tween_bg_3).addTo(controller).addIndicators();
 
-// menu activate
-var scene_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 400 }).setTween(tween_1).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
+if (window.innerWidth > 993) {
+                             // tweens
+                             var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0 }, { right: '120%', ease: Back.ease }, 0), TweenMax.staggerFromTo(".word-writing", 2, { left: 0 }, { left: '120%', ease: Back.ease }, 0)]);
 
-var scene_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: 400 })
-//.setTween(tween_3)
-.addTo(controller).addIndicators().setClassToggle("#trainer-item", 'active');
+                             var tween_2 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
 
-var scene_4 = new ScrollMagic.Scene({ triggerElement: "#project-route", duration: 400 })
-//.setTween(tween_3)
-.addTo(controller).addIndicators().setClassToggle("#project-route-item", 'active');
+                             var tween_3 = new TimelineMax().add([TweenMax.to("#title-section-three", 0.5, { opacity: 1.75 }), TweenMax.to(".trainer", 0.2, { opacity: 1 })]);
+                             // scenes
+                             var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
 
-var scene_5 = new ScrollMagic.Scene({ triggerElement: "#places", duration: 400 })
-//.setTween(tween_3)
-.addTo(controller).addIndicators().setClassToggle("#place-item", 'active');
+                             var scene_2 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
 
-var scene_6 = new ScrollMagic.Scene({ triggerElement: "#how-to-get", duration: 400 })
-//.setTween(tween_3)
-.addTo(controller).addIndicators().setClassToggle("#how-to-get-item", 'active');
+                             var scene_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
 
-var scene_7 = new ScrollMagic.Scene({ triggerElement: "#quotas", duration: 400 })
-//.setTween(tween_3)
-.addTo(controller).addIndicators().setClassToggle("#quota-item", 'active');
+                             // nav items activate
+                             var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
 
-var scene_8 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: 400 })
-//.setTween(tween_3)
-.addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
+                             var nav_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
 
-var scene_9 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: 400 })
-//.setTween(tween_3)
-.addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
+                             var nav_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: document.getElementById('trainers').offsetHeight })
+                             //.setTween(tween_3)
+                             .addTo(controller).addIndicators().setClassToggle("#trainer-item", 'active');
+
+                             var nav_4 = new ScrollMagic.Scene({ triggerElement: "#project-route", duration: document.getElementById('project-route').offsetHeight })
+                             //.setTween(tween_3)
+                             .addTo(controller).addIndicators().setClassToggle("#project-route-item", 'active');
+
+                             var nav_5 = new ScrollMagic.Scene({ triggerElement: "#places", duration: document.getElementById('places').offsetHeight })
+                             //.setTween(tween_3)
+                             .addTo(controller).addIndicators().setClassToggle("#place-item", 'active');
+
+                             var nav_6 = new ScrollMagic.Scene({ triggerElement: "#how-to-get", duration: document.getElementById('how-to-get').offsetHeight })
+                             //.setTween(tween_3)
+                             .addTo(controller).addIndicators().setClassToggle("#how-to-get-item", 'active');
+
+                             var nav_7 = new ScrollMagic.Scene({ triggerElement: "#quotas", duration: document.getElementById('quotas').offsetHeight })
+                             //.setTween(tween_3)
+                             .addTo(controller).addIndicators().setClassToggle("#quota-item", 'active');
+
+                             var nav_8 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight })
+                             //.setTween(tween_3)
+                             .addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
+
+                             var nav_9 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight })
+                             //.setTween(tween_3)
+                             .addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
+}
 
 /***/ }),
 /* 182 */
@@ -90755,7 +90775,7 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c("div", { staticClass: "navbar-items" }, [
+    _c("div", { staticClass: "navbar-items hide-on-med-and-down" }, [
       _c(
         "div",
         {
@@ -90912,7 +90932,9 @@ var render = function() {
     _vm._v(" "),
     _c("section", { attrs: { id: "home" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("Hackathon Montería")]),
+        _c("h1", { staticClass: "title-main normal" }, [
+          _vm._v("Hackathon Montería")
+        ]),
         _vm._v(" "),
         _c("div", { staticClass: "col s12 m5" }, [
           _c("div", { staticClass: "box-register" }, [
@@ -91029,7 +91051,9 @@ var render = function() {
                     _vm._v(" "),
                     _c("span", [_vm._v("Desarrollador")])
                   ])
-                ])
+                ]),
+                _vm._v(" "),
+                _vm._m(2)
               ])
             ])
           ])
@@ -91044,8 +91068,6 @@ var render = function() {
       ])
     ]),
     _vm._v(" "),
-    _vm._m(2),
-    _vm._v(" "),
     _vm._m(3),
     _vm._v(" "),
     _vm._m(4),
@@ -91058,7 +91080,9 @@ var render = function() {
     _vm._v(" "),
     _vm._m(8),
     _vm._v(" "),
-    _vm._m(9)
+    _vm._m(9),
+    _vm._v(" "),
+    _vm._m(10)
   ])
 }
 var staticRenderFns = [
@@ -91067,8 +91091,8 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("h2", { staticClass: "title-sub center" }, [
-      _vm._v("Inscríbete "),
-      _c("span", { staticClass: "y-text" }, [_vm._v("aquí")])
+      _vm._v("¡Haz parte del "),
+      _c("span", { staticClass: "y-text" }, [_vm._v("evento!")])
     ])
   },
   function() {
@@ -91082,8 +91106,16 @@ var staticRenderFns = [
       }),
       _vm._v(" "),
       _c("p", { staticClass: "description-text" }, [
-        _vm._v("Es muy facíl, selecciona tu rol:")
+        _vm._v("Simplemente selecciona tu rol:")
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 center" }, [
+      _c("p", { staticClass: "terms" }, [_vm._v("Terminos y condiciones")])
     ])
   },
   function() {
@@ -91158,10 +91190,6 @@ var staticRenderFns = [
               ])
             ])
           ])
-        ]),
-        _vm._v(" "),
-        _c("p", { staticClass: "center black-text" }, [
-          _vm._v("Los jurados xd")
         ])
       ])
     ])
@@ -91172,10 +91200,14 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "trainers" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("CAPACITADORES")]),
+        _c(
+          "h1",
+          { staticClass: "title-main", attrs: { id: "title-section-three" } },
+          [_vm._v("CAPACITADORES")]
+        ),
         _vm._v(" "),
-        _c("div", { staticClass: "container-judges" }, [
-          _c("div", { staticClass: "judge" }, [
+        _c("div", { staticClass: "container-trainers" }, [
+          _c("div", { staticClass: "trainer" }, [
             _c("span", { staticClass: "name" }, [_vm._v("Omar Flórez")]),
             _vm._v(" "),
             _c("img", {
@@ -91190,7 +91222,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "judge" }, [
+          _c("div", { staticClass: "trainer" }, [
             _c("span", { staticClass: "name" }, [_vm._v("Sergio Molina")]),
             _vm._v(" "),
             _c("img", {
@@ -91205,7 +91237,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "judge" }, [
+          _c("div", { staticClass: "trainer" }, [
             _c("span", { staticClass: "name" }, [_vm._v("Cheo")]),
             _vm._v(" "),
             _c("img", {
@@ -91220,7 +91252,7 @@ var staticRenderFns = [
             ])
           ]),
           _vm._v(" "),
-          _c("div", { staticClass: "judge" }, [
+          _c("div", { staticClass: "trainer" }, [
             _c("span", { staticClass: "name" }, [_vm._v("Uribe")]),
             _vm._v(" "),
             _c("img", {
@@ -92209,7 +92241,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.word-text[data-v-7da5dfcb] {\n  position: relative;\n  padding-right: 11px;\n}\n.slash[data-v-7da5dfcb] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.write-mode[data-v-7da5dfcb] {\n  font-weight: 400;\n  font-size: 1.5rem;\n  margin: auto;\n  display: block;\n}\n.write-mode #word[data-v-7da5dfcb] {\n    margin-right: 6px;\n    width: 120px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-7da5dfcb] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-7da5dfcb] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.console[data-v-7da5dfcb] {\n  background: #222122;\n  padding: 0 10px;\n  border-radius: 3px;\n  position: relative;\n}\nheader[data-v-7da5dfcb] {\n  padding: 2px 5px;\n  content: '';\n  position: absolute;\n  width: 100%;\n  height: 25px;\n  top: -24px;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.button-navbar-mac[data-v-7da5dfcb] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-7da5dfcb] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-7da5dfcb] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-7da5dfcb] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
+exports.push([module.i, "\n.word-text[data-v-7da5dfcb] {\n  position: relative;\n  padding-right: 8px;\n}\n.slash[data-v-7da5dfcb] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.write-mode[data-v-7da5dfcb] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  margin: auto;\n  display: block;\n}\n.write-mode #word[data-v-7da5dfcb] {\n    margin-right: 6px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-7da5dfcb] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-7da5dfcb] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.console[data-v-7da5dfcb] {\n  background: #222122;\n  padding: 0 10px;\n  border-radius: 3px;\n  position: relative;\n}\nheader[data-v-7da5dfcb] {\n  padding: 2px 5px;\n  content: '';\n  position: absolute;\n  width: 100%;\n  height: 25px;\n  top: -24px;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.button-navbar-mac[data-v-7da5dfcb] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-7da5dfcb] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-7da5dfcb] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-7da5dfcb] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
 
 // exports
 

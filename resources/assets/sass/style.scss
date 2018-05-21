@@ -69,6 +69,10 @@ body {
 .title-main {
   margin: 0;
   padding: 1em 0;
+  &.normal {
+    padding-bottom: 1em;
+  }
+  padding-bottom: 20px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: center;
@@ -134,7 +138,7 @@ body {
   filter: blur(10px);
 }
 
-#title-section-two {
+#title-section-two, #title-section-three {
   opacity: 0;
   color: #fff;
 }
@@ -156,11 +160,66 @@ body {
 }
 
 .title-sub {
-  font-weight: 100;
-  font-size: 2.5rem;
+  font-weight: 300;
+  font-size: 2rem;
   margin: 0 1em;
   color: #fff;
   & .y-text {
     color: $primary-color;
   }
+}
+
+.container-judges, .container-trainers {
+  display: flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  & .judge {
+    background: #4db2ce;
+    background-image: linear-gradient(#4db2ce, #086a86);
+  }
+  & .trainer {
+    background: #6b413e;
+    background-image: linear-gradient(#6b413e, #311b1a);
+  }
+  & .judge, & .trainer {
+    opacity: 0;
+    display: inline-block;
+    position: relative;
+    padding: 0 1em 1em 1em;
+    border-radius: 5px;
+    text-align: center;
+    margin: 25px 20px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    transition: all .3s ease;
+    &:hover {
+      transform: translateY(20px) scale(1.2);
+    }
+    & .name {
+      text-align: center;
+      height: 40px;
+      line-height: 40px;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      display: block;
+      color: #fff;
+    }
+    .profession {
+      color: #fff;
+    }
+  }
+  & img {
+    width: 150px;
+    max-width: 150px;
+    border-radius: 50%;
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.terms {
+  margin: 20px 0 0 0;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
 }

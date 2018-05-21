@@ -87,7 +87,7 @@
 <style lang="scss" scoped>
   .word-text {
     position: relative;
-    padding-right: 11px;
+    padding-right: 8px;
   }
   .slash {
     position: absolute;
@@ -103,12 +103,11 @@
   }
   .write-mode {
     font-weight: 400;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     margin: auto;
     display: block;
     #word {
       margin-right: 6px;
-      width: 120px;
       display: inline-block;
     }
     & .container-word {

@@ -9613,10 +9613,15 @@ body {
 .title-main {
   margin: 0;
   padding: 1em 0;
+  padding-bottom: 20px;
   font-weight: 600;
   text-transform: uppercase;
   text-align: center;
   color: #fff;
+}
+
+.title-main.normal {
+  padding-bottom: 1em;
 }
 
 .container-algorithm-icon {
@@ -9690,7 +9695,8 @@ body {
           filter: blur(10px);
 }
 
-#title-section-two {
+#title-section-two,
+#title-section-three {
   opacity: 0;
   color: #fff;
 }
@@ -9707,19 +9713,111 @@ body {
 
 #judges {
   background-repeat: no-repeat;
-  background-image: url(/images/teletype-reverse.svg?304fd4e0e0af9c7d4187f67fe98960d0);
+  background-image: url(/images/teletype-reverse.svg?245aa895f7c2d171be40cec335a1abd6);
   background-position: calc(50% - 1450px) center;
 }
 
 .title-sub {
-  font-weight: 100;
-  font-size: 2.5rem;
+  font-weight: 300;
+  font-size: 2rem;
   margin: 0 1em;
   color: #fff;
 }
 
 .title-sub .y-text {
   color: #03A9F4;
+}
+
+.container-judges,
+.container-trainers {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.container-judges .judge,
+.container-trainers .judge {
+  background: #4db2ce;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#4db2ce), to(#086a86));
+  background-image: linear-gradient(#4db2ce, #086a86);
+}
+
+.container-judges .trainer,
+.container-trainers .trainer {
+  background: #6b413e;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#6b413e), to(#311b1a));
+  background-image: linear-gradient(#6b413e, #311b1a);
+}
+
+.container-judges .judge,
+.container-judges .trainer,
+.container-trainers .judge,
+.container-trainers .trainer {
+  opacity: 0;
+  display: inline-block;
+  position: relative;
+  padding: 0 1em 1em 1em;
+  border-radius: 5px;
+  text-align: center;
+  margin: 25px 20px;
+  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  -webkit-transition: all .3s ease;
+  transition: all .3s ease;
+}
+
+.container-judges .judge:hover,
+.container-judges .trainer:hover,
+.container-trainers .judge:hover,
+.container-trainers .trainer:hover {
+  -webkit-transform: translateY(20px) scale(1.2);
+          transform: translateY(20px) scale(1.2);
+}
+
+.container-judges .judge .name,
+.container-judges .trainer .name,
+.container-trainers .judge .name,
+.container-trainers .trainer .name {
+  text-align: center;
+  height: 40px;
+  line-height: 40px;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  display: block;
+  color: #fff;
+}
+
+.container-judges .judge .profession,
+.container-judges .trainer .profession,
+.container-trainers .judge .profession,
+.container-trainers .trainer .profession {
+  color: #fff;
+}
+
+.container-judges img,
+.container-trainers img {
+  width: 150px;
+  max-width: 150px;
+  border-radius: 50%;
+  -webkit-box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
+}
+
+.terms {
+  margin: 20px 0 0 0;
+  color: #fff;
+  text-align: center;
+  font-weight: 600;
 }
 
 /* Enter and leave animations can use different */
@@ -10068,10 +10166,79 @@ body {
 }
 
 @media only screen and (max-width: 600px) {
-  .container-judges .judge {
-    width: 50%;
+  .container-judges .judge,
+  .container-judges .trainer,
+  .container-trainers .judge,
+  .container-trainers .trainer {
     width: 100%;
     margin-bottom: calc(25px + 20px);
+  }
+
+  .button-register:first-of-type {
+    margin-bottom: 10px;
+  }
+
+  .button-register .icon-caracter {
+    width: 30px !important;
+    height: 30px !important;
+    float: left !important;
+    display: inline-block !important;
+    margin-right: 15px !important;
+  }
+
+  .button-register span {
+    float: left;
+    line-height: 30px;
+  }
+
+  .content-register img {
+    width: 100px !important;
+  }
+
+  .write-mode {
+    font-size: 1rem !important;
+  }
+
+  .console {
+    margin-top: 5em !important;
+  }
+
+  .console .word-text {
+    padding-right: 6px !important;
+  }
+
+  #home {
+    background-position: calc(50% + 530px) center;
+  }
+
+  #judges {
+    background-position: calc(50% - 530px) center;
+  }
+}
+
+@media only screen and (max-width: 992px) {
+  #title-section-two,
+  #title-section-three,
+  .judge,
+  .trainer {
+    opacity: 1 !important;
+  }
+
+  .title-main {
+    font-size: 2rem;
+  }
+
+  .title-sub {
+    font-size: 1.7rem;
+    margin-bottom: 20px;
+  }
+
+  .box-register {
+    top: 24px;
+  }
+
+  section {
+    height: auto;
   }
 }
 

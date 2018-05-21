@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="navbar-items">
+		<div class="navbar-items hide-on-med-and-down">
 	    <div class="item" id="home-item" @click.prevent="$root.goToView('home')">Inicio</div>
 	    <div class="item" id="judge-item" @click.prevent="$root.goToView('judges')">Jurados</div>
 	    <div class="item" id="trainer-item" @click.prevent="$root.goToView('trainers')">Capacitadores</div>
@@ -17,15 +17,15 @@
 	  </div>
 	  <section id="home">
 	  	<div class="container">
-		    <h1 class="title-main">Hackathon Montería</h1>
+		    <h1 class="title-main normal">Hackathon Montería</h1>
 		    <div class="col s12 m5">
 		      <div class="box-register">
-		        <h2 class="title-sub center">Inscríbete <span class="y-text">aquí</span></h2>
+		        <h2 class="title-sub center">¡Haz parte del <span class="y-text">evento!</span></h2>
 		        <div class="content-register">
 		          <div class="row">
 		            <div class="col s12">
 		              <img src="/images/logo.png" class="responsive-img" width="200" />
-		              <p class="description-text">Es muy facíl, selecciona tu rol:</p>
+		              <p class="description-text">Simplemente selecciona tu rol:</p>
 		            </div>
 		            <div class="col s12 m6">
 		              <button class="button-register">
@@ -73,6 +73,9 @@
 		                <span>Desarrollador</span>
 		              </button>
 		            </div>
+		            <div class="col s12 center">
+		              <p class="terms">Terminos y condiciones</p>
+		            </div>
 		          </div>
 		        </div>
 		      </div>
@@ -115,35 +118,34 @@
 		        </div>
 		      </div>
 		    </div>
-		    <p class="center black-text">Los jurados xd</p>
 	    </div>
 	  </section>
 	  <section id="trainers">
 	  	<div class="container">
-		    <h1 class="title-main">CAPACITADORES</h1>
-		    <div class="container-judges">
-		      <div class="judge">
+		    <h1 class="title-main" id="title-section-three">CAPACITADORES</h1>
+		    <div class="container-trainers">
+		      <div class="trainer">
 		      	<span class="name">Omar Flórez</span>
 		        <img src="/images/judges/omar.jpg" class="responsive-img" />
 		        <div class="info">
 		          <div class="profession">PhD. Computer Science</div>
 		        </div>
 		      </div>
-		      <div class="judge">
+		      <div class="trainer">
 		      	<span class="name">Sergio Molina</span>
 		        <img src="/images/judges/sergio.jpg" class="responsive-img" />
 		        <div class="info">
 		          <div class="profession">PhD. Computer Science</div>
 		        </div>
 		      </div>
-		      <div class="judge">
+		      <div class="trainer">
 		      	<span class="name">Cheo</span>
 		        <img src="/images/judges/cheo.jpg" class="responsive-img" />
 		        <div class="info">
 		          <div class="profession">PhD. Computer Science</div>
 		        </div>
 		      </div>
-		      <div class="judge">
+		      <div class="trainer">
 		      	<span class="name">Uribe</span>
 		        <img src="/images/judges/uribe.png" class="responsive-img" />
 		        <div class="info">
@@ -220,6 +222,9 @@
     top: -24px;
     background: #222122;
   }
+  &:hover {
+  	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  }
 }
 .content-register {
   padding: 0 1em;
@@ -231,7 +236,7 @@
   padding: .5em 1em;
   line-height: inherit;
   font-size: inherit;
-  font-weight: 500;
+  font-weight: 600;
   text-decoration: none;
   border-radius: 5px;
   color: $button;
@@ -239,8 +244,9 @@
   border: 0;
   cursor: pointer;
   width: 100%;
-  font-size: 1rem;
+  font-size: .9rem;
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  text-transform: uppercase;
   &:active {
     color: #343233;
     background-color: darken($button, 40);
@@ -270,46 +276,11 @@
   margin: 0 0 1em 0;
   text-align: left;
   font-size: 1.2rem;
+  color: #fff;
 }
 
 .fill-caracter-icon {
   fill: $button
 }
 
-.container-judges {
-  display: flex;
-  flex-direction:row;
-  flex-wrap:wrap;
-  justify-content:space-between;
-  & .judge {
-    opacity: 0;
-    display: inline-block;
-    position: relative;
-    padding: 0 1em 1em 1em;
-    background: #4db2ce;
-    background-image: linear-gradient(#4db2ce, #086a86);
-    border-radius: 5px;
-    text-align: center;
-    margin: 25px 20px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
-    & .name {
-      text-align: center;
-      height: 40px;
-	    line-height: 40px;
-	    font-size: 1.2rem;
-	    text-transform: uppercase;
-	    font-weight: 600;
-	    display: block;
-	    color: #fff;
-    }
-    .profession {
-	    color: #fff;
-		}
-  }
-  & img {
-    width: 150px;
-    max-width: 150px;
-    border-radius: 50%;
-  }
-}
 </style>

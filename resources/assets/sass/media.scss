@@ -1,17 +1,68 @@
 @media #{$small-and-down} {
-	.container-judges {
-  	& .judge {
-  		width: 50%;
-  		width: 100%;
-    	margin-bottom: calc(25px + 20px);
+	.container-judges, .container-trainers {
+	  	& .judge, & .trainer {
+	  		width: 100%;
+	    	margin-bottom: calc(25px + 20px);
 		}
+	}
+	.button-register {
+		&:first-of-type {
+			margin-bottom: 10px;
+		}
+		& .icon-caracter {
+			width: 30px !important;
+    		height: 30px !important;
+    		float: left !important;
+		    display: inline-block !important;
+		    margin-right: 15px !important;
+		}
+		& span {
+			float: left;
+    		line-height: 30px;
+		}
+	}
+	.content-register {
+		& img {
+			width: 100px !important;
+		}
+	}
+	.write-mode {
+		font-size: 1rem !important;
+	}
+	.console {
+		margin-top: 5em !important;
+		& .word-text {
+			padding-right: 6px !important;
+		}
+	}
+	#home {
+	  background-position: calc(50% + 530px) center;
+	}
+	
+	#judges {
+	  background-position: calc(50% - 530px) center;
 	}
 }
 @media #{$medium-and-up} {
 // styles for medium screens and larger
 }
 @media #{$medium-and-down} {
-// styles for medium screens and down
+	#title-section-two, #title-section-three, .judge, .trainer {
+	  opacity: 1 !important;
+  	}
+  	.title-main {
+  		font-size: 2rem;
+  	}
+  	.title-sub {
+  		font-size: 1.7rem;
+  		margin-bottom: 20px;
+  	}
+  	.box-register {
+  		top: 24px;
+  	}
+  	section {
+  		height: auto;
+  	}
 }
 @media #{$large-and-up} {
 // styles for large screens and up
