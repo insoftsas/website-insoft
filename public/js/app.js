@@ -88132,7 +88132,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #2e2d2d;\n  padding: 1em;\n  position: relative;\n}\n.box-register[data-v-384052eb]:before {\n    content: '';\n    width: 100%;\n    left: 0;\n    position: absolute;\n    height: 25px;\n    top: -24px;\n    background: #222122;\n}\n.box-register[data-v-384052eb]:hover {\n    -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n", ""]);
 
 // exports
 
@@ -88176,6 +88176,14 @@ module.exports = function listToStyles (parentId, list) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -90720,7 +90728,7 @@ var bg_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: 300 })
 
 if (window.innerWidth > 993) {
                              // tweens
-                             var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0 }, { right: '120%', ease: Back.ease }, 0), TweenMax.staggerFromTo(".word-writing", 2, { left: 0 }, { left: '120%', ease: Back.ease }, 0)]);
+                             var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0 }, { right: '120%', ease: Back.ease }, 0), TweenMax.staggerFromTo(".container-console", 2, { left: 0 }, { left: '120%', ease: Back.ease }, 0)]);
 
                              var tween_2 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
 
@@ -90733,7 +90741,8 @@ if (window.innerWidth > 993) {
                              var scene_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
 
                              // nav items activate
-                             var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
+                             var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
+                             var nav_0_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
 
                              var nav_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
 
@@ -91053,20 +91062,30 @@ var render = function() {
                   ])
                 ]),
                 _vm._v(" "),
-                _vm._m(2)
+                _c("div", { staticClass: "col s12 center" }, [
+                  _c(
+                    "div",
+                    {
+                      staticClass: "more-info",
+                      on: {
+                        click: function($event) {
+                          _vm.$root.goToView("info")
+                        }
+                      }
+                    },
+                    [_vm._v("Mas información")]
+                  )
+                ])
               ])
             ])
           ])
         ]),
         _vm._v(" "),
-        _c(
-          "div",
-          { staticClass: "col s12 m7" },
-          [_c("word-writing", { staticClass: "word-writing" })],
-          1
-        )
+        _c("div", { staticClass: "col s12 m7" }, [_c("word-writing")], 1)
       ])
     ]),
+    _vm._v(" "),
+    _vm._m(2),
     _vm._v(" "),
     _vm._m(3),
     _vm._v(" "),
@@ -91090,9 +91109,9 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("h2", { staticClass: "title-sub center" }, [
-      _vm._v("¡Haz parte del "),
-      _c("span", { staticClass: "y-text" }, [_vm._v("evento!")])
+    return _c("header", [
+      _vm._v("\n\t\t      \t\t¡Haz parte del "),
+      _c("span", { staticClass: "r-text" }, [_vm._v("evento!")])
     ])
   },
   function() {
@@ -91114,8 +91133,12 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col s12 center" }, [
-      _c("p", { staticClass: "terms" }, [_vm._v("Terminos y condiciones")])
+    return _c("section", { attrs: { id: "info" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("INFO")]),
+        _vm._v(" "),
+        _c("p", [_vm._v("slo")])
+      ])
     ])
   },
   function() {
@@ -92241,7 +92264,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.word-text[data-v-7da5dfcb] {\n  position: relative;\n  padding-right: 8px;\n}\n.slash[data-v-7da5dfcb] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.write-mode[data-v-7da5dfcb] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  margin: auto;\n  display: block;\n}\n.write-mode #word[data-v-7da5dfcb] {\n    margin-right: 6px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-7da5dfcb] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-7da5dfcb] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.console[data-v-7da5dfcb] {\n  background: #222122;\n  padding: 0 10px;\n  border-radius: 3px;\n  position: relative;\n}\nheader[data-v-7da5dfcb] {\n  padding: 2px 5px;\n  content: '';\n  position: absolute;\n  width: 100%;\n  height: 25px;\n  top: -24px;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.button-navbar-mac[data-v-7da5dfcb] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-7da5dfcb] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-7da5dfcb] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-7da5dfcb] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
+exports.push([module.i, "\n.word-text[data-v-7da5dfcb] {\n  position: relative;\n  padding-right: 8px;\n}\n.slash[data-v-7da5dfcb] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.command-input[data-v-7da5dfcb], .help-box[data-v-7da5dfcb] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  border: 0px;\n  position: absolute;\n  width: 100%;\n  height: 30px;\n  line-height: 20px;\n  top: 25px;\n  left: 0px;\n  margin: 0px;\n  padding: 5px 10px;\n  color: #c5d6da;\n  background: inherit;\n  outline: none;\n  font-family: \"Helvetica Neue\", 'Roboto', arial, sans-serif;\n}\n.command-input.move-input-cmd[data-v-7da5dfcb], .help-box.move-input-cmd[data-v-7da5dfcb] {\n    top: 75px;\n}\n.help-box span[data-v-7da5dfcb] {\n  display: block;\n}\n.write-mode[data-v-7da5dfcb] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  margin: auto;\n  display: block;\n  padding: 0 10px;\n}\n.write-mode #word[data-v-7da5dfcb] {\n    margin-right: 6px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-7da5dfcb] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-7da5dfcb] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.container-console[data-v-7da5dfcb] {\n  position: relative;\n}\n.console[data-v-7da5dfcb] {\n  background: #222122;\n  border-radius: 3px;\n  position: relative;\n}\n.console.last[data-v-7da5dfcb] {\n    margin-top: 20px;\n    height: 110.29px;\n}\nheader[data-v-7da5dfcb] {\n  padding: 2px 5px;\n  content: '';\n  position: relative;\n  width: 100%;\n  height: 25px;\n  top: 0;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\nheader[data-v-7da5dfcb]:after {\n    content: attr(data-title-cmd);\n    text-align: center;\n    color: #000;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    font-weight: 400;\n}\nheader .help[data-v-7da5dfcb] {\n    color: #ffff;\n    border-width: 1px;\n    width: 19px;\n    height: 19px;\n    line-height: 19px;\n    text-align: center;\n    font-size: 1rem;\n    border-style: solid;\n    border-radius: 2px;\n    display: inline-block;\n    background: #2295f1;\n    border-color: #2196F3;\n    cursor: pointer;\n    z-index: 50;\n    position: absolute;\n    right: 4px;\n    top: 2.35px;\n}\nheader .help[data-v-7da5dfcb]:hover {\n      background: #0d7bd3;\n      border-color: #0c7cd5;\n}\n.button-navbar-mac[data-v-7da5dfcb] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-7da5dfcb] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-7da5dfcb] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-7da5dfcb] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
 
 // exports
 
@@ -92293,13 +92316,33 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       word: 'crear',
-      step: 1
+      step: 1,
+      command: '$ ',
+      help_show: false
     };
   },
 
@@ -92315,10 +92358,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         case 3:
           this.word = 'imaginar';
           break;
+        case 4:
+          this.word = 'aprender';
+          break;
+        case 5:
+          this.word = 'descubrir';
+          break;
+        case 6:
+          this.word = 'invertir';
+          break;
       }
-      if (this.step == 3) {
+      if (this.step == 6) {
         this.step = 0;
       }
+    },
+    formatCommand: function formatCommand() {
+      var n = this.command;
+      if (n == '' || n == null) this.command = '$ ';
     },
     handleResize: function handleResize() {
       var s = document.getElementById('slash');
@@ -92327,6 +92383,71 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         this.step++;
         this.changeWords();
       }
+    },
+    showHelp: function showHelp() {
+      this.help_show = !this.help_show;
+    },
+    executeCommand: function executeCommand() {
+      var vm = this;
+      var c = vm.command;
+      if (c == "$ goto 1" || c == "$goto 1") {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('Estas en la primera sección', 1500);
+      } else if (c == "$ goto 2" || c == "$goto 2") {
+        vm.$root.goToView('judges');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 3" || c == "$goto 3") {
+        vm.$root.goToView('trainers');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 4" || c == "$goto 4") {
+        vm.$root.goToView('project-route');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 5" || c == "$goto 5") {
+        vm.$root.goToView('places');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 6" || c == "$goto 6") {
+        vm.$root.goToView('how-to-get');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 7" || c == "$goto 7") {
+        vm.$root.goToView('quotas');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 8" || c == "$goto 8") {
+        vm.$root.goToView('inscriptions');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 9" || c == "$goto 9") {
+        vm.$root.goToView('challenges');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ dev" || c == "$dev") {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('Desarrollado por Segrith Tech', 1500);
+      } else if (c == "$ clear" || c == "$clear") {
+        vm.help_show = false;
+        vm.command = "$ ";
+      } else if (c == "$ help" || c == "$help") {
+        vm.help_show = true;
+        vm.command = "$ ";
+      } else {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('Error de comando', 1500);
+      }
+    },
+    messageCommand: function messageCommand(m, t) {
+      var vm = this;
+      vm.command = m;
+      setTimeout(function () {
+        vm.command = "$ ";
+      }, t);
+    },
+    focusTerminal: function focusTerminal() {
+      document.getElementById('terminal-input').focus();
     }
   },
   computed: {
@@ -92474,129 +92595,200 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "console" }, [
-    _vm._m(0),
-    _vm._v(" "),
-    _c("span", { staticClass: "write-mode" }, [
-      _vm._v("Ultimo acceso: " + _vm._s(_vm.date))
+  return _c("div", { staticClass: "container-console" }, [
+    _c("div", { staticClass: "console" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c("span", { staticClass: "write-mode" }, [
+        _vm._v("Ultimo acceso: " + _vm._s(_vm.date))
+      ]),
+      _vm._v(" "),
+      _c("span", { staticClass: "write-mode" }, [
+        _vm._v("El evento donde podrás\n      "),
+        _c(
+          "span",
+          { staticClass: "container-word", attrs: { id: "width-word" } },
+          [
+            _c("div", { attrs: { id: "word" } }, [
+              _c("span", { staticClass: "word-text" }, [
+                _vm._v(_vm._s(_vm.word)),
+                _c("span", { staticClass: "slash" })
+              ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "resize-observer",
+              { attrs: { id: "slash" }, on: { notify: _vm.handleResize } },
+              [_vm._v(" ")]
+            )
+          ],
+          1
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "container-algorithm-icon" }, [
+        _c(
+          "svg",
+          {
+            attrs: { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 64 64" }
+          },
+          [
+            _c("path", {
+              staticClass: "sun",
+              attrs: {
+                d:
+                  "m17 32c0-1.51 2.19-2.656 2.633-4.019.458-1.412-.624-3.623.231-4.8s3.308-.837 4.5-1.7 1.592-3.292 3-3.75c1.362-.443 3.126 1.269 4.636 1.269s3.274-1.712 4.637-1.269c1.412.458 1.829 2.895 3 3.751s3.631.513 4.5 1.7-.227 3.387.231 4.8c.442 1.362 2.632 2.508 2.632 4.018s-2.19 2.656-2.633 4.019c-.458 1.412.624 3.623-.231 4.8s-3.308.837-4.5 1.7-1.592 3.292-3 3.75c-1.362.443-3.126-1.269-4.636-1.269s-3.274 1.712-4.637 1.269c-1.412-.458-1.829-2.895-3-3.751s-3.631-.513-4.5-1.7.227-3.387-.231-4.8c-.442-1.362-2.632-2.508-2.632-4.018z",
+                fill: "#fcf05a"
+              }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              attrs: { cx: "32", cy: "32", fill: "#fdbd40", r: "10" }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "st0-solar half-saucer",
+              attrs: {
+                d:
+                  "m32 54a22 22 0 1 1 14.667-5.6l-1.334-1.49a19.948 19.948 0 1 0 -10.475 4.89l.284 1.98a22.186 22.186 0 0 1 -3.142.22z"
+              }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "st0-solar dish-outside",
+              attrs: {
+                d:
+                  "m32 60a28.008 28.008 0 0 1 -24.546-41.482l1.752.964a26 26 0 1 0 48.349 7.7l1.966-.368a28.025 28.025 0 0 1 -27.521 33.186z"
+              }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "st0-solar dish-outside",
+              attrs: {
+                d:
+                  "m51.379 14.667a26.008 26.008 0 0 0 -33-4.815l-1.049-1.7a28.012 28.012 0 0 1 35.54 5.181z"
+              }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              staticClass: "dish-outside",
+              attrs: { cx: "12", cy: "13", fill: "#84f03c", r: "3" }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              staticClass: "half-saucer",
+              attrs: { cx: "41", cy: "51", fill: "#7fcac9", r: "2" }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              staticClass: "dish-outside",
+              attrs: { cx: "57", cy: "20", fill: "#fdbd40", r: "4" }
+            }),
+            _vm._v(" "),
+            _c("g", { attrs: { fill: "#7d8d9c" } }, [
+              _c("path", {
+                staticClass: "rect-anim-one",
+                attrs: { d: "m52 4h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-two",
+                attrs: { d: "m56 6h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-three",
+                attrs: { d: "m2 54h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-two",
+                attrs: { d: "m6 56h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-four",
+                attrs: { d: "m54 54h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-five",
+                attrs: { d: "m58 56h2v2h-2z" }
+              })
+            ])
+          ]
+        )
+      ])
     ]),
     _vm._v(" "),
-    _c("span", { staticClass: "write-mode" }, [
-      _vm._v("El evento donde podrás\n    "),
-      _c(
-        "span",
-        { staticClass: "container-word", attrs: { id: "width-word" } },
-        [
-          _c("div", { attrs: { id: "word" } }, [
-            _c("span", { staticClass: "word-text" }, [
-              _vm._v(_vm._s(_vm.word)),
-              _c("span", { staticClass: "slash" })
-            ])
-          ]),
+    _c(
+      "div",
+      { staticClass: "console last", on: { click: _vm.focusTerminal } },
+      [
+        _c("header", { attrs: { "data-title-cmd": "Ejecuta comandos" } }, [
+          _c("div", { staticClass: "close button-navbar-mac" }),
+          _vm._v(" "),
+          _c("div", { staticClass: "minify button-navbar-mac" }),
+          _vm._v(" "),
+          _c("div", { staticClass: "maximize button-navbar-mac" }),
           _vm._v(" "),
           _c(
-            "resize-observer",
-            { attrs: { id: "slash" }, on: { notify: _vm.handleResize } },
-            [_vm._v(" ")]
+            "div",
+            { staticClass: "right help", on: { click: _vm.showHelp } },
+            [
+              !_vm.help_show
+                ? _c("span", [_vm._v("?")])
+                : _c("span", [_vm._v("X")])
+            ]
           )
-        ],
-        1
-      )
-    ]),
-    _vm._v(" "),
-    _c("div", { staticClass: "container-algorithm-icon" }, [
-      _c(
-        "svg",
-        {
-          attrs: { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 64 64" }
-        },
-        [
-          _c("path", {
-            staticClass: "sun",
-            attrs: {
-              d:
-                "m17 32c0-1.51 2.19-2.656 2.633-4.019.458-1.412-.624-3.623.231-4.8s3.308-.837 4.5-1.7 1.592-3.292 3-3.75c1.362-.443 3.126 1.269 4.636 1.269s3.274-1.712 4.637-1.269c1.412.458 1.829 2.895 3 3.751s3.631.513 4.5 1.7-.227 3.387.231 4.8c.442 1.362 2.632 2.508 2.632 4.018s-2.19 2.656-2.633 4.019c-.458 1.412.624 3.623-.231 4.8s-3.308.837-4.5 1.7-1.592 3.292-3 3.75c-1.362.443-3.126-1.269-4.636-1.269s-3.274 1.712-4.637 1.269c-1.412-.458-1.829-2.895-3-3.751s-3.631-.513-4.5-1.7.227-3.387-.231-4.8c-.442-1.362-2.632-2.508-2.632-4.018z",
-              fill: "#fcf05a"
+        ]),
+        _vm._v(" "),
+        _vm.help_show
+          ? _c("div", { staticClass: "help-box" }, [
+              _c("span", [_vm._v("Puede ejecutar los siguientes comandos:")]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v("clear, dev, help, goto [número de la sección]")
+              ])
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.command,
+              expression: "command"
             }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            attrs: { cx: "32", cy: "32", fill: "#fdbd40", r: "10" }
-          }),
-          _vm._v(" "),
-          _c("path", {
-            staticClass: "st0-solar half-saucer",
-            attrs: {
-              d:
-                "m32 54a22 22 0 1 1 14.667-5.6l-1.334-1.49a19.948 19.948 0 1 0 -10.475 4.89l.284 1.98a22.186 22.186 0 0 1 -3.142.22z"
+          ],
+          staticClass: "command-input browser-default",
+          class: { "move-input-cmd": _vm.help_show },
+          attrs: { type: "text", id: "terminal-input" },
+          domProps: { value: _vm.command },
+          on: {
+            input: [
+              function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.command = $event.target.value
+              },
+              _vm.formatCommand
+            ],
+            keyup: function($event) {
+              if (
+                !("button" in $event) &&
+                _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+              ) {
+                return null
+              }
+              return _vm.executeCommand($event)
             }
-          }),
-          _vm._v(" "),
-          _c("path", {
-            staticClass: "st0-solar dish-outside",
-            attrs: {
-              d:
-                "m32 60a28.008 28.008 0 0 1 -24.546-41.482l1.752.964a26 26 0 1 0 48.349 7.7l1.966-.368a28.025 28.025 0 0 1 -27.521 33.186z"
-            }
-          }),
-          _vm._v(" "),
-          _c("path", {
-            staticClass: "st0-solar dish-outside",
-            attrs: {
-              d:
-                "m51.379 14.667a26.008 26.008 0 0 0 -33-4.815l-1.049-1.7a28.012 28.012 0 0 1 35.54 5.181z"
-            }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            staticClass: "dish-outside",
-            attrs: { cx: "12", cy: "13", fill: "#84f03c", r: "3" }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            staticClass: "half-saucer",
-            attrs: { cx: "41", cy: "51", fill: "#7fcac9", r: "2" }
-          }),
-          _vm._v(" "),
-          _c("circle", {
-            staticClass: "dish-outside",
-            attrs: { cx: "57", cy: "20", fill: "#fdbd40", r: "4" }
-          }),
-          _vm._v(" "),
-          _c("g", { attrs: { fill: "#7d8d9c" } }, [
-            _c("path", {
-              staticClass: "rect-anim-one",
-              attrs: { d: "m52 4h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-two",
-              attrs: { d: "m56 6h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-three",
-              attrs: { d: "m2 54h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-two",
-              attrs: { d: "m6 56h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-four",
-              attrs: { d: "m54 54h2v2h-2z" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "rect-anim-five",
-              attrs: { d: "m58 56h2v2h-2z" }
-            })
-          ])
-        ]
-      )
-    ])
+          }
+        })
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -92604,7 +92796,7 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("header", [
+    return _c("header", { attrs: { "data-title-cmd": "Terminal" } }, [
       _c("div", { staticClass: "close button-navbar-mac" }),
       _vm._v(" "),
       _c("div", { staticClass: "minify button-navbar-mac" }),

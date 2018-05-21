@@ -20,7 +20,9 @@
 		    <h1 class="title-main normal">Hackathon Montería</h1>
 		    <div class="col s12 m5">
 		      <div class="box-register">
-		        <h2 class="title-sub center">¡Haz parte del <span class="y-text">evento!</span></h2>
+		      	<header>
+		      		¡Haz parte del <span class="r-text">evento!</span>
+		      	</header>
 		        <div class="content-register">
 		          <div class="row">
 		            <div class="col s12">
@@ -74,17 +76,23 @@
 		              </button>
 		            </div>
 		            <div class="col s12 center">
-		              <p class="terms">Terminos y condiciones</p>
+		              <div class="more-info" @click="$root.goToView('info')">Mas información</div>
 		            </div>
 		          </div>
 		        </div>
 		      </div>
 		    </div>
 		    <div class="col s12 m7">
-		      <word-writing class="word-writing"></word-writing>
+		      <word-writing></word-writing>
 		    </div>
 	    </div>
 	  </section>
+	  <section id="info">
+	  	<div class="container">
+		    <h1 class="title-main">INFO</h1>
+		    <p>slo</p>
+	    </div>
+    </section>
 	  <section id="judges">
 	  	<div class="container">
 		    <h1 class="title-main" id="title-section-two">JURADOS</h1>
@@ -210,20 +218,23 @@
 <style lang="scss" scoped>
 @import "~@";
 .box-register {
-  background: #2e2d2d;
-  padding: 1em;
+  background: $background-welcome;
   position: relative;
-  &:before {
-    content: '';
+  border: 1.5px solid #222122;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+  & header {
     width: 100%;
     left: 0;
-    position: absolute;
-    height: 25px;
-    top: -24px;
+    position: relative;
+    height: 35px;
+    line-height: 35px;
+    top: 0;
+    font-weight: 300;
+    font-size: 1.5rem;
+    padding: 0 1em;
+    color: #fff;
     background: #222122;
-  }
-  &:hover {
-  	box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+    text-align: center;
   }
 }
 .content-register {

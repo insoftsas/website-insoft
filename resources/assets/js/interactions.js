@@ -26,7 +26,7 @@ if (window.innerWidth > 993) {
                         .add([
                           TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }),
                           TweenMax.staggerFromTo(".box-register", 2, {right: 0}, {right: '120%', ease: Back.ease}, 0),
-                          TweenMax.staggerFromTo(".word-writing", 2, {left: 0}, {left: '120%', ease: Back.ease}, 0)
+                          TweenMax.staggerFromTo(".container-console", 2, {left: 0}, {left: '120%', ease: Back.ease}, 0)
                         ])
 
     const tween_2 = new TimelineMax()
@@ -60,10 +60,14 @@ if (window.innerWidth > 993) {
                                  .addIndicators()
 
     // nav items activate
-    const nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('judges').offsetHeight})
+    const nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight})
                                  .addTo(controller)
                                  .addIndicators()
                                  .setClassToggle("#home-item", 'active')
+    const nav_0_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight})
+                                 .addTo(controller)
+                                 .addIndicators()
+                                 .setClassToggle("#home-item", 'active')                                 
 
     const nav_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight})
                                  .addTo(controller)

@@ -23,7 +23,7 @@
 
 @keyframes parpadeoY {
   0%, 100% {
-    border-color: $primary-color;
+    border-color: inherit;
   }
   50% {
     border-color: transparent;

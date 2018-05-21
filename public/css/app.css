@@ -9612,20 +9612,15 @@ body {
 
 .title-main {
   margin: 0;
-  padding: 1em 0;
-  padding-bottom: 20px;
+  padding: 1em;
   font-weight: 600;
   text-transform: uppercase;
   text-align: center;
   color: #fff;
 }
 
-.title-main.normal {
-  padding-bottom: 1em;
-}
-
 .container-algorithm-icon {
-  width: 200px;
+  width: 175px;
   margin-top: 1em;
   margin: auto;
 }
@@ -9717,14 +9712,7 @@ body {
   background-position: calc(50% - 1450px) center;
 }
 
-.title-sub {
-  font-weight: 300;
-  font-size: 2rem;
-  margin: 0 1em;
-  color: #fff;
-}
-
-.title-sub .y-text {
+.r-text {
   color: #03A9F4;
 }
 
@@ -9813,11 +9801,16 @@ body {
           box-shadow: 0 6px 8px rgba(0, 0, 0, 0.25);
 }
 
-.terms {
-  margin: 20px 0 0 0;
+.more-info {
+  margin: 22px 0;
   color: #fff;
   text-align: center;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.more-info:hover {
+  text-decoration: underline;
 }
 
 /* Enter and leave animations can use different */
@@ -9863,7 +9856,7 @@ body {
 
 @-webkit-keyframes parpadeoY {
   0%, 100% {
-    border-color: #03A9F4;
+    border-color: inherit;
   }
 
   50% {
@@ -9873,7 +9866,7 @@ body {
 
 @keyframes parpadeoY {
   0%, 100% {
-    border-color: #03A9F4;
+    border-color: inherit;
   }
 
   50% {
