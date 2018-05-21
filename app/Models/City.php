@@ -24,10 +24,6 @@ class City extends Model
         return $this->belongsTo('App\Models\State', 'state_id');
     }
 
-    public function ditricts()
-    {
-        return $this->hasMany('App\Models\District');
-    }
 
     public function getStateNameAttribute()
     {
