@@ -88132,7 +88132,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.tabs[data-v-384052eb] {\n  background-color: transparent !important;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n", ""]);
 
 // exports
 
@@ -88373,14 +88373,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
 
 window.ScrollMagic = __webpack_require__(7);
 __webpack_require__(178);
@@ -88394,9 +88386,6 @@ __webpack_require__(180);
   methods: {},
   mounted: function mounted() {
     __webpack_require__(181);
-    $('.tabs').tabs({
-      swipeable: true
-    });
   }
 });
 
@@ -91350,31 +91339,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "inscriptions" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("INSCRIPCIÓN")]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12" }, [
-          _c("ul", { staticClass: "tabs" }, [
-            _c("li", { staticClass: "tab col s6" }, [
-              _c(
-                "a",
-                { staticClass: "active", attrs: { href: "#enterprise" } },
-                [_vm._v("Empresario")]
-              )
-            ]),
-            _vm._v(" "),
-            _c("li", { staticClass: "tab col s6" }, [
-              _c("a", { attrs: { href: "#maker" } }, [_vm._v("Desarrollador")])
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12", attrs: { id: "enterprise" } }, [
-          _vm._v("Test 1")
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12", attrs: { id: "maker" } }, [
-          _vm._v("Test 2")
-        ])
+        _c("h1", { staticClass: "title-main" }, [_vm._v("INSCRIPCIÓN")])
       ])
     ])
   },
