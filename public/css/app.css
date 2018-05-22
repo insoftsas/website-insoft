@@ -9743,7 +9743,7 @@ body {
 .container-objects .object {
   display: inline-block;
   position: relative;
-  padding: 0 1em 1em 1em;
+  padding: 1em;
   border-radius: 5px;
   text-align: center;
   -webkit-transition: all .3s ease;
@@ -9752,16 +9752,16 @@ body {
 
 .container-judges .judge {
   opacity: 0;
-  background: #4db2ce;
-  background-image: -webkit-gradient(linear, left top, left bottom, from(#4db2ce), to(#086a86));
-  background-image: linear-gradient(#4db2ce, #086a86);
+  max-width: 260px;
+  padding: 2em;
+  background: #2b3b4f;
   -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
           box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
 }
 
 .container-judges .judge:hover {
-  -webkit-transform: translateY(20px) scale(1.2);
-          transform: translateY(20px) scale(1.2);
+  -webkit-transform: translateY(20px) scale(1.1);
+          transform: translateY(20px) scale(1.1);
 }
 
 .container-judges .judge .name {
@@ -9775,8 +9775,9 @@ body {
   color: #fff;
 }
 
-.container-judges .judge .profession {
+.container-judges .judge .info {
   color: #fff;
+  text-align: justify;
 }
 
 .container-judges img {
@@ -10298,35 +10299,35 @@ body {
 
 @-webkit-keyframes moveMemo {
   0% {
-    -webkit-transform: scale(0.6) translateY(-40px) translateX(-196px);
-            transform: scale(0.6) translateY(-40px) translateX(-196px);
+    -webkit-transform: scale(0.6) translateY(-40px) translateX(-75px);
+            transform: scale(0.6) translateY(-40px) translateX(-75px);
   }
 
   50% {
-    -webkit-transform: scale(0.6) translateY(-28px) translateX(-196px);
-            transform: scale(0.6) translateY(-28px) translateX(-196px);
+    -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);
+            transform: scale(0.6) translateY(-28px) translateX(-75px);
   }
 
   100% {
-    -webkit-transform: scale(0.6) translateY(-40px) translateX(-196px);
-            transform: scale(0.6) translateY(-40px) translateX(-196px);
+    -webkit-transform: scale(0.6) translateY(-40px) translateX(-75px);
+            transform: scale(0.6) translateY(-40px) translateX(-75px);
   }
 }
 
 @keyframes moveMemo {
   0% {
-    -webkit-transform: scale(0.6) translateY(-40px) translateX(-196px);
-            transform: scale(0.6) translateY(-40px) translateX(-196px);
+    -webkit-transform: scale(0.6) translateY(-40px) translateX(-75px);
+            transform: scale(0.6) translateY(-40px) translateX(-75px);
   }
 
   50% {
-    -webkit-transform: scale(0.6) translateY(-28px) translateX(-196px);
-            transform: scale(0.6) translateY(-28px) translateX(-196px);
+    -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);
+            transform: scale(0.6) translateY(-28px) translateX(-75px);
   }
 
   100% {
-    -webkit-transform: scale(0.6) translateY(-40px) translateX(-196px);
-            transform: scale(0.6) translateY(-40px) translateX(-196px);
+    -webkit-transform: scale(0.6) translateY(-40px) translateX(-75px);
+            transform: scale(0.6) translateY(-40px) translateX(-75px);
   }
 }
 
@@ -10372,12 +10373,25 @@ body {
     padding-right: 6px !important;
   }
 
+  .title-time {
+    margin: 2em 0 !important;
+    font-size: 1.1rem !important;
+  }
+
   #home {
     background-position: calc(50% + 530px) center;
   }
 
   #judges {
     background-position: calc(50% - 530px) center;
+  }
+
+  .container-content-info {
+    font-size: 1.1rem !important;
+  }
+
+  .console.last {
+    display: none !important;
   }
 }
 
@@ -10398,12 +10412,24 @@ body {
     margin-bottom: 20px;
   }
 
+  .title-section {
+    font-size: 1.3rem !important;
+    padding: 0px 0px 15px 0px !important;
+  }
+
   .box-register {
     top: 24px;
   }
 
-  section {
+  section,
+  footer {
     height: auto;
+    opacity: 1 !important;
+  }
+
+  .container-objects .object,
+  .container-judges .judge {
+    max-width: initial !important;
   }
 }
 

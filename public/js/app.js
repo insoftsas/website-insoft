@@ -88132,7 +88132,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 80px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(729px) translateY(-22px);\n          transform: scale(0.5) translateX(729px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-196px);\n          transform: scale(0.6) translateY(-28px) translateX(-196px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.5rem;\n  text-align: center;\n  margin: 0;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: 600;\n    text-transform: uppercase;\n}\n", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.container-content-info .content-info[data-v-384052eb] {\n    display: block;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 80px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(589px) translateY(-22px);\n          transform: scale(0.5) translateX(589px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);\n          transform: scale(0.6) translateY(-28px) translateX(-75px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.5rem;\n  text-align: center;\n  margin: 0;\n  text-transform: uppercase;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: bold;\n}\n", ""]);
 
 // exports
 
@@ -88176,6 +88176,28 @@ module.exports = function listToStyles (parentId, list) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -90814,48 +90836,41 @@ var controller = new ScrollMagic.Controller();
 if (window.innerWidth > 993) {
     // tweens
     var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { right: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0), TweenMax.staggerFromTo(".console", 2, { left: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { left: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0)]);
+    var tween_2 = new TimelineMax().add([TweenMax.to("#info", 0.2, { opacity: 1 }), TweenMax.to("#info", 0.5, { backgroundPositionX: 'calc(50% + 800px)', backgroundPositionY: 'center' })]);
 
-    var tween_2 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
-
-    var tween_3 = new TimelineMax().add([TweenMax.to("#info", 0.2, { opacity: 1 }), TweenMax.to("#info", 0.5, { backgroundPositionX: 'calc(50% + 800px)', backgroundPositionY: 'center' })]);
+    var tween_3 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
 
     // scenes
     var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
 
-    var scene_2 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
+    var scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
 
-    var scene_3 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
+    var scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
 
     // nav items activate
     var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
 
-    var nav_0_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#info-item", 'active');
+    var nav_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#info-item", 'active');
 
-    var nav_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
+    var nav_2 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#search-item", 'active');
 
-    var nav_4 = new ScrollMagic.Scene({ triggerElement: "#project-route", duration: document.getElementById('project-route').offsetHeight })
+    var nav_3 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#participate-item", 'active');
+
+    var nav_4 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
+
+    var nav_5 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
+
+    var nav_6 = new ScrollMagic.Scene({ triggerElement: "#prices", duration: document.getElementById('prices').offsetHeight })
     //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#project-route-item", 'active');
+    .addTo(controller).addIndicators().setClassToggle("#price-item", 'active');
 
-    var nav_5 = new ScrollMagic.Scene({ triggerElement: "#places", duration: document.getElementById('places').offsetHeight })
-    //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#place-item", 'active');
-
-    var nav_6 = new ScrollMagic.Scene({ triggerElement: "#how-to-get", duration: document.getElementById('how-to-get').offsetHeight })
-    //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#how-to-get-item", 'active');
-
-    var nav_7 = new ScrollMagic.Scene({ triggerElement: "#quotas", duration: document.getElementById('quotas').offsetHeight })
-    //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#quota-item", 'active');
-
-    var nav_8 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight })
+    var nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight })
     //.setTween(tween_3)
     .addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
 
-    var nav_9 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight })
+    var nav_8 = new ScrollMagic.Scene({ triggerElement: "#conctact", duration: document.getElementById('conctact').offsetHeight })
     //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
+    .addTo(controller).addIndicators().setClassToggle("#conctact-item", 'active');
 }
 
 /***/ }),
@@ -90902,6 +90917,51 @@ var render = function() {
         "div",
         {
           staticClass: "item",
+          attrs: { id: "search-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("we-search")
+            }
+          }
+        },
+        [_vm._v("¿Qué buscamos?")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "participate-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("participate")
+            }
+          }
+        },
+        [_vm._v("¿Quienes participan?")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "challenge-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("challenges")
+            }
+          }
+        },
+        [_vm._v("Retos")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
           attrs: { id: "judge-item" },
           on: {
             click: function($event) {
@@ -90917,60 +90977,15 @@ var render = function() {
         "div",
         {
           staticClass: "item",
-          attrs: { id: "project-route-item" },
+          attrs: { id: "price-item" },
           on: {
             click: function($event) {
               $event.preventDefault()
-              _vm.$root.goToView("project-route")
+              _vm.$root.goToView("prices")
             }
           }
         },
-        [_vm._v("Ruta del proyecto")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "place-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("places")
-            }
-          }
-        },
-        [_vm._v("Lugar evento")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "how-to-get-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("how-to-get")
-            }
-          }
-        },
-        [_vm._v("¿Cómo llegar?")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "quota-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("quotas")
-            }
-          }
-        },
-        [_vm._v("Cupos")]
+        [_vm._v("Premios")]
       ),
       _vm._v(" "),
       _c(
@@ -90992,15 +91007,15 @@ var render = function() {
         "div",
         {
           staticClass: "item",
-          attrs: { id: "challenge-item" },
+          attrs: { id: "conctact-item" },
           on: {
             click: function($event) {
               $event.preventDefault()
-              _vm.$root.goToView("challenges")
+              _vm.$root.goToView("conctact")
             }
           }
         },
-        [_vm._v("Retos")]
+        [_vm._v("Contacto")]
       ),
       _vm._v(" "),
       _c(
@@ -91560,6 +91575,12 @@ var staticRenderFns = [
           _vm._v(
             "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t\t\t    consequat."
           )
+        ]),
+        _vm._v(" "),
+        _c("span", [
+          _vm._v(
+            "ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t\t    tempor incididunt ut labore et."
+          )
         ])
       ])
     ])
@@ -91648,6 +91669,38 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "we-search" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("¿Qué buscamos?")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "participate" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [
+          _vm._v("¿Quienes participan?")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "challenges" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("RETOS")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "judges" } }, [
       _c("div", { staticClass: "container" }, [
         _c(
@@ -91658,61 +91711,93 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("div", { staticClass: "container-judges" }, [
           _c("div", { staticClass: "judge" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Omar Flórez")]),
-            _vm._v(" "),
             _c("img", {
               staticClass: "responsive-img",
               attrs: { src: "/images/judges/omar.jpg" }
             }),
             _vm._v(" "),
+            _c("span", { staticClass: "name" }, [_vm._v("Omar Flórez")]),
+            _vm._v(" "),
             _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
+              _c("span", [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t    consequat."
+                )
+              ]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v(
+                  "ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et."
+                )
               ])
             ])
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "judge" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Sergio Molina")]),
-            _vm._v(" "),
             _c("img", {
               staticClass: "responsive-img",
               attrs: { src: "/images/judges/sergio.jpg" }
             }),
             _vm._v(" "),
+            _c("span", { staticClass: "name" }, [_vm._v("Sergio Molina")]),
+            _vm._v(" "),
             _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
+              _c("span", [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t    consequat."
+                )
+              ]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v(
+                  "ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et."
+                )
               ])
             ])
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "judge" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Cheo")]),
-            _vm._v(" "),
             _c("img", {
               staticClass: "responsive-img",
               attrs: { src: "/images/judges/cheo.jpg" }
             }),
             _vm._v(" "),
+            _c("span", { staticClass: "name" }, [_vm._v("Cheo")]),
+            _vm._v(" "),
             _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
+              _c("span", [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t    consequat."
+                )
+              ]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v(
+                  "ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et."
+                )
               ])
             ])
           ]),
           _vm._v(" "),
           _c("div", { staticClass: "judge" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Uribe")]),
-            _vm._v(" "),
             _c("img", {
               staticClass: "responsive-img",
               attrs: { src: "/images/judges/uribe.png" }
             }),
             _vm._v(" "),
+            _c("span", { staticClass: "name" }, [_vm._v("Uribe")]),
+            _vm._v(" "),
             _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
+              _c("span", [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t    consequat."
+                )
+              ]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v(
+                  "ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et."
+                )
               ])
             ])
           ])
@@ -91724,39 +91809,9 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "project-route" } }, [
+    return _c("section", { attrs: { id: "prices" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("RUTA DEL PROYECTO")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "places" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("LUGAR")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "how-to-get" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("¿CÓMO LLEGAR?")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "quotas" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("CUPOS")])
+        _c("h1", { staticClass: "title-main" }, [_vm._v("Premios")])
       ])
     ])
   },
@@ -91774,9 +91829,9 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "challenges" } }, [
+    return _c("section", { attrs: { id: "conctact" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("RETOS")])
+        _c("h1", { staticClass: "title-main" }, [_vm._v("Contacto")])
       ])
     ])
   },
