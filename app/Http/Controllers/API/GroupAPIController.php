@@ -24,6 +24,7 @@ class GroupAPIController extends AppBaseController
 
     public function __construct(GroupRepository $groupRepo)
     {
+        $this->middleware('roles:root');
         $this->groupRepository = $groupRepo;
     }
 

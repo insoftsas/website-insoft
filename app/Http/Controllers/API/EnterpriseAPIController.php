@@ -24,6 +24,7 @@ class EnterpriseAPIController extends AppBaseController
 
     public function __construct(EnterpriseRepository $enterpriseRepo)
     {
+        $this->middleware('roles:root')->except('store');
         $this->enterpriseRepository = $enterpriseRepo;
     }
 

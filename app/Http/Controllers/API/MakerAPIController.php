@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\AppBaseController;
 use App\Http\Requests\API\CreateMakerAPIRequest;
 use App\Http\Requests\API\UpdateMakerAPIRequest;
+use App\Models\Group;
 use App\Models\Maker;
 use App\Repositories\MakerRepository;
 use Illuminate\Http\Request;
-use App\Http\Controllers\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
@@ -24,6 +25,8 @@ class MakerAPIController extends AppBaseController
 
     public function __construct(MakerRepository $makerRepo)
     {
+        $this->middleware('auth:api')->except('store');
+        $this->middleware('roles:root')->except('store');
         $this->makerRepository = $makerRepo;
     }
 
@@ -53,11 +56,19 @@ class MakerAPIController extends AppBaseController
      */
     public function store(CreateMakerAPIRequest $request)
     {
+       
+        if (!empty($request->group_code)) {
+            $group = Group::where('code', $request->group_code)->first();
+            if (empty($group)) {
+                return $this->sendError('Codigo de grupo no encontrado');
+            } 
+            //falta validacion de cantidad de participantes en cada grupo
+        }
         $input = $request->all();
 
         $makers = $this->makerRepository->create($input);
 
-        return $this->sendResponse($makers->toArray(), 'Maker saved successfully');
+        return $this->sendResponse([], 'Maker Registrado correctamente');
     }
 
     /**
