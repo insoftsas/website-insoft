@@ -88132,7 +88132,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.container-content-info .content-info[data-v-384052eb] {\n    display: block;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 80px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(589px) translateY(-22px);\n          transform: scale(0.5) translateX(589px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);\n          transform: scale(0.6) translateY(-28px) translateX(-75px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.5rem;\n  text-align: center;\n  margin: 0;\n  text-transform: uppercase;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: bold;\n}\n", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.container-content-info .content-info[data-v-384052eb] {\n    display: block;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 80px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(589px) translateY(-22px);\n          transform: scale(0.5) translateX(589px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);\n          transform: scale(0.6) translateY(-28px) translateX(-75px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.5rem;\n  text-align: center;\n  margin: 0;\n  text-transform: uppercase;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: bold;\n}\n.transform-arrow[data-v-384052eb] {\n  -webkit-transform: translateX(105px) translateY(-65px) scale(3.5);\n          transform: translateX(105px) translateY(-65px) scale(3.5);\n}\n.transform-arrow .icon_arrow-line path[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n}\n.transform-arrow .icon_arrow-line .arrow-line-b[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_b;\n          animation-name: draw_arrow_line_b;\n}\n.transform-arrow .icon_arrow-line .arrow-line-c[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_c;\n          animation-name: draw_arrow_line_c;\n}\n.transform-arrow .icon_arrow-line .arrow-line-d[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_d;\n          animation-name: draw_arrow_line_d;\n}\n.transform-arrow .icon_arrow-line .arrow-line-e[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_e;\n          animation-name: draw_arrow_line_e;\n}\n.transform-arrow .icon_arrow-line .arrow-line-f[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_f;\n          animation-name: draw_arrow_line_f;\n}\n.transform-arrow .icon_arrow-line .arrow-line-g[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_g;\n          animation-name: draw_arrow_line_g;\n}\n.transform-arrow .arrow-end[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n}\n", ""]);
 
 // exports
 
@@ -88176,6 +88176,20 @@ module.exports = function listToStyles (parentId, list) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -90840,12 +90854,15 @@ if (window.innerWidth > 993) {
 
     var tween_3 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
 
+    var tween_4 = new TimelineMax().add([TweenMax.to("#we-search", 0.2, { opacity: 1 }), TweenMax.to("#we-search", 0.5, { backgroundPositionX: 'calc(50% + 20px)', backgroundPositionY: 'center' })]);
+
     // scenes
     var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
 
     var scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
 
     var scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
+    var scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).setTween(tween_4).addTo(controller).addIndicators();
 
     // nav items activate
     var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
@@ -91161,18 +91178,19 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "col s12 center" }, [
-                  _c(
-                    "div",
-                    {
-                      staticClass: "more-info",
-                      on: {
-                        click: function($event) {
-                          _vm.$root.goToView("info")
+                  _c("div", { staticClass: "more-info" }, [
+                    _c(
+                      "a",
+                      {
+                        on: {
+                          click: function($event) {
+                            _vm.$root.goToView("info")
+                          }
                         }
-                      }
-                    },
-                    [_vm._v("Mas información")]
-                  )
+                      },
+                      [_vm._v("Mas información")]
+                    )
+                  ])
                 ])
               ])
             ])
@@ -91509,7 +91527,82 @@ var render = function() {
                               }
                             })
                           ])
-                        ])
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "g",
+                          {
+                            staticClass: "transform-arrow",
+                            attrs: { fill: "#f28a7c" }
+                          },
+                          [
+                            _c("g", { staticClass: "icon_arrow-line" }, [
+                              _c("path", {
+                                staticClass: "arrow-line-a",
+                                attrs: {
+                                  d:
+                                    "m 30.201849,72.467726 2.78648,0.161796 0.287637,-4.674096 -2.804458,-0.161796 z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "arrow-line-b",
+                                attrs: {
+                                  d:
+                                    "m 35.073695,61.303828 -2.750526,-0.683137 -1.06066,4.566232 2.660639,0.66516 z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "arrow-line-c",
+                                attrs: {
+                                  d:
+                                    "m 33.707421,57.744325 2.444911,1.312342 2.265139,-4.062868 -2.498843,-1.348297 z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "arrow-line-d",
+                                attrs: {
+                                  d:
+                                    "m 37.752311,51.578114 2.157275,1.707842 2.912321,-3.613435 -2.193229,-1.743797 z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "arrow-line-e",
+                                attrs: {
+                                  d:
+                                    "m 42.749998,46.005153 1.599979,2.301094 3.865118,-2.552776 -1.599979,-2.337047 z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "arrow-line-f",
+                                attrs: {
+                                  d:
+                                    "m 49.275755,42.229922 0.916842,2.624685 4.422413,-1.52807 -0.898864,-2.606707 z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "arrow-line-g",
+                                attrs: {
+                                  d:
+                                    "m 56.232967,40.036693 0.287636,2.804457 4.602187,-0.431455 -0.233705,-2.732548 z"
+                                }
+                              })
+                            ]),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "arrow-end",
+                              attrs: {
+                                d:
+                                  "m 60.392578,33.474609 -2.042969,2.113282 5.839844,5.648437 -5.583984,5.773438 2.113281,2.042968 7.587891,-7.845703 -0.107422,-0.103515 z"
+                              }
+                            })
+                          ]
+                        )
                       ]
                     )
                   ])
@@ -91671,7 +91764,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "we-search" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("¿Qué buscamos?")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("¿Qué buscamos?")])
       ])
     ])
   },
@@ -91681,7 +91774,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "participate" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [
+        _c("h2", { staticClass: "title-section" }, [
           _vm._v("¿Quienes participan?")
         ])
       ])
@@ -91693,7 +91786,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "challenges" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("RETOS")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Retos")])
       ])
     ])
   },
@@ -91704,9 +91797,9 @@ var staticRenderFns = [
     return _c("section", { attrs: { id: "judges" } }, [
       _c("div", { staticClass: "container" }, [
         _c(
-          "h1",
-          { staticClass: "title-main", attrs: { id: "title-section-two" } },
-          [_vm._v("JURADOS")]
+          "h2",
+          { staticClass: "title-section", attrs: { id: "title-section-two" } },
+          [_vm._v("Jurados")]
         ),
         _vm._v(" "),
         _c("div", { staticClass: "container-judges" }, [
@@ -91811,7 +91904,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "prices" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("Premios")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Premios")])
       ])
     ])
   },
@@ -91821,7 +91914,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "inscriptions" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("INSCRIPCIÓN")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Inscripción")])
       ])
     ])
   },
@@ -91831,7 +91924,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "conctact" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("Contacto")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Contacto")])
       ])
     ])
   },
