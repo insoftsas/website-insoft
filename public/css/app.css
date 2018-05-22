@@ -10331,7 +10331,235 @@ body {
   }
 }
 
+@-webkit-keyframes draw_arrow_line_a {
+  0% {
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line_a {
+  0% {
+    opacity: 0;
+  }
+
+  30% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes draw_arrow_line_b {
+  0% {
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line_b {
+  0% {
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes draw_arrow_line_c {
+  0% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0;
+  }
+
+  45% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line_c {
+  0% {
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0;
+  }
+
+  45% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes draw_arrow_line_d {
+  0% {
+    opacity: 0;
+  }
+
+  45% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line_d {
+  0% {
+    opacity: 0;
+  }
+
+  45% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes draw_arrow_line_e {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  55% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line_e {
+  0% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 0;
+  }
+
+  55% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes draw_arrow_line_f {
+  0% {
+    opacity: 0;
+  }
+
+  55% {
+    opacity: 0;
+  }
+
+  60% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line_f {
+  0% {
+    opacity: 0;
+  }
+
+  55% {
+    opacity: 0;
+  }
+
+  60% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes draw_arrow_line_g {
+  0% {
+    opacity: 0;
+  }
+
+  60% {
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line_g {
+  0% {
+    opacity: 0;
+  }
+
+  60% {
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes draw_arrow_line-end {
+  0% {
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 0;
+  }
+
+  70% {
+    opacity: 1;
+  }
+}
+
+@keyframes draw_arrow_line-end {
+  0% {
+    opacity: 0;
+  }
+
+  65% {
+    opacity: 0;
+  }
+
+  70% {
+    opacity: 1;
+  }
+}
+
 @media only screen and (max-width: 600px) {
+  .title-main {
+    font-size: 1.4rem !important;
+  }
+
   .container-judges .judge,
   .container-judges .trainer,
   .container-trainers .judge,
@@ -10375,7 +10603,7 @@ body {
 
   .title-time {
     margin: 2em 0 !important;
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
   }
 
   #home {
@@ -10392,6 +10620,10 @@ body {
 
   .console.last {
     display: none !important;
+  }
+
+  .title-section {
+    font-size: 1.2rem !important;
   }
 }
 
@@ -10419,6 +10651,11 @@ body {
 
   .box-register {
     top: 24px;
+  }
+
+  .title-time {
+    margin: 2em 0 !important;
+    font-size: 1.2rem !important;
   }
 
   section,
