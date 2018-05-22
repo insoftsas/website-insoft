@@ -8,6 +8,7 @@ use App\Http\Requests\API\UpdateMakerAPIRequest;
 use App\Models\Group;
 use App\Models\Maker;
 use App\Repositories\MakerRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
@@ -56,17 +57,58 @@ class MakerAPIController extends AppBaseController
      */
     public function store(CreateMakerAPIRequest $request)
     {
-       
-        if (!empty($request->group_code)) {
-            $group = Group::where('code', $request->group_code)->first();
-            if (empty($group)) {
-                return $this->sendError('Codigo de grupo no encontrado');
-            } 
-            //falta validacion de cantidad de participantes en cada grupo
-        }
-        $input = $request->all();
+        $input = $request->only(['first_name', 'last_name', 'doc_type', 'document', 'genere', 'bird_date', 'city_id', 'email', 'phone', 'level', 'semester', 'area', 'career', 'skills', 'bio', 'file_document', 'file_certificate']);
 
-        $makers = $this->makerRepository->create($input);
+
+        if ($request->new_group == 1) 
+        {
+            $group = Group::where('name', $request->group_name)->first();
+            if (!empty($group)) {
+                return $this->sendError('Su grupo ya se encuentra registrado en nuestro sistema');
+            }
+
+            $code_new = mb_strtoupper(substr(uniqid(), -6));
+
+            while (!empty(Group::where('code', $code_new)->first())) {
+                $code_new = mb_strtoupper(substr(uniqid(), -6));
+            }
+        } else {
+      
+            if (!empty($request->group_code)) {
+                $group = Group::where('code', $request->group_code)->first();
+                if (empty($group)) {
+                    return $this->sendError('Codigo de grupo no encontrado');
+                } else {
+                    $input['group_id'] = $group->id;
+                }
+                //falta validacion de cantidad de participantes en cada grupo
+            }
+
+        }
+
+        $bird_date = Carbon::createFromFormat('Y-m-d', $request->bird_date);
+        $age = $bird_date->diffInYears(Carbon::today());
+        if ($age<16 || $age>30)
+        {
+            return $this->sendError('La edad permitida para el evento es de 16-30 años de edad');
+        }
+
+        $maker = $this->makerRepository->create($input);
+
+        if ($request->new_group == 1) 
+        {
+
+            $groupCreated = Group::create([
+                'name' => $request->group_name,
+                'code' => $code_new,
+                'leader_id' => $maker->id,
+                'description' => $request->description,
+            ]);
+            if (!empty($group)) {
+                return $this->sendError('Su grupo ya se encuentra registrado en nuestro sistema');
+            }
+        }
+
 
         return $this->sendResponse([], 'Maker Registrado correctamente');
     }
