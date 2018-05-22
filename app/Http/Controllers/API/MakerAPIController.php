@@ -95,6 +95,8 @@ class MakerAPIController extends AppBaseController
 
         $maker = $this->makerRepository->create($input);
 
+        $result = [];
+
         if ($request->new_group == 1) 
         {
 
@@ -104,13 +106,15 @@ class MakerAPIController extends AppBaseController
                 'leader_id' => $maker->id,
                 'description' => $request->description,
             ]);
-            if (!empty($group)) {
-                return $this->sendError('Su grupo ya se encuentra registrado en nuestro sistema');
-            }
+
+            $result['code'] = $code_new;
+
+            $maker = $this->makerRepository->update(['group_id' => $groupCreated->id], $maker->id);
+            
         }
 
 
-        return $this->sendResponse([], 'Maker Registrado correctamente');
+        return $this->sendResponse($result, 'Maker Registrado correctamente');
     }
 
     /**
