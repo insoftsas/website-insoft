@@ -88498,10 +88498,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
-//
-//
-//
-//
 
 window.ScrollMagic = __webpack_require__(7);
 __webpack_require__(178);
@@ -91666,13 +91662,13 @@ var staticRenderFns = [
       _c("div", { staticClass: "content-info" }, [
         _c("span", [
           _vm._v(
-            "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t\t\t    consequat."
+            "La transformación digital reconstruye las dinámicas de las organizaciones para adaptarlas a las necesidades del presente y del futuro."
           )
         ]),
         _vm._v(" "),
         _c("span", [
           _vm._v(
-            "ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t\t    tempor incididunt ut labore et."
+            "En la actualidad, la transformación digital no es una opción. Las empresas de hoy ya no pueden plantearse la adaptación a este nuevo panorama pues no hay otra manera de renovarse y competir que mediante la transformación digital."
           )
         ])
       ])

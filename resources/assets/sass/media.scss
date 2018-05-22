@@ -1,8 +1,11 @@
 @media #{$small-and-down} {
+	.title-main {
+		font-size: 1.4rem !important;
+	}
 	.container-judges, .container-trainers {
-	  	& .judge, & .trainer {
-	  		width: 100%;
-	    	margin-bottom: calc(25px + 20px);
+  	& .judge, & .trainer {
+  		width: 100%;
+    	margin-bottom: calc(25px + 20px);
 		}
 	}
 	.button-register {
@@ -11,14 +14,14 @@
 		}
 		& .icon-caracter {
 			width: 30px !important;
-    		height: 30px !important;
-    		float: left !important;
-		    display: inline-block !important;
-		    margin-right: 15px !important;
+  		height: 30px !important;
+  		float: left !important;
+	    display: inline-block !important;
+	    margin-right: 15px !important;
 		}
 		& span {
 			float: left;
-    		line-height: 30px;
+    	line-height: 30px;
 		}
 	}
 	.content-register {
@@ -35,6 +38,10 @@
 			padding-right: 6px !important;
 		}
 	}
+	.title-time {
+		margin: 2em 0 !important;
+    font-size: 1rem !important;
+	}
 	#home {
 	  background-position: calc(50% + 530px) center;
 	}
@@ -42,27 +49,48 @@
 	#judges {
 	  background-position: calc(50% - 530px) center;
 	}
+	.container-content-info {
+		font-size: 1.1rem !important;
+	}
+	.console.last {
+		display: none !important;
+	}
+	.title-section {
+		font-size: 1.2rem !important;
+	}
 }
 @media #{$medium-and-up} {
 // styles for medium screens and larger
 }
 @media #{$medium-and-down} {
 	#title-section-two, #title-section-three, .judge, .trainer {
-	  opacity: 1 !important;
-  	}
-  	.title-main {
-  		font-size: 2rem;
-  	}
-  	.title-sub {
-  		font-size: 1.7rem;
-  		margin-bottom: 20px;
-  	}
-  	.box-register {
-  		top: 24px;
-  	}
-  	section {
-  		height: auto;
-  	}
+  	opacity: 1 !important;
+	}
+	.title-main {
+		font-size: 2rem;
+	}
+	.title-sub {
+		font-size: 1.7rem;
+		margin-bottom: 20px;
+	}
+	.title-section {
+		font-size: 1.3rem !important;
+		padding: 0px 0px 15px 0px !important;
+	}
+	.box-register {
+		top: 24px;
+	}
+	.title-time {
+		margin: 2em 0 !important;
+    font-size: 1.2rem !important;
+	}
+	section, footer {
+		height: auto;
+		opacity: 1 !important;
+	}
+	.container-objects .object, .container-judges .judge {
+		max-width: initial !important;
+	}
 }
 @media #{$large-and-up} {
 // styles for large screens and up
