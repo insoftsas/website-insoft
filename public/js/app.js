@@ -88132,7 +88132,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 80px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(729px) translateY(-22px);\n          transform: scale(0.5) translateX(729px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-196px);\n          transform: scale(0.6) translateY(-28px) translateX(-196px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.5rem;\n  text-align: center;\n  margin: 0;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: 600;\n    text-transform: uppercase;\n}\n", ""]);
 
 // exports
 
@@ -88176,6 +88176,99 @@ module.exports = function listToStyles (parentId, list) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -90718,61 +90811,51 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 var controller = new ScrollMagic.Controller();
 
-// tweens backgrounds
-var tween_bg_2 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#343233', backgroundImage: 'linear-gradient(#343233, #007496)' })]);
-var tween_bg_3 = new TimelineMax().add([TweenMax.to("#body-app", 0.5, { backgroundColor: '#343233', backgroundImage: 'linear-gradient(#343233, #673330)' })]);
-
-// backgounds scenes
-var bg_2 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: 300 }).setTween(tween_bg_2).addTo(controller).addIndicators();
-var bg_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: 300 }).setTween(tween_bg_3).addTo(controller).addIndicators();
-
 if (window.innerWidth > 993) {
-                             // tweens
-                             var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0 }, { right: '120%', ease: Back.ease }, 0), TweenMax.staggerFromTo(".container-console", 2, { left: 0 }, { left: '120%', ease: Back.ease }, 0)]);
+    // tweens
+    var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { right: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0), TweenMax.staggerFromTo(".console", 2, { left: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { left: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0)]);
 
-                             var tween_2 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
+    var tween_2 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
 
-                             var tween_3 = new TimelineMax().add([TweenMax.to("#title-section-three", 0.5, { opacity: 1.75 }), TweenMax.to(".trainer", 0.2, { opacity: 1 })]);
-                             // scenes
-                             var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
+    var tween_3 = new TimelineMax().add([TweenMax.to("#info", 0.2, { opacity: 1 }), TweenMax.to("#info", 0.5, { backgroundPositionX: 'calc(50% + 800px)', backgroundPositionY: 'center' })]);
 
-                             var scene_2 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
+    // scenes
+    var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
 
-                             var scene_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
+    var scene_2 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
 
-                             // nav items activate
-                             var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
-                             var nav_0_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
+    var scene_3 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
 
-                             var nav_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
+    // nav items activate
+    var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
 
-                             var nav_3 = new ScrollMagic.Scene({ triggerElement: "#trainers", duration: document.getElementById('trainers').offsetHeight })
-                             //.setTween(tween_3)
-                             .addTo(controller).addIndicators().setClassToggle("#trainer-item", 'active');
+    var nav_0_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#info-item", 'active');
 
-                             var nav_4 = new ScrollMagic.Scene({ triggerElement: "#project-route", duration: document.getElementById('project-route').offsetHeight })
-                             //.setTween(tween_3)
-                             .addTo(controller).addIndicators().setClassToggle("#project-route-item", 'active');
+    var nav_1 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
 
-                             var nav_5 = new ScrollMagic.Scene({ triggerElement: "#places", duration: document.getElementById('places').offsetHeight })
-                             //.setTween(tween_3)
-                             .addTo(controller).addIndicators().setClassToggle("#place-item", 'active');
+    var nav_4 = new ScrollMagic.Scene({ triggerElement: "#project-route", duration: document.getElementById('project-route').offsetHeight })
+    //.setTween(tween_3)
+    .addTo(controller).addIndicators().setClassToggle("#project-route-item", 'active');
 
-                             var nav_6 = new ScrollMagic.Scene({ triggerElement: "#how-to-get", duration: document.getElementById('how-to-get').offsetHeight })
-                             //.setTween(tween_3)
-                             .addTo(controller).addIndicators().setClassToggle("#how-to-get-item", 'active');
+    var nav_5 = new ScrollMagic.Scene({ triggerElement: "#places", duration: document.getElementById('places').offsetHeight })
+    //.setTween(tween_3)
+    .addTo(controller).addIndicators().setClassToggle("#place-item", 'active');
 
-                             var nav_7 = new ScrollMagic.Scene({ triggerElement: "#quotas", duration: document.getElementById('quotas').offsetHeight })
-                             //.setTween(tween_3)
-                             .addTo(controller).addIndicators().setClassToggle("#quota-item", 'active');
+    var nav_6 = new ScrollMagic.Scene({ triggerElement: "#how-to-get", duration: document.getElementById('how-to-get').offsetHeight })
+    //.setTween(tween_3)
+    .addTo(controller).addIndicators().setClassToggle("#how-to-get-item", 'active');
 
-                             var nav_8 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight })
-                             //.setTween(tween_3)
-                             .addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
+    var nav_7 = new ScrollMagic.Scene({ triggerElement: "#quotas", duration: document.getElementById('quotas').offsetHeight })
+    //.setTween(tween_3)
+    .addTo(controller).addIndicators().setClassToggle("#quota-item", 'active');
 
-                             var nav_9 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight })
-                             //.setTween(tween_3)
-                             .addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
+    var nav_8 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight })
+    //.setTween(tween_3)
+    .addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
+
+    var nav_9 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight })
+    //.setTween(tween_3)
+    .addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
 }
 
 /***/ }),
@@ -90804,6 +90887,21 @@ var render = function() {
         "div",
         {
           staticClass: "item",
+          attrs: { id: "info-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("info")
+            }
+          }
+        },
+        [_vm._v("¿Qué es?")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
           attrs: { id: "judge-item" },
           on: {
             click: function($event) {
@@ -90813,21 +90911,6 @@ var render = function() {
           }
         },
         [_vm._v("Jurados")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "trainer-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("trainers")
-            }
-          }
-        },
-        [_vm._v("Capacitadores")]
       ),
       _vm._v(" "),
       _c(
@@ -91085,11 +91168,345 @@ var render = function() {
       ])
     ]),
     _vm._v(" "),
-    _vm._m(2),
-    _vm._v(" "),
-    _vm._m(3),
-    _vm._v(" "),
-    _vm._m(4),
+    _c("section", { attrs: { id: "info" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col s12" }, [
+            _c("h2", { staticClass: "title-section" }, [
+              _vm._v("¿Qúe es la transformación digital?")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "col s12 container-content-info" }, [
+              _vm._m(2),
+              _vm._v(" "),
+              _c("div", { staticClass: "col s12 m6" }, [
+                _c("div", { staticClass: "content-info" }, [
+                  _vm._m(3),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "animation-digital-transform" }, [
+                    _c(
+                      "svg",
+                      {
+                        staticStyle: {
+                          "enable-background": "new 0 0 656 573.3"
+                        },
+                        attrs: {
+                          version: "1.1",
+                          id: "Layer_1",
+                          xmlns: "http://www.w3.org/2000/svg",
+                          "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                          x: "0px",
+                          y: "0px",
+                          viewBox: "0 0 656 273",
+                          "xml:space": "preserve"
+                        }
+                      },
+                      [
+                        _c("g", { staticClass: "memo-dt" }, [
+                          _c("rect", {
+                            staticClass: "st6 memo-container",
+                            attrs: {
+                              x: "198.4",
+                              y: "131.9",
+                              width: "254",
+                              height: "254"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("g", { staticClass: "objects-drawed-pencil" }, [
+                            _c("g", [
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M341.2,309.8c-2,0-3.6-1.6-3.6-3.6v-10.9c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v10.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC344.9,308.2,343.2,309.8,341.2,309.8"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M355.8,309.8c-2,0-3.6-1.6-3.6-3.6v-25.5c0-2,1.6-3.6,3.6-3.6c2,0,3.6,1.6,3.6,3.6v25.5\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC359.4,308.2,357.8,309.8,355.8,309.8"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M370.3,309.8c-2,0-3.6-1.6-3.6-3.6V288c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v18.2\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC374,308.2,372.4,309.8,370.3,309.8"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M384.9,309.8c-2,0-3.6-1.6-3.6-3.6v-43.7c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v43.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC388.5,308.2,386.9,309.8,384.9,309.8"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M399.5,309.8c-2,0-3.6-1.6-3.6-3.6V277c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v29.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC403.1,308.2,401.5,309.8,399.5,309.8"
+                                }
+                              })
+                            ]),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st8",
+                              attrs: {
+                                d:
+                                  "M319.4,257c0,21.1-17.1,38.2-38.2,38.2S243,278.1,243,257s17.1-38.2,38.2-38.2S319.4,235.9,319.4,257"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st8",
+                              attrs: {
+                                d:
+                                  "M279.4,218.9C279.4,218.9,279.4,218.9,279.4,218.9l-0.1,39.9c0,0.1,0.1,0.1,0.1,0.1h39.8c0,0,0,0,0.1-0.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC320.4,236.3,301.9,217.8,279.4,218.9"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("g", [
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M381.3,237h-29.1c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h29.1c2,0,3.6,1.6,3.6,3.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC384.9,235.4,383.3,237,381.3,237"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M399.5,237c-0.9,0-1.9-0.4-2.6-1.1c-0.1-0.2-0.3-0.4-0.4-0.5c-0.1-0.2-0.3-0.4-0.3-0.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc-0.1-0.2-0.2-0.4-0.2-0.7c0-0.3-0.1-0.5-0.1-0.7c0-0.2,0-0.5,0.1-0.7c0-0.2,0.1-0.4,0.2-0.7c0.1-0.2,0.2-0.4,0.3-0.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc0.1-0.2,0.3-0.4,0.4-0.5c1.3-1.3,3.8-1.3,5.2,0c0.7,0.7,1.1,1.6,1.1,2.6c0,1-0.4,1.9-1.1,2.6C401.3,236.6,400.4,237,399.5,237"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M399.5,218.8h-10.9c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h10.9c2,0,3.6,1.6,3.6,3.6S401.5,218.8,399.5,218.8"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M359.4,218.8h-7.3c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h7.3c2,0,3.6,1.6,3.6,3.6S361.4,218.8,359.4,218.8"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                staticClass: "st8",
+                                attrs: {
+                                  d:
+                                    "M374,218.8c-0.9,0-1.9-0.4-2.6-1.1c-0.7-0.7-1.1-1.6-1.1-2.6c0-0.9,0.4-1.9,1.1-2.6c0.4-0.3,0.7-0.6,1.2-0.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc1.3-0.6,2.9-0.3,4,0.8c0.7,0.7,1.1,1.6,1.1,2.6c0,0.9-0.4,1.9-1.1,2.6C375.9,218.4,374.9,218.8,374,218.8"
+                                }
+                              })
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _c("g", { staticClass: "pencil-dt" }, [
+                            _c("path", {
+                              staticClass: "st7",
+                              attrs: {
+                                d:
+                                  "M358.2,222.4c1.4,1.4,1.4,3.7,0,5.1l-1.3,1.3l20.8-5.7l-20.2-20.2l-5.7,20.8l1.3-1.3\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC354.6,221,356.8,221,358.2,222.4z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st9",
+                              attrs: {
+                                d:
+                                  "M357,228.8l1.3-1.3c1.4-1.4,1.4-3.7,0-5.1c-1.4-1.4-3.7-1.4-5.1,0l-1.3,1.3l-1.9,7L357,228.8z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("polygon", {
+                              staticClass: "st10",
+                              attrs: {
+                                points:
+                                  "474.6,126.4 454.3,106 357.6,202.7 357.6,202.8 377.8,223.1 377.9,223 "
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st11",
+                              attrs: {
+                                d:
+                                  "M497.5,93.3l-10.3-10.3c-2.8-2.8-7.3-2.8-10.1,0l-12.8,12.8l20.3,20.3l12.8-12.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC500.3,100.7,500.3,96.1,497.5,93.3z"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("rect", {
+                              staticClass: "st7",
+                              attrs: {
+                                x: "462.3",
+                                y: "96.7",
+                                transform:
+                                  "matrix(0.7071 -0.7071 0.7071 0.7071 58.9513 364.5358)",
+                                width: "14.4",
+                                height: "28.8"
+                              }
+                            })
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c("g", { staticClass: "computer-dt" }, [
+                          _c("path", {
+                            staticClass: "st0",
+                            attrs: {
+                              d:
+                                "M584,389.8H72V120.6c0-17.1,13.8-30.9,30.9-30.9h450.2c17.1,0,30.9,13.8,30.9,30.9L584,389.8L584,389.8z"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("path", {
+                            staticClass: "st1",
+                            attrs: {
+                              d:
+                                "M433.9,566.3H222.1c0-19.5,15.8-35.3,35.3-35.3h141.2C418.1,531,433.9,546.8,433.9,566.3"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("polygon", {
+                            staticClass: "st2",
+                            attrs: {
+                              points:
+                                "389.8,531 266.2,531 283.9,460.4 372.1,460.4 \t"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("path", {
+                            staticClass: "st1",
+                            attrs: {
+                              d:
+                                "M553.1,460.4H102.9c-17.1,0-30.9-13.8-30.9-30.9v-39.7h512v39.7C584,446.6,570.2,460.4,553.1,460.4"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("g", { staticClass: "bars-horizontal" }, [
+                            _c("path", {
+                              staticClass: "st3",
+                              attrs: {
+                                d:
+                                  "M363.3,363.3c-4.9,0-8.8-4-8.8-8.8V328c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v26.5\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC372.1,359.4,368.2,363.3,363.3,363.3"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st3",
+                              attrs: {
+                                d:
+                                  "M398.6,363.3c-4.9,0-8.8-4-8.8-8.8v-61.8c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v61.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC407.4,359.4,403.5,363.3,398.6,363.3"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st3",
+                              attrs: {
+                                d:
+                                  "M433.9,363.3c-4.9,0-8.8-4-8.8-8.8v-44.1c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v44.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC442.8,359.4,438.8,363.3,433.9,363.3"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st3",
+                              attrs: {
+                                d:
+                                  "M469.2,363.3c-4.9,0-8.8-4-8.8-8.8V248.6c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v105.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC478.1,359.4,474.1,363.3,469.2,363.3"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st3",
+                              attrs: {
+                                d:
+                                  "M504.6,363.3c-4.9,0-8.8-4-8.8-8.8v-70.6c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v70.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC513.4,359.4,509.4,363.3,504.6,363.3"
+                              }
+                            })
+                          ]),
+                          _vm._v(" "),
+                          _c("path", {
+                            staticClass: "st4",
+                            attrs: {
+                              d:
+                                "M310.3,235.3c0,51.2-41.5,92.7-92.7,92.7S125,286.5,125,235.3s41.5-92.7,92.7-92.7S310.3,184.1,310.3,235.3"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("path", {
+                            staticClass: "st5 graphic-part",
+                            attrs: {
+                              d:
+                                "M213.4,142.7c0,0-0.1,0.1-0.1,0.1v96.6c0,0.2,0.1,0.3,0.3,0.3h96.6c0,0,0.1-0.1,0.1-0.1\n\t\t\t\t\t\t\t\t\t\t\t\t\tC312.7,185,267.9,140.3,213.4,142.7"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _c("g", { staticClass: "bars-vertical" }, [
+                            _c("path", {
+                              staticClass: "st4",
+                              attrs: {
+                                d:
+                                  "M460.4,186.8h-70.6c-4.9,0-8.8-4-8.8-8.8s3.9-8.8,8.8-8.8h70.6c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC469.2,182.8,465.3,186.8,460.4,186.8"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st4",
+                              attrs: {
+                                d:
+                                  "M504.6,186.8c-2.3,0-4.6-1-6.3-2.6c-0.4-0.4-0.8-0.9-1.1-1.3c-0.4-0.5-0.6-1.1-0.8-1.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tc-0.3-0.5-0.4-1.1-0.5-1.6c-0.1-0.6-0.2-1.2-0.2-1.8s0.1-1.1,0.2-1.8c0.1-0.5,0.3-1.1,0.5-1.6c0.2-0.5,0.4-1.1,0.8-1.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tc0.3-0.4,0.7-0.9,1.1-1.3c3.3-3.3,9.2-3.3,12.5,0c1.6,1.7,2.6,3.9,2.6,6.3c0,2.4-1,4.6-2.6,6.3\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC509.1,185.8,506.8,186.8,504.6,186.8"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st4",
+                              attrs: {
+                                d:
+                                  "M504.6,142.6h-26.5c-4.9,0-8.8-4-8.8-8.8c0-4.9,3.9-8.8,8.8-8.8h26.5c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC513.4,138.7,509.4,142.6,504.6,142.6"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st4",
+                              attrs: {
+                                d:
+                                  "M407.4,142.6h-17.7c-4.9,0-8.8-4-8.8-8.8c0-4.9,3.9-8.8,8.8-8.8h17.7c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC416.3,138.7,412.3,142.6,407.4,142.6"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("path", {
+                              staticClass: "st4",
+                              attrs: {
+                                d:
+                                  "M442.8,142.6c-2.3,0-4.6-1-6.3-2.6c-1.6-1.7-2.6-4-2.6-6.3c0-2.3,1-4.6,2.6-6.3c0.9-0.8,1.8-1.4,2.9-1.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tc3.3-1.4,7.1-0.6,9.6,1.9c1.6,1.7,2.6,4,2.6,6.3c0,2.3-1,4.6-2.6,6.3C447.3,141.6,445.1,142.6,442.8,142.6"
+                              }
+                            })
+                          ])
+                        ])
+                      ]
+                    )
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _vm._m(4)
+            ])
+          ])
+        ])
+      ])
+    ]),
     _vm._v(" "),
     _vm._m(5),
     _vm._v(" "),
@@ -91101,7 +91518,11 @@ var render = function() {
     _vm._v(" "),
     _vm._m(9),
     _vm._v(" "),
-    _vm._m(10)
+    _vm._m(10),
+    _vm._v(" "),
+    _vm._m(11),
+    _vm._v(" "),
+    _vm._m(12)
   ])
 }
 var staticRenderFns = [
@@ -91133,11 +91554,93 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "info" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("INFO")]),
+    return _c("div", { staticClass: "col s12 m6" }, [
+      _c("div", { staticClass: "content-info" }, [
+        _c("span", [
+          _vm._v(
+            "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t\t\t    consequat."
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "title-time" }, [
+      _vm._v("¡Es hora de "),
+      _c("span", { staticClass: "sub" }, [_vm._v("transformar")]),
+      _vm._v(" tu empresa!")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12" }, [
+      _c("div", { staticClass: "container-objects" }, [
+        _c("div", { staticClass: "object" }, [
+          _c("img", {
+            staticClass: "responsive-img",
+            attrs: { src: "/images/judges/omar.jpg" }
+          }),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [_vm._v("Omar Flórez")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "info" }, [
+            _vm._v(
+              "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            )
+          ])
+        ]),
         _vm._v(" "),
-        _c("p", [_vm._v("slo")])
+        _c("div", { staticClass: "object" }, [
+          _c("img", {
+            staticClass: "responsive-img",
+            attrs: { src: "/images/judges/sergio.jpg" }
+          }),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [
+            _vm._v("Sergio Molina")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "info" }, [
+            _vm._v(
+              "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "object" }, [
+          _c("img", {
+            staticClass: "responsive-img",
+            attrs: { src: "/images/judges/cheo.jpg" }
+          }),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [_vm._v("Cheo")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "info" }, [
+            _vm._v(
+              "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            )
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "object" }, [
+          _c("img", {
+            staticClass: "responsive-img",
+            attrs: { src: "/images/judges/uribe.png" }
+          }),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [_vm._v("Uribe")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "info" }, [
+            _vm._v(
+              "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+            )
+          ])
+        ])
       ])
     ])
   },
@@ -91221,82 +91724,6 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "trainers" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c(
-          "h1",
-          { staticClass: "title-main", attrs: { id: "title-section-three" } },
-          [_vm._v("CAPACITADORES")]
-        ),
-        _vm._v(" "),
-        _c("div", { staticClass: "container-trainers" }, [
-          _c("div", { staticClass: "trainer" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Omar Flórez")]),
-            _vm._v(" "),
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/omar.jpg" }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "trainer" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Sergio Molina")]),
-            _vm._v(" "),
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/sergio.jpg" }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "trainer" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Cheo")]),
-            _vm._v(" "),
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/cheo.jpg" }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "trainer" }, [
-            _c("span", { staticClass: "name" }, [_vm._v("Uribe")]),
-            _vm._v(" "),
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/uribe.png" }
-            }),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("div", { staticClass: "profession" }, [
-                _vm._v("PhD. Computer Science")
-              ])
-            ])
-          ])
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "project-route" } }, [
       _c("div", { staticClass: "container" }, [
         _c("h1", { staticClass: "title-main" }, [_vm._v("RUTA DEL PROYECTO")])
@@ -91350,6 +91777,16 @@ var staticRenderFns = [
     return _c("section", { attrs: { id: "challenges" } }, [
       _c("div", { staticClass: "container" }, [
         _c("h1", { staticClass: "title-main" }, [_vm._v("RETOS")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("footer", { attrs: { id: "footer" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("PATROCINADORES")])
       ])
     ])
   }
@@ -92394,11 +92831,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         if (vm.help_show) vm.help_show = false;
         vm.messageCommand('Estas en la primera sección', 1500);
       } else if (c == "$ goto 2" || c == "$goto 2") {
-        vm.$root.goToView('judges');
+        vm.$root.goToView('info');
         vm.command = "$ ";
         if (vm.help_show) vm.help_show = false;
       } else if (c == "$ goto 3" || c == "$goto 3") {
-        vm.$root.goToView('trainers');
+        vm.$root.goToView('judges');
         vm.command = "$ ";
         if (vm.help_show) vm.help_show = false;
       } else if (c == "$ goto 4" || c == "$goto 4") {
@@ -92434,6 +92871,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       } else if (c == "$ help" || c == "$help") {
         vm.help_show = true;
         vm.command = "$ ";
+      } else if (c == "$ ls" || c == "$ls") {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('css favicon.ico fonts images  index.php', 3000);
       } else {
         if (vm.help_show) vm.help_show = false;
         vm.messageCommand('Error de comando', 1500);
@@ -92764,7 +93204,7 @@ var render = function() {
           ],
           staticClass: "command-input browser-default",
           class: { "move-input-cmd": _vm.help_show },
-          attrs: { type: "text", id: "terminal-input" },
+          attrs: { type: "text", spellcheck: "false", id: "terminal-input" },
           domProps: { value: _vm.command },
           on: {
             input: [
