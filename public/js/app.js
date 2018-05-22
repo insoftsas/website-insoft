@@ -88500,6 +88500,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 window.ScrollMagic = __webpack_require__(7);
 __webpack_require__(178);
@@ -90852,12 +90854,15 @@ if (window.innerWidth > 993) {
 
     var tween_3 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -81, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
 
+    var tween_4 = new TimelineMax().add([TweenMax.to("#we-search", 0.2, { opacity: 1 }), TweenMax.to("#we-search", 0.5, { backgroundPositionX: 'calc(50% + 20px)', backgroundPositionY: 'center' })]);
+
     // scenes
     var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
 
     var scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
 
     var scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
+    var scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).setTween(tween_4).addTo(controller).addIndicators();
 
     // nav items activate
     var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
@@ -91173,18 +91178,19 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "col s12 center" }, [
-                  _c(
-                    "div",
-                    {
-                      staticClass: "more-info",
-                      on: {
-                        click: function($event) {
-                          _vm.$root.goToView("info")
+                  _c("div", { staticClass: "more-info" }, [
+                    _c(
+                      "a",
+                      {
+                        on: {
+                          click: function($event) {
+                            _vm.$root.goToView("info")
+                          }
                         }
-                      }
-                    },
-                    [_vm._v("Mas información")]
-                  )
+                      },
+                      [_vm._v("Mas información")]
+                    )
+                  ])
                 ])
               ])
             ])
@@ -91758,7 +91764,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "we-search" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("¿Qué buscamos?")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("¿Qué buscamos?")])
       ])
     ])
   },
@@ -91768,7 +91774,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "participate" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [
+        _c("h2", { staticClass: "title-section" }, [
           _vm._v("¿Quienes participan?")
         ])
       ])
@@ -91780,7 +91786,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "challenges" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("RETOS")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Retos")])
       ])
     ])
   },
@@ -91791,9 +91797,9 @@ var staticRenderFns = [
     return _c("section", { attrs: { id: "judges" } }, [
       _c("div", { staticClass: "container" }, [
         _c(
-          "h1",
-          { staticClass: "title-main", attrs: { id: "title-section-two" } },
-          [_vm._v("JURADOS")]
+          "h2",
+          { staticClass: "title-section", attrs: { id: "title-section-two" } },
+          [_vm._v("Jurados")]
         ),
         _vm._v(" "),
         _c("div", { staticClass: "container-judges" }, [
@@ -91898,7 +91904,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "prices" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("Premios")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Premios")])
       ])
     ])
   },
@@ -91908,7 +91914,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "inscriptions" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("INSCRIPCIÓN")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Inscripción")])
       ])
     ])
   },
@@ -91918,7 +91924,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "conctact" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("Contacto")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Contacto")])
       ])
     ])
   },

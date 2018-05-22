@@ -9717,6 +9717,13 @@ body {
   opacity: 0;
 }
 
+#we-search {
+  background-repeat: no-repeat;
+  background-image: url(/images/teletype-reverse.svg?245aa895f7c2d171be40cec335a1abd6);
+  background-position: calc(50% - 850px) center;
+  opacity: 0;
+}
+
 .r-text {
   color: #03A9F4;
 }
@@ -9815,7 +9822,6 @@ body {
 
 .more-info {
   margin: 22px 0;
-  color: #fff;
   text-align: center;
   font-weight: 600;
   cursor: pointer;
@@ -9823,6 +9829,10 @@ body {
 
 .more-info:hover {
   text-decoration: underline;
+}
+
+.more-info a {
+  color: #fff;
 }
 
 .circle-middle {
