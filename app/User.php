@@ -67,17 +67,7 @@ class User extends Authenticatable
     {
         return (new Date( $this->created_at))->diffForHumans();
     }
-    public function getIsMixedAdminAttribute()
-    {
-        return $this->isMixAdmin()==1?true:false;
-    }
-    public function getIsPollsterAttribute()
-    {
-        if($this->isPollster()){
-            return true;
-        }
-        return false;
-    }
+    
 
     /*
     *   Relationships

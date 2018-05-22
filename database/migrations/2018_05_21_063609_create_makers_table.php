@@ -15,10 +15,10 @@ class CreateMakersTable extends Migration
     {
         Schema::create('makers', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('group_id')->unsigned();
+            $table->integer('group_id')->unsigned()->nullable();
             $table->string('first_name');
             $table->string('last_name');
-            $table->enum('doc_type', ['CC', 'CE', 'TI', 'SSN', 'NIT', 'PPN']);
+            $table->enum('doc_type', ['CC', 'CE', 'TI', 'SSN', 'PPN']);
             $table->string('document');
             $table->string('genere', 10);
             $table->date('bird_date')->nullable();
