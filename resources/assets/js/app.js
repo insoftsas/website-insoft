@@ -38,7 +38,7 @@ const app = new Vue({
       return {
         scrollMagicClass: null,
         client_id: '2',
-        client_secret: 'fqBuEvxFWpQuZyDnf9NEWTLs1x51VBGQgo2Qbcwp',
+        client_secret: 'XSfChGYCNUFq0OuAeyIMroOOMLpqGDQvLK6vsMpi',
         apiMap: {
           logout: '/logout',
           login: '/oauth/token',
