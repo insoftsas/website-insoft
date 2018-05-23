@@ -2,6 +2,8 @@
 window._ = require('lodash');
 window.Popper = require('popper.js').default;
 window.moment = require('moment');
+window.useragent = require('useragent');
+
 moment.locale('es')
 try {
     window.$ = window.jQuery = require('jquery');

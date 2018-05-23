@@ -9623,7 +9623,7 @@ textarea.materialize-textarea:focus:not([readonly]) {
   color: #03A9F4 !important;
 }
 
-.svg-inline--fa {
+.btn-floating .svg-inline--fa {
   width: 100% !important;
   text-align: center;
   vertical-align: middle;

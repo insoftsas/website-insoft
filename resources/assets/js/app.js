@@ -12,8 +12,10 @@ import routes from './routes';
 import fontawesome from '@fortawesome/fontawesome'
 import fontawesomevue from '@fortawesome/vue-fontawesome'
 import solid from '@fortawesome/fontawesome-free-solid'
+import brands from '@fortawesome/fontawesome-free-brands'
 
 fontawesome.library.add(solid)
+fontawesome.library.add(brands)
 
 Vue.use(VueRouter);
 Vue.use(VeeValidate);
@@ -36,12 +38,14 @@ const app = new Vue({
       return {
         scrollMagicClass: null,
         client_id: '2',
-        client_secret: 'SOcWtgo3QmzYnc87wgxxFV1vMjiEAqmGScPjmknZ',
+        client_secret: 'fqBuEvxFWpQuZyDnf9NEWTLs1x51VBGQgo2Qbcwp',
         apiMap: {
           logout: '/logout',
           login: '/oauth/token',
           user: '/api/user',
           makers: '/api/makers',
+          tokens: '/api/user/tokens',
+          enterprises: '/api/enterprises',
         },
         auth: false,
         user: {

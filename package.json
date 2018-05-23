@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
+    "@fortawesome/fontawesome-free-brands": "^5.0.13",
     "@fortawesome/fontawesome-free-solid": "^5.0.13",
     "@fortawesome/vue-fontawesome": "0.0.22",
     "animejs": "^2.2.0",
@@ -24,11 +25,14 @@
     "moment": "^2.22.1",
     "popper.js": "^1.12",
     "scrollmagic": "^2.0.5",
+    "useragent": "^2.3.0",
     "vue": "^2.5.7",
     "vue-paginate": "^3.6.0",
-    "vue-resize": "^0.4.4"
+    "vue-resize": "^0.4.4",
+    "yamlparser": "0.0.2"
   },
   "dependencies": {
+    "request": "^2.87.0",
     "vee-validate": "^2.0.9",
     "vue-router": "^3.0.1"
   }
