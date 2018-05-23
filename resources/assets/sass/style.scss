@@ -303,3 +303,91 @@ body {
 .step-row {
   margin-bottom: 20px;
 }
+
+.container-challenge {
+  margin-bottom: 20px;
+  &:hover {
+    & .number-challenge {
+      top: -100%;
+    }
+  }
+}
+
+.title-challenge {
+  background: #FFF;
+  color: #071a31;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.challenge-icon {
+  position: relative;
+  text-align: center;
+  height: 150px;
+  background: #041323;
+  border: 1px solid #fff59d;
+  border-top: 0;
+  border-bottom: 0;
+  & div {
+    position: absolute;
+    width: 100%;
+    transform: translateY(-50%);
+    top: 50%;
+  }
+  & img {
+    width: 100px;
+    &.mini {
+      width: 60px;
+    }
+  }
+}
+
+.info-challenge {
+  text-align: justify;
+  background: #041323;
+  padding: 5px 10px;
+  border: 1px solid #fff59d;
+  border-top: 0;
+}
+
+.margin-default-bottom {
+  margin-bottom: 20px;
+}
+
+.title-number-challenge {
+  background: #FFF59D;
+  font-weight: bold;
+}
+
+.title-challenge {
+  background: #FFF;
+  color: #071a31;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.bg-number {
+  width: 99%;
+  height: 100px;
+  top: 30px;
+  left: 0px;
+  transform: skewY(-15deg);
+  color: #041323;
+  position: relative;
+  & .number-challenge {
+    position: absolute;
+    font-size: 12rem;
+    -webkit-transform: skewY(15deg) !important;
+    transform: skewY(15deg) !important;
+    top: -70%;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    user-select: none;
+    transition: .3s all;
+  }
+}

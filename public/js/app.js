@@ -88132,7 +88132,7 @@ exports = module.exports = __webpack_require__(3)(false);
 
 
 // module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.container-content-info .content-info[data-v-384052eb] {\n    display: block;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 40px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.subtitle-section[data-v-384052eb] {\n  font-size: 1.2rem;\n  color: #ffffff;\n  border-radius: 5px;\n  font-weight: bold;\n  text-transform: uppercase;\n  margin: 30px 0 0px 0;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(589px) translateY(-22px);\n          transform: scale(0.5) translateX(589px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);\n          transform: scale(0.6) translateY(-28px) translateX(-75px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: center;\n  margin: 0;\n  text-transform: uppercase;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: bold;\n}\n.transform-arrow[data-v-384052eb] {\n  -webkit-transform: translateX(105px) translateY(-65px) scale(3.5);\n          transform: translateX(105px) translateY(-65px) scale(3.5);\n}\n.transform-arrow .icon_arrow-line path[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n}\n.transform-arrow .icon_arrow-line .arrow-line-b[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_b;\n          animation-name: draw_arrow_line_b;\n}\n.transform-arrow .icon_arrow-line .arrow-line-c[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_c;\n          animation-name: draw_arrow_line_c;\n}\n.transform-arrow .icon_arrow-line .arrow-line-d[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_d;\n          animation-name: draw_arrow_line_d;\n}\n.transform-arrow .icon_arrow-line .arrow-line-e[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_e;\n          animation-name: draw_arrow_line_e;\n}\n.transform-arrow .icon_arrow-line .arrow-line-f[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_f;\n          animation-name: draw_arrow_line_f;\n}\n.transform-arrow .icon_arrow-line .arrow-line-g[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_g;\n          animation-name: draw_arrow_line_g;\n}\n.transform-arrow .arrow-end[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n}\n.content-solution-image[data-v-384052eb] {\n  width: 200px;\n  margin: auto;\n  margin-bottom: 20px;\n}\n.hand-puzzle[data-v-384052eb] {\n  -webkit-animation: moveHandle 5s ease infinite;\n          animation: moveHandle 5s ease infinite;\n}\n.puzzle-blue[data-v-384052eb] {\n  -webkit-transform: translateX(159px) translateY(-2px);\n          transform: translateX(159px) translateY(-2px);\n}\n.card-participate[data-v-384052eb] {\n  text-align: center;\n  margin: auto;\n  background: #ffffff;\n}\n.card-participate img[data-v-384052eb] {\n    display: block;\n    margin: auto;\n    width: 100px;\n    padding: 1em;\n    -webkit-box-sizing: content-box;\n            box-sizing: content-box;\n}\n.card-title-participate[data-v-384052eb] {\n  text-align: center;\n  height: 40px;\n  line-height: 40px;\n  background: #ffd422;\n  color: #071a31;\n  padding: 0 5px;\n}\n.card-title-participate .title[data-v-384052eb] {\n    font-size: 1.3rem;\n    font-weight: bold;\n    text-transform: uppercase;\n}\n.card-info-participate[data-v-384052eb] {\n  padding: .5em;\n  color: #ffffff;\n  font-size: 1.2rem;\n}\n.container-participate[data-v-384052eb] {\n  position: relative;\n}\n", ""]);
+exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.container-content-info .content-info[data-v-384052eb] {\n    display: block;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 40px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.subtitle-section[data-v-384052eb] {\n  font-size: 1.2rem;\n  color: #ffffff;\n  border-radius: 5px;\n  font-weight: bold;\n  text-transform: uppercase;\n  margin: 30px 0 0px 0;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(589px) translateY(-22px);\n          transform: scale(0.5) translateX(589px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);\n          transform: scale(0.6) translateY(-28px) translateX(-75px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: center;\n  margin: 0;\n  text-transform: uppercase;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: bold;\n}\n.transform-arrow[data-v-384052eb] {\n  -webkit-transform: translateX(105px) translateY(-65px) scale(3.5);\n          transform: translateX(105px) translateY(-65px) scale(3.5);\n}\n.transform-arrow .icon_arrow-line path[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n}\n.transform-arrow .icon_arrow-line .arrow-line-b[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_b;\n          animation-name: draw_arrow_line_b;\n}\n.transform-arrow .icon_arrow-line .arrow-line-c[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_c;\n          animation-name: draw_arrow_line_c;\n}\n.transform-arrow .icon_arrow-line .arrow-line-d[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_d;\n          animation-name: draw_arrow_line_d;\n}\n.transform-arrow .icon_arrow-line .arrow-line-e[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_e;\n          animation-name: draw_arrow_line_e;\n}\n.transform-arrow .icon_arrow-line .arrow-line-f[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_f;\n          animation-name: draw_arrow_line_f;\n}\n.transform-arrow .icon_arrow-line .arrow-line-g[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_g;\n          animation-name: draw_arrow_line_g;\n}\n.transform-arrow .arrow-end[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n}\n.content-solution-image[data-v-384052eb] {\n  width: 200px;\n  margin: auto;\n  margin-bottom: 20px;\n}\n.hand-puzzle[data-v-384052eb] {\n  -webkit-animation: moveHandle 5s ease infinite;\n          animation: moveHandle 5s ease infinite;\n}\n.puzzle-blue[data-v-384052eb] {\n  -webkit-transform: translateX(159px) translateY(-2px);\n          transform: translateX(159px) translateY(-2px);\n}\n.card-participate[data-v-384052eb] {\n  text-align: center;\n  margin: auto;\n  background: #ffffff;\n}\n.card-participate img[data-v-384052eb] {\n    display: block;\n    margin: auto;\n    width: 100px;\n    padding: 1em;\n    -webkit-box-sizing: content-box;\n            box-sizing: content-box;\n}\n.card-title-participate[data-v-384052eb] {\n  text-align: center;\n  height: 40px;\n  line-height: 40px;\n  background: #FFF59D;\n  color: #071a31;\n  padding: 0 5px;\n}\n.card-title-participate .title[data-v-384052eb] {\n    font-size: 1.3rem;\n    font-weight: bold;\n    text-transform: uppercase;\n}\n.card-info-participate[data-v-384052eb] {\n  padding: .5em;\n  color: #ffffff;\n  font-size: 1.2rem;\n}\n.container-participate[data-v-384052eb] {\n  position: relative;\n}\n", ""]);
 
 // exports
 
@@ -88587,11 +88587,77 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
-window.ScrollMagic = __webpack_require__(7);
-__webpack_require__(178);
-window.TweenMax = __webpack_require__(138);
-__webpack_require__(180);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {};
@@ -88600,6 +88666,9 @@ __webpack_require__(180);
   methods: {},
   mounted: function mounted() {
     __webpack_require__(181);
+  },
+  beforeMount: function beforeMount() {
+    window.controller = window.controller.destroy(true);
   }
 });
 
@@ -90928,9 +90997,14 @@ var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_
 
 /***/ }),
 /* 181 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-var controller = new ScrollMagic.Controller();
+window.ScrollMagic = __webpack_require__(7);
+__webpack_require__(178);
+window.TweenMax = __webpack_require__(138);
+__webpack_require__(180);
+
+window.controller = new ScrollMagic.Controller();
 
 if (window.innerWidth > 993) {
     // tweens
@@ -92055,7 +92129,7 @@ var staticRenderFns = [
               _vm._v(" "),
               _c("div", { staticClass: "card-info-participate" }, [
                 _vm._v(
-                  "Los Makers son agentes generadores de ideas y conocimientos para la resolución de problemas. Son los desarrolladores, programadores de las soluciones a las dificultades presentadas por los empresarios; estos son profesionales o estudiantes, técnicos o tecnólogos que conforman el capital humano. \n\t\t  \t\t\t\t"
+                  "Los makers son agentes generadores de ideas y conocimientos para la resolución de problemas. Son los desarrolladores de las soluciones a las dificultades presentadas por los empresarios; estos son profesionales o estudiantes, técnicos o tecnólogos que conforman el capital humano. \n\t\t  \t\t\t\t"
                 )
               ])
             ])
@@ -92070,7 +92144,138 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("section", { attrs: { id: "challenges" } }, [
       _c("div", { staticClass: "container" }, [
-        _c("h2", { staticClass: "title-section" }, [_vm._v("Retos")])
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Retos")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col s12 container-content-info" }, [
+          _c("div", { staticClass: "content-info margin-default-bottom" }, [
+            _c("span", [
+              _vm._v(
+                "Proponemos los siguientes retos a cumplir para que el evento sea todo un exito."
+              )
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col s12 m6 l3" }, [
+          _c("div", { staticClass: "container-challenge" }, [
+            _c("div", { staticClass: "title-number-challenge" }, [
+              _c("div", { staticClass: "bg-number" }, [
+                _c("span", { staticClass: "number-challenge" }, [_vm._v("1")])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "challenge-icon" }, [
+              _c("div", [
+                _c("img", {
+                  staticClass: "responsive-img",
+                  attrs: { src: "/images/challenges/car-repair.svg" }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "title-challenge" }, [
+              _vm._v("Diagnóstico")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "info-challenge" }, [
+              _vm._v(
+                "Socialización del proyecto al sector productivo y capacitación en Transformación Productiva y Digital"
+              )
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col s12 m6 l3" }, [
+          _c("div", { staticClass: "container-challenge" }, [
+            _c("div", { staticClass: "title-number-challenge" }, [
+              _c("div", { staticClass: "bg-number" }, [
+                _c("span", { staticClass: "number-challenge" }, [_vm._v("2")])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "challenge-icon" }, [
+              _c("div", [
+                _c("img", {
+                  staticClass: "responsive-img",
+                  attrs: { src: "/images/challenges/user.svg" }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "title-challenge" }, [
+              _vm._v("Selección")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "info-challenge" }, [
+              _vm._v(
+                "Reclutamiento y selección de los Makers, socialización del proyecto y capacitación en prototipado."
+              )
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col s12 m6 l3" }, [
+          _c("div", { staticClass: "container-challenge" }, [
+            _c("div", { staticClass: "title-number-challenge" }, [
+              _c("div", { staticClass: "bg-number" }, [
+                _c("span", { staticClass: "number-challenge" }, [_vm._v("3")])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "challenge-icon" }, [
+              _c("div", [
+                _c("img", {
+                  staticClass: "responsive-img",
+                  attrs: { src: "/images/challenges/problem.svg" }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "title-challenge" }, [
+              _vm._v("Necesidades")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "info-challenge" }, [
+              _vm._v(
+                "Categorización de necesidades y conformación de Makers Team."
+              )
+            ])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "col s12 m6 l3" }, [
+          _c("div", { staticClass: "container-challenge" }, [
+            _c("div", { staticClass: "title-number-challenge" }, [
+              _c("div", { staticClass: "bg-number" }, [
+                _c("span", { staticClass: "number-challenge" }, [_vm._v("4")])
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "challenge-icon" }, [
+              _c("div", [
+                _c("img", {
+                  staticClass: "responsive-img mini",
+                  attrs: { src: "/images/challenges/employee_female.svg" }
+                }),
+                _vm._v(" "),
+                _c("img", {
+                  staticClass: "responsive-img mini",
+                  attrs: { src: "/images/challenges/employee_male.svg" }
+                })
+              ])
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "title-challenge" }, [
+              _vm._v("Desarrollo")
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "info-challenge" }, [
+              _vm._v(
+                "Desarrollo tecnológico para solucionar la necesidad planteada por el sector empresarial."
+              )
+            ])
+          ])
+        ])
       ])
     ])
   },
