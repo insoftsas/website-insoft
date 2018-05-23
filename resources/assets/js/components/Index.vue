@@ -483,14 +483,18 @@
   export default {
     data() {
       return {
-
+      	
       }
     },
     methods: {
 
     },
     mounted() {
-    	require('../interactions')
+    	this.$root.scrollMagicClass = new scrollIndex.default()
+    },
+    destroyed(){
+    	this.$root.scrollMagicClass.destroy()
+    	this.$root.scrollMagicClass = null
     }
   }
 </script>

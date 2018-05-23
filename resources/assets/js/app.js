@@ -2,6 +2,8 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+window.scrollIndex = require('./interactions');
+
 import VueRouter from 'vue-router';
 import VeeValidate from 'vee-validate';
 import VuePaginate from 'vue-paginate'
@@ -32,6 +34,7 @@ const app = new Vue({
     router,
     data() {
       return {
+        scrollMagicClass: null,
         client_id: '2',
         client_secret: 'SOcWtgo3QmzYnc87wgxxFV1vMjiEAqmGScPjmknZ',
         apiMap: {
