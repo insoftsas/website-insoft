@@ -91103,59 +91103,35 @@ var scrollIndex = function () {
                                     var tween_5 = new TimelineMax().add([TweenMax.to("#participate", 0.2, { opacity: 1 }), TweenMax.to("#participate", 0.5, { backgroundPositionX: 'calc(50% - 964px)', backgroundPositionY: 'center' })]);
                                     var tween_6 = new TimelineMax().add([TweenMax.staggerFromTo(".enterprise", 2, { right: '120%' }, { right: 0, ease: Back.ease }, 0), TweenMax.staggerFromTo(".developer", 2, { left: '120%' }, { left: 0, ease: Back.ease }, 0)]);
 
-                                    var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller);
-                                    //.addIndicators()
+                                    var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
 
-                                    var scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_2).addTo(controller);
-                                    //.addIndicators()
+                                    var scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
 
-                                    var scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller);
-                                    //.addIndicators()
-                                    var scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).setTween(tween_4).addTo(controller);
-                                    //.addIndicators()   
+                                    var scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
+                                    var scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).setTween(tween_4).addTo(controller).addIndicators();
 
-                                    var scene_5 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).setTween(tween_5).addTo(controller);
-                                    //.addIndicators()
+                                    var scene_5 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).setTween(tween_5).addTo(controller).addIndicators();
 
-                                    var scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight - 300 }).setTween(tween_6).addTo(controller);
-                                    //.addIndicators()                                   
+                                    var scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight - 300 }).setTween(tween_6).addTo(controller).addIndicators();
 
                                     // nav items activate
-                                    var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#home-item", 'active');
+                                    var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
 
-                                    var nav_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#info-item", 'active');
+                                    var nav_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#info-item", 'active');
 
-                                    var nav_2 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#search-item", 'active');
+                                    var nav_2 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#search-item", 'active');
 
-                                    var nav_3 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#participate-item", 'active');
+                                    var nav_3 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#participate-item", 'active');
 
-                                    var nav_4 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#challenge-item", 'active');
+                                    var nav_4 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
 
-                                    var nav_5 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#judge-item", 'active');
+                                    var nav_5 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
 
-                                    var nav_6 = new ScrollMagic.Scene({ triggerElement: "#prices", duration: document.getElementById('prices').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#price-item", 'active');
+                                    var nav_6 = new ScrollMagic.Scene({ triggerElement: "#prices", duration: document.getElementById('prices').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#price-item", 'active');
 
-                                    var nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#inscription-item", 'active');
+                                    var nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
 
-                                    var nav_8 = new ScrollMagic.Scene({ triggerElement: "#conctact", duration: document.getElementById('conctact').offsetHeight }).addTo(controller)
-                                    //.addIndicators()
-                                    .setClassToggle("#conctact-item", 'active');
+                                    var nav_8 = new ScrollMagic.Scene({ triggerElement: "#conctact", duration: document.getElementById('conctact').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#conctact-item", 'active');
                         }
             }]);
 

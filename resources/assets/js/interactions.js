@@ -59,80 +59,80 @@ let scrollIndex = class scroll {
             let scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight })
                                         .setTween(tween_1)
                                         .addTo(controller)
-                                        //.addIndicators()
+                                        .addIndicators()
 
             let scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight })
                                          .setTween(tween_2)
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
 
             let scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight})
                                          .setTween(tween_3)
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
             let scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight})
                                          .setTween(tween_4)
                                          .addTo(controller)
-                                         //.addIndicators()   
+                                         .addIndicators()   
 
             let scene_5 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight})
                                          .setTween(tween_5)
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
 
             let scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: (document.getElementById('participate').offsetHeight - 300) })
                                          .setTween(tween_6)
                                          .addTo(controller)
-                                         //.addIndicators()                                   
+                                         .addIndicators()                                   
 
             // nav items activate
             let nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#home-item", 'active')
 
             let nav_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#info-item", 'active')                                 
 
             let nav_2 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#search-item", 'active')
 
             
 
             let nav_3 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#participate-item", 'active')
 
             let nav_4 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#challenge-item", 'active')                                                                                                   
 
             let nav_5 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#judge-item", 'active')
 
             
 
             let nav_6 = new ScrollMagic.Scene({ triggerElement: "#prices", duration: document.getElementById('prices').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#price-item", 'active')
 
             let nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#inscription-item", 'active')                                 
 
             let nav_8 = new ScrollMagic.Scene({ triggerElement: "#conctact", duration: document.getElementById('conctact').offsetHeight})
                                          .addTo(controller)
-                                         //.addIndicators()
+                                         .addIndicators()
                                          .setClassToggle("#conctact-item", 'active')
     }
 }
