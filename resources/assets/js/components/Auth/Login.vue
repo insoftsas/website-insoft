@@ -64,11 +64,12 @@
         })
         .then(function (response) {
           vm.$root.token = response.data.access_token;
-          vm.$root.getUser("/dashboard");
-          vm.$router.push("/dashboard");
+          setTimeout(function () {
+            vm.$root.getUser();
+            vm.$router.push("/dashboard");
+          },10)
         })
         .catch(function(error) {
-          if(M.getData(error).message.indexOf("username"))
           M.toastError(error);
         })
         .then(function() {

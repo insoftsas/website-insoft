@@ -2,8 +2,11 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
+window.scrollIndex = require('./interactions');
+
 import VueRouter from 'vue-router';
 import VeeValidate from 'vee-validate';
+import VuePaginate from 'vue-paginate'
 import routes from './routes';
 
 import fontawesome from '@fortawesome/fontawesome'
@@ -14,13 +17,13 @@ fontawesome.library.add(solid)
 
 Vue.use(VueRouter);
 Vue.use(VeeValidate);
+Vue.use(VuePaginate)
 
 Vue.component('font-awesome-icon', fontawesomevue);
 
 Vue.component('main-app', require('./components/App.vue'));
 Vue.component('word-writing', require('./components/wordWriting.vue'));
-
-Vue.component('login', require('./components/Auth/Login.vue'));
+Vue.component('menu-admin', require('./components/MenuAdmin.vue'));
 
 const router = new VueRouter({
     routes
@@ -31,12 +34,14 @@ const app = new Vue({
     router,
     data() {
       return {
+        scrollMagicClass: null,
         client_id: '2',
         client_secret: 'SOcWtgo3QmzYnc87wgxxFV1vMjiEAqmGScPjmknZ',
         apiMap: {
           logout: '/logout',
           login: '/oauth/token',
           user: '/api/user',
+          makers: '/api/makers',
         },
         auth: false,
         user: {
@@ -73,6 +78,7 @@ const app = new Vue({
           if(error.response.status == 401){
             vm.token = '';
           }
+          vm.$router.push("/");
         }).then(() => {
           vm.loading = false;
           vm.loaded = true;

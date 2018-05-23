@@ -4578,13 +4578,40 @@
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var bind = __webpack_require__(132);
-var isBuffer = __webpack_require__(151);
+var isBuffer = __webpack_require__(152);
 
 /*global toString:true*/
 
@@ -4887,34 +4914,116 @@ module.exports = {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
-var g;
+/* globals __VUE_SSR_CONTEXT__ */
 
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
+// IMPORTANT: Do NOT use ES2015 features in this file.
+// This module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle.
 
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  functionalTemplate,
+  injectStyles,
+  scopeId,
+  moduleIdentifier /* server only */
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
+
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
+  }
+
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+    options._compiled = true
+  }
+
+  // functional template
+  if (functionalTemplate) {
+    options.functional = true
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
+
+  var hook
+  if (moduleIdentifier) { // server build
+    hook = function (context) {
+      // 2.3 injection
+      context =
+        context || // cached call
+        (this.$vnode && this.$vnode.ssrContext) || // stateful
+        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
+      // 2.2 with runInNewContext: true
+      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+        context = __VUE_SSR_CONTEXT__
+      }
+      // inject component styles
+      if (injectStyles) {
+        injectStyles.call(this, context)
+      }
+      // register component module identifier for async chunk inferrence
+      if (context && context._registeredComponents) {
+        context._registeredComponents.add(moduleIdentifier)
+      }
+    }
+    // used by ssr in case component is cached and beforeCreate
+    // never gets called
+    options._ssrRegister = hook
+  } else if (injectStyles) {
+    hook = injectStyles
+  }
+
+  if (hook) {
+    var functional = options.functional
+    var existing = functional
+      ? options.render
+      : options.beforeCreate
+
+    if (!functional) {
+      // inject component registration as beforeCreate hook
+      options.beforeCreate = existing
+        ? [].concat(existing, hook)
+        : [hook]
+    } else {
+      // for template-only hot-reload because in that case the render fn doesn't
+      // go through the normalizer
+      options._injectStyles = hook
+      // register for functioal component in vue file
+      options.render = function renderWithStyleInjection (h, context) {
+        hook.call(context)
+        return existing(h, context)
+      }
+    }
+  }
+
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
+  }
 }
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports) {
 
 /*
@@ -4996,7 +5105,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -5015,7 +5124,7 @@ if (typeof DEBUG !== 'undefined' && DEBUG) {
   ) }
 }
 
-var listToStyles = __webpack_require__(176)
+var listToStyles = __webpack_require__(183)
 
 /*
 type StyleObject = {
@@ -5224,123 +5333,14 @@ function applyToTag (styleElement, obj) {
 
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports) {
-
-/* globals __VUE_SSR_CONTEXT__ */
-
-// IMPORTANT: Do NOT use ES2015 features in this file.
-// This module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle.
-
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  functionalTemplate,
-  injectStyles,
-  scopeId,
-  moduleIdentifier /* server only */
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
-
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
-  }
-
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
-    options._compiled = true
-  }
-
-  // functional template
-  if (functionalTemplate) {
-    options.functional = true
-  }
-
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
-  }
-
-  var hook
-  if (moduleIdentifier) { // server build
-    hook = function (context) {
-      // 2.3 injection
-      context =
-        context || // cached call
-        (this.$vnode && this.$vnode.ssrContext) || // stateful
-        (this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext) // functional
-      // 2.2 with runInNewContext: true
-      if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-        context = __VUE_SSR_CONTEXT__
-      }
-      // inject component styles
-      if (injectStyles) {
-        injectStyles.call(this, context)
-      }
-      // register component module identifier for async chunk inferrence
-      if (context && context._registeredComponents) {
-        context._registeredComponents.add(moduleIdentifier)
-      }
-    }
-    // used by ssr in case component is cached and beforeCreate
-    // never gets called
-    options._ssrRegister = hook
-  } else if (injectStyles) {
-    hook = injectStyles
-  }
-
-  if (hook) {
-    var functional = options.functional
-    var existing = functional
-      ? options.render
-      : options.beforeCreate
-
-    if (!functional) {
-      // inject component registration as beforeCreate hook
-      options.beforeCreate = existing
-        ? [].concat(existing, hook)
-        : [hook]
-    } else {
-      // for template-only hot-reload because in that case the render fn doesn't
-      // go through the normalizer
-      options._injectStyles = hook
-      // register for functioal component in vue file
-      options.render = function renderWithStyleInjection (h, context) {
-        hook.call(context)
-        return existing(h, context)
-      }
-    }
-  }
-
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
-  }
-}
-
-
-/***/ }),
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
-var utils = __webpack_require__(1);
-var normalizeHeaderName = __webpack_require__(153);
+var utils = __webpack_require__(2);
+var normalizeHeaderName = __webpack_require__(154);
 
 var DEFAULT_CONTENT_TYPE = {
   'Content-Type': 'application/x-www-form-urlencoded'
@@ -20313,13 +20313,13 @@ process.umask = function() { return 0; };
 "use strict";
 
 
-var utils = __webpack_require__(1);
-var settle = __webpack_require__(154);
-var buildURL = __webpack_require__(156);
-var parseHeaders = __webpack_require__(157);
-var isURLSameOrigin = __webpack_require__(158);
+var utils = __webpack_require__(2);
+var settle = __webpack_require__(155);
+var buildURL = __webpack_require__(157);
+var parseHeaders = __webpack_require__(158);
+var isURLSameOrigin = __webpack_require__(159);
 var createError = __webpack_require__(135);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(159);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(160);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -20416,7 +20416,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(160);
+      var cookies = __webpack_require__(161);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -20500,7 +20500,7 @@ module.exports = function xhrAdapter(config) {
 "use strict";
 
 
-var enhanceError = __webpack_require__(155);
+var enhanceError = __webpack_require__(156);
 
 /**
  * Create an Error with the specified message, config, error code, request and response.
@@ -28538,7 +28538,7 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 		_tickerActive = false; //ensures that the first official animation forces a ticker.tick() to update the time when it is instantiated
 
 })((typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window, "TweenMax");
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 139 */
@@ -30487,57 +30487,1828 @@ if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); } //necessary in case Tween
 		_tickerActive = false; //ensures that the first official animation forces a ticker.tick() to update the time when it is instantiated
 
 })((typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window, "TweenLite");
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 140 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(188)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(190)
-/* template */
-var __vue_template__ = __webpack_require__(191)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-17ca704c"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\Auth\\Login.vue"
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "config", function() { return config; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "icon", function() { return icon; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "noAuto", function() { return noAuto; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "layer", function() { return layer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "text", function() { return text; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "library", function() { return library; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "dom", function() { return dom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parse", function() { return parse; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "findIconDefinition", function() { return findIconDefinition; });
+/*!
+ * Font Awesome Free 5.0.13 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ */
+var noop = function noop() {};
 
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-17ca704c", Component.options)
-  } else {
-    hotAPI.reload("data-v-17ca704c", Component.options)
+var _WINDOW = {};
+var _DOCUMENT = {};
+var _MUTATION_OBSERVER$1 = null;
+var _PERFORMANCE = { mark: noop, measure: noop };
+
+try {
+  if (typeof window !== 'undefined') _WINDOW = window;
+  if (typeof document !== 'undefined') _DOCUMENT = document;
+  if (typeof MutationObserver !== 'undefined') _MUTATION_OBSERVER$1 = MutationObserver;
+  if (typeof performance !== 'undefined') _PERFORMANCE = performance;
+} catch (e) {}
+
+var _ref = _WINDOW.navigator || {};
+var _ref$userAgent = _ref.userAgent;
+var userAgent = _ref$userAgent === undefined ? '' : _ref$userAgent;
+
+var WINDOW = _WINDOW;
+var DOCUMENT = _DOCUMENT;
+var MUTATION_OBSERVER = _MUTATION_OBSERVER$1;
+var PERFORMANCE = _PERFORMANCE;
+var IS_BROWSER = !!WINDOW.document;
+var IS_DOM = !!DOCUMENT.documentElement && !!DOCUMENT.head && typeof DOCUMENT.addEventListener === 'function' && typeof DOCUMENT.createElement === 'function';
+var IS_IE = ~userAgent.indexOf('MSIE') || ~userAgent.indexOf('Trident/');
+
+var NAMESPACE_IDENTIFIER = '___FONT_AWESOME___';
+var UNITS_IN_GRID = 16;
+var DEFAULT_FAMILY_PREFIX = 'fa';
+var DEFAULT_REPLACEMENT_CLASS = 'svg-inline--fa';
+var DATA_FA_I2SVG = 'data-fa-i2svg';
+var DATA_FA_PSEUDO_ELEMENT = 'data-fa-pseudo-element';
+var HTML_CLASS_I2SVG_BASE_CLASS = 'fontawesome-i2svg';
+
+var PRODUCTION = function () {
+  try {
+    return "development" === 'production';
+  } catch (e) {
+    return false;
   }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
+}();
 
-module.exports = Component.exports
+var oneToTen = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+var oneToTwenty = oneToTen.concat([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
+
+var ATTRIBUTES_WATCHED_FOR_MUTATION = ['class', 'data-prefix', 'data-icon', 'data-fa-transform', 'data-fa-mask'];
+
+var RESERVED_CLASSES = ['xs', 'sm', 'lg', 'fw', 'ul', 'li', 'border', 'pull-left', 'pull-right', 'spin', 'pulse', 'rotate-90', 'rotate-180', 'rotate-270', 'flip-horizontal', 'flip-vertical', 'stack', 'stack-1x', 'stack-2x', 'inverse', 'layers', 'layers-text', 'layers-counter'].concat(oneToTen.map(function (n) {
+  return n + 'x';
+})).concat(oneToTwenty.map(function (n) {
+  return 'w-' + n;
+}));
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+var _extends = Object.assign || function (target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i];
+
+    for (var key in source) {
+      if (Object.prototype.hasOwnProperty.call(source, key)) {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+var initial = WINDOW.FontAwesomeConfig || {};
+var initialKeys = Object.keys(initial);
+
+var _default = _extends({
+  familyPrefix: DEFAULT_FAMILY_PREFIX,
+  replacementClass: DEFAULT_REPLACEMENT_CLASS,
+  autoReplaceSvg: true,
+  autoAddCss: true,
+  autoA11y: true,
+  searchPseudoElements: false,
+  observeMutations: true,
+  keepOriginalSource: true,
+  measurePerformance: false,
+  showMissingIcons: true
+}, initial);
+
+if (!_default.autoReplaceSvg) _default.observeMutations = false;
+
+var config$1 = _extends({}, _default);
+
+WINDOW.FontAwesomeConfig = config$1;
+
+function update(newConfig) {
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _params$asNewDefault = params.asNewDefault,
+      asNewDefault = _params$asNewDefault === undefined ? false : _params$asNewDefault;
+
+  var validKeys = Object.keys(config$1);
+  var ok = asNewDefault ? function (k) {
+    return ~validKeys.indexOf(k) && !~initialKeys.indexOf(k);
+  } : function (k) {
+    return ~validKeys.indexOf(k);
+  };
+
+  Object.keys(newConfig).forEach(function (configKey) {
+    if (ok(configKey)) config$1[configKey] = newConfig[configKey];
+  });
+}
+
+function auto(value) {
+  update({
+    autoReplaceSvg: value,
+    observeMutations: value
+  });
+}
+
+var w = WINDOW || {};
+
+if (!w[NAMESPACE_IDENTIFIER]) w[NAMESPACE_IDENTIFIER] = {};
+if (!w[NAMESPACE_IDENTIFIER].styles) w[NAMESPACE_IDENTIFIER].styles = {};
+if (!w[NAMESPACE_IDENTIFIER].hooks) w[NAMESPACE_IDENTIFIER].hooks = {};
+if (!w[NAMESPACE_IDENTIFIER].shims) w[NAMESPACE_IDENTIFIER].shims = [];
+
+var namespace = w[NAMESPACE_IDENTIFIER];
+
+var functions = [];
+var listener = function listener() {
+  DOCUMENT.removeEventListener('DOMContentLoaded', listener);
+  loaded = 1;
+  functions.map(function (fn) {
+    return fn();
+  });
+};
+
+var loaded = false;
+
+if (IS_DOM) {
+  loaded = (DOCUMENT.documentElement.doScroll ? /^loaded|^c/ : /^loaded|^i|^c/).test(DOCUMENT.readyState);
+
+  if (!loaded) DOCUMENT.addEventListener('DOMContentLoaded', listener);
+}
+
+var domready = function (fn) {
+  if (!IS_DOM) return;
+  loaded ? setTimeout(fn, 0) : functions.push(fn);
+};
+
+var d = UNITS_IN_GRID;
+
+var meaninglessTransform = {
+  size: 16,
+  x: 0,
+  y: 0,
+  rotate: 0,
+  flipX: false,
+  flipY: false
+};
+
+function isReserved(name) {
+  return ~RESERVED_CLASSES.indexOf(name);
+}
+
+function bunker(fn) {
+  try {
+    fn();
+  } catch (e) {
+    if (!PRODUCTION) {
+      throw e;
+    }
+  }
+}
+
+function insertCss(css) {
+  if (!css || !IS_DOM) {
+    return;
+  }
+
+  var style = DOCUMENT.createElement('style');
+  style.setAttribute('type', 'text/css');
+  style.innerHTML = css;
+
+  var headChildren = DOCUMENT.head.childNodes;
+  var beforeChild = null;
+
+  for (var i = headChildren.length - 1; i > -1; i--) {
+    var child = headChildren[i];
+    var tagName = (child.tagName || '').toUpperCase();
+    if (['STYLE', 'LINK'].indexOf(tagName) > -1) {
+      beforeChild = child;
+    }
+  }
+
+  DOCUMENT.head.insertBefore(style, beforeChild);
+
+  return css;
+}
+
+var _uniqueId = 0;
+
+function nextUniqueId() {
+  _uniqueId++;
+
+  return _uniqueId;
+}
+
+function toArray(obj) {
+  var array = [];
+
+  for (var i = (obj || []).length >>> 0; i--;) {
+    array[i] = obj[i];
+  }
+
+  return array;
+}
+
+function classArray(node) {
+  if (node.classList) {
+    return toArray(node.classList);
+  } else {
+    return (node.getAttribute('class') || '').split(' ').filter(function (i) {
+      return i;
+    });
+  }
+}
+
+function getIconName(familyPrefix, cls) {
+  var parts = cls.split('-');
+  var prefix = parts[0];
+  var iconName = parts.slice(1).join('-');
+
+  if (prefix === familyPrefix && iconName !== '' && !isReserved(iconName)) {
+    return iconName;
+  } else {
+    return null;
+  }
+}
+
+function htmlEscape(str) {
+  return ('' + str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function joinAttributes(attributes) {
+  return Object.keys(attributes || {}).reduce(function (acc, attributeName) {
+    return acc + (attributeName + '="' + htmlEscape(attributes[attributeName]) + '" ');
+  }, '').trim();
+}
+
+function joinStyles(styles) {
+  return Object.keys(styles || {}).reduce(function (acc, styleName) {
+    return acc + (styleName + ': ' + styles[styleName] + ';');
+  }, '');
+}
+
+function transformIsMeaningful(transform) {
+  return transform.size !== meaninglessTransform.size || transform.x !== meaninglessTransform.x || transform.y !== meaninglessTransform.y || transform.rotate !== meaninglessTransform.rotate || transform.flipX || transform.flipY;
+}
+
+function transformForSvg(_ref) {
+  var transform = _ref.transform,
+      containerWidth = _ref.containerWidth,
+      iconWidth = _ref.iconWidth;
+
+  var outer = {
+    transform: 'translate(' + containerWidth / 2 + ' 256)'
+  };
+  var innerTranslate = 'translate(' + transform.x * 32 + ', ' + transform.y * 32 + ') ';
+  var innerScale = 'scale(' + transform.size / 16 * (transform.flipX ? -1 : 1) + ', ' + transform.size / 16 * (transform.flipY ? -1 : 1) + ') ';
+  var innerRotate = 'rotate(' + transform.rotate + ' 0 0)';
+  var inner = {
+    transform: innerTranslate + ' ' + innerScale + ' ' + innerRotate
+  };
+  var path = {
+    transform: 'translate(' + iconWidth / 2 * -1 + ' -256)'
+  };
+  return {
+    outer: outer,
+    inner: inner,
+    path: path
+  };
+}
+
+function transformForCss(_ref2) {
+  var transform = _ref2.transform,
+      _ref2$width = _ref2.width,
+      width = _ref2$width === undefined ? UNITS_IN_GRID : _ref2$width,
+      _ref2$height = _ref2.height,
+      height = _ref2$height === undefined ? UNITS_IN_GRID : _ref2$height,
+      _ref2$startCentered = _ref2.startCentered,
+      startCentered = _ref2$startCentered === undefined ? false : _ref2$startCentered;
+
+  var val = '';
+
+  if (startCentered && IS_IE) {
+    val += 'translate(' + (transform.x / d - width / 2) + 'em, ' + (transform.y / d - height / 2) + 'em) ';
+  } else if (startCentered) {
+    val += 'translate(calc(-50% + ' + transform.x / d + 'em), calc(-50% + ' + transform.y / d + 'em)) ';
+  } else {
+    val += 'translate(' + transform.x / d + 'em, ' + transform.y / d + 'em) ';
+  }
+
+  val += 'scale(' + transform.size / d * (transform.flipX ? -1 : 1) + ', ' + transform.size / d * (transform.flipY ? -1 : 1) + ') ';
+  val += 'rotate(' + transform.rotate + 'deg) ';
+
+  return val;
+}
+
+var ALL_SPACE = {
+  x: 0,
+  y: 0,
+  width: '100%',
+  height: '100%'
+};
+
+var makeIconMasking = function (_ref) {
+  var children = _ref.children,
+      attributes = _ref.attributes,
+      main = _ref.main,
+      mask = _ref.mask,
+      transform = _ref.transform;
+  var mainWidth = main.width,
+      mainPath = main.icon;
+  var maskWidth = mask.width,
+      maskPath = mask.icon;
+
+
+  var trans = transformForSvg({ transform: transform, containerWidth: maskWidth, iconWidth: mainWidth });
+
+  var maskRect = {
+    tag: 'rect',
+    attributes: _extends({}, ALL_SPACE, {
+      fill: 'white'
+    })
+  };
+  var maskInnerGroup = {
+    tag: 'g',
+    attributes: _extends({}, trans.inner),
+    children: [{ tag: 'path', attributes: _extends({}, mainPath.attributes, trans.path, { fill: 'black' }) }]
+  };
+  var maskOuterGroup = {
+    tag: 'g',
+    attributes: _extends({}, trans.outer),
+    children: [maskInnerGroup]
+  };
+  var maskId = 'mask-' + nextUniqueId();
+  var clipId = 'clip-' + nextUniqueId();
+  var maskTag = {
+    tag: 'mask',
+    attributes: _extends({}, ALL_SPACE, {
+      id: maskId,
+      maskUnits: 'userSpaceOnUse',
+      maskContentUnits: 'userSpaceOnUse'
+    }),
+    children: [maskRect, maskOuterGroup]
+  };
+  var defs = {
+    tag: 'defs',
+    children: [{ tag: 'clipPath', attributes: { id: clipId }, children: [maskPath] }, maskTag]
+  };
+
+  children.push(defs, { tag: 'rect', attributes: _extends({ fill: 'currentColor', 'clip-path': 'url(#' + clipId + ')', mask: 'url(#' + maskId + ')' }, ALL_SPACE) });
+
+  return {
+    children: children,
+    attributes: attributes
+  };
+};
+
+var makeIconStandard = function (_ref) {
+  var children = _ref.children,
+      attributes = _ref.attributes,
+      main = _ref.main,
+      transform = _ref.transform,
+      styles = _ref.styles;
+
+  var styleString = joinStyles(styles);
+
+  if (styleString.length > 0) {
+    attributes['style'] = styleString;
+  }
+
+  if (transformIsMeaningful(transform)) {
+    var trans = transformForSvg({ transform: transform, containerWidth: main.width, iconWidth: main.width });
+    children.push({
+      tag: 'g',
+      attributes: _extends({}, trans.outer),
+      children: [{
+        tag: 'g',
+        attributes: _extends({}, trans.inner),
+        children: [{
+          tag: main.icon.tag,
+          children: main.icon.children,
+          attributes: _extends({}, main.icon.attributes, trans.path)
+        }]
+      }]
+    });
+  } else {
+    children.push(main.icon);
+  }
+
+  return {
+    children: children,
+    attributes: attributes
+  };
+};
+
+var asIcon = function (_ref) {
+  var children = _ref.children,
+      main = _ref.main,
+      mask = _ref.mask,
+      attributes = _ref.attributes,
+      styles = _ref.styles,
+      transform = _ref.transform;
+
+  if (transformIsMeaningful(transform) && main.found && !mask.found) {
+    var width = main.width,
+        height = main.height;
+
+    var offset = {
+      x: width / height / 2,
+      y: 0.5
+    };
+    attributes['style'] = joinStyles(_extends({}, styles, {
+      'transform-origin': offset.x + transform.x / 16 + 'em ' + (offset.y + transform.y / 16) + 'em'
+    }));
+  }
+
+  return [{
+    tag: 'svg',
+    attributes: attributes,
+    children: children
+  }];
+};
+
+var asSymbol = function (_ref) {
+  var prefix = _ref.prefix,
+      iconName = _ref.iconName,
+      children = _ref.children,
+      attributes = _ref.attributes,
+      symbol = _ref.symbol;
+
+  var id = symbol === true ? prefix + '-' + config$1.familyPrefix + '-' + iconName : symbol;
+
+  return [{
+    tag: 'svg',
+    attributes: {
+      style: 'display: none;'
+    },
+    children: [{
+      tag: 'symbol',
+      attributes: _extends({}, attributes, { id: id }),
+      children: children
+    }]
+  }];
+};
+
+function makeInlineSvgAbstract(params) {
+  var _params$icons = params.icons,
+      main = _params$icons.main,
+      mask = _params$icons.mask,
+      prefix = params.prefix,
+      iconName = params.iconName,
+      transform = params.transform,
+      symbol = params.symbol,
+      title = params.title,
+      extra = params.extra,
+      _params$watchable = params.watchable,
+      watchable = _params$watchable === undefined ? false : _params$watchable;
+
+  var _ref = mask.found ? mask : main,
+      width = _ref.width,
+      height = _ref.height;
+
+  var widthClass = 'fa-w-' + Math.ceil(width / height * 16);
+  var attrClass = [config$1.replacementClass, iconName ? config$1.familyPrefix + '-' + iconName : '', widthClass].concat(extra.classes).join(' ');
+
+  var content = {
+    children: [],
+    attributes: _extends({}, extra.attributes, {
+      'data-prefix': prefix,
+      'data-icon': iconName,
+      'class': attrClass,
+      'role': 'img',
+      'xmlns': 'http://www.w3.org/2000/svg',
+      'viewBox': '0 0 ' + width + ' ' + height
+    })
+  };
+
+  if (watchable) {
+    content.attributes[DATA_FA_I2SVG] = '';
+  }
+
+  if (title) content.children.push({ tag: 'title', attributes: { id: content.attributes['aria-labelledby'] || 'title-' + nextUniqueId() }, children: [title] });
+
+  var args = _extends({}, content, {
+    prefix: prefix,
+    iconName: iconName,
+    main: main,
+    mask: mask,
+    transform: transform,
+    symbol: symbol,
+    styles: extra.styles
+  });
+
+  var _ref2 = mask.found && main.found ? makeIconMasking(args) : makeIconStandard(args),
+      children = _ref2.children,
+      attributes = _ref2.attributes;
+
+  args.children = children;
+  args.attributes = attributes;
+
+  if (symbol) {
+    return asSymbol(args);
+  } else {
+    return asIcon(args);
+  }
+}
+
+function makeLayersTextAbstract(params) {
+  var content = params.content,
+      width = params.width,
+      height = params.height,
+      transform = params.transform,
+      title = params.title,
+      extra = params.extra,
+      _params$watchable2 = params.watchable,
+      watchable = _params$watchable2 === undefined ? false : _params$watchable2;
+
+
+  var attributes = _extends({}, extra.attributes, title ? { 'title': title } : {}, {
+    'class': extra.classes.join(' ')
+  });
+
+  if (watchable) {
+    attributes[DATA_FA_I2SVG] = '';
+  }
+
+  var styles = _extends({}, extra.styles);
+
+  if (transformIsMeaningful(transform)) {
+    styles['transform'] = transformForCss({ transform: transform, startCentered: true, width: width, height: height });
+    styles['-webkit-transform'] = styles['transform'];
+  }
+
+  var styleString = joinStyles(styles);
+
+  if (styleString.length > 0) {
+    attributes['style'] = styleString;
+  }
+
+  var val = [];
+
+  val.push({
+    tag: 'span',
+    attributes: attributes,
+    children: [content]
+  });
+
+  if (title) {
+    val.push({ tag: 'span', attributes: { class: 'sr-only' }, children: [title] });
+  }
+
+  return val;
+}
+
+var noop$2 = function noop() {};
+var p = config$1.measurePerformance && PERFORMANCE && PERFORMANCE.mark && PERFORMANCE.measure ? PERFORMANCE : { mark: noop$2, measure: noop$2 };
+var preamble = 'FA "5.0.13"';
+
+var begin = function begin(name) {
+  p.mark(preamble + ' ' + name + ' begins');
+  return function () {
+    return end(name);
+  };
+};
+
+var end = function end(name) {
+  p.mark(preamble + ' ' + name + ' ends');
+  p.measure(preamble + ' ' + name, preamble + ' ' + name + ' begins', preamble + ' ' + name + ' ends');
+};
+
+var perf = { begin: begin, end: end };
+
+'use strict';
+
+/**
+ * Internal helper to bind a function known to have 4 arguments
+ * to a given context.
+ */
+var bindInternal4 = function bindInternal4 (func, thisContext) {
+  return function (a, b, c, d) {
+    return func.call(thisContext, a, b, c, d);
+  };
+};
+
+'use strict';
+
+
+
+/**
+ * # Reduce
+ *
+ * A fast object `.reduce()` implementation.
+ *
+ * @param  {Object}   subject      The object to reduce over.
+ * @param  {Function} fn           The reducer function.
+ * @param  {mixed}    initialValue The initial value for the reducer, defaults to subject[0].
+ * @param  {Object}   thisContext  The context for the reducer.
+ * @return {mixed}                 The final result.
+ */
+var reduce = function fastReduceObject (subject, fn, initialValue, thisContext) {
+  var keys = Object.keys(subject),
+      length = keys.length,
+      iterator = thisContext !== undefined ? bindInternal4(fn, thisContext) : fn,
+      i, key, result;
+
+  if (initialValue === undefined) {
+    i = 1;
+    result = subject[keys[0]];
+  }
+  else {
+    i = 0;
+    result = initialValue;
+  }
+
+  for (; i < length; i++) {
+    key = keys[i];
+    result = iterator(result, subject[key], key, subject);
+  }
+
+  return result;
+};
+
+var styles$2 = namespace.styles;
+var shims = namespace.shims;
+
+
+var _byUnicode = {};
+var _byLigature = {};
+var _byOldName = {};
+
+var build = function build() {
+  var lookup = function lookup(reducer) {
+    return reduce(styles$2, function (o, style, prefix) {
+      o[prefix] = reduce(style, reducer, {});
+      return o;
+    }, {});
+  };
+
+  _byUnicode = lookup(function (acc, icon, iconName) {
+    acc[icon[3]] = iconName;
+
+    return acc;
+  });
+
+  _byLigature = lookup(function (acc, icon, iconName) {
+    var ligatures = icon[2];
+
+    acc[iconName] = iconName;
+
+    ligatures.forEach(function (ligature) {
+      acc[ligature] = iconName;
+    });
+
+    return acc;
+  });
+
+  var hasRegular = 'far' in styles$2;
+
+  _byOldName = reduce(shims, function (acc, shim) {
+    var oldName = shim[0];
+    var prefix = shim[1];
+    var iconName = shim[2];
+
+    if (prefix === 'far' && !hasRegular) {
+      prefix = 'fas';
+    }
+
+    acc[oldName] = { prefix: prefix, iconName: iconName };
+
+    return acc;
+  }, {});
+};
+
+build();
+
+function byUnicode(prefix, unicode) {
+  return _byUnicode[prefix][unicode];
+}
+
+function byLigature(prefix, ligature) {
+  return _byLigature[prefix][ligature];
+}
+
+function byOldName(name) {
+  return _byOldName[name] || { prefix: null, iconName: null };
+}
+
+var styles$1 = namespace.styles;
+
+
+var emptyCanonicalIcon = function emptyCanonicalIcon() {
+  return { prefix: null, iconName: null, rest: [] };
+};
+
+function getCanonicalIcon(values) {
+  return values.reduce(function (acc, cls) {
+    var iconName = getIconName(config$1.familyPrefix, cls);
+
+    if (styles$1[cls]) {
+      acc.prefix = cls;
+    } else if (iconName) {
+      var shim = acc.prefix === 'fa' ? byOldName(iconName) : {};
+
+      acc.iconName = shim.iconName || iconName;
+      acc.prefix = shim.prefix || acc.prefix;
+    } else if (cls !== config$1.replacementClass && cls.indexOf('fa-w-') !== 0) {
+      acc.rest.push(cls);
+    }
+
+    return acc;
+  }, emptyCanonicalIcon());
+}
+
+function iconFromMapping(mapping, prefix, iconName) {
+  if (mapping && mapping[prefix] && mapping[prefix][iconName]) {
+    return {
+      prefix: prefix,
+      iconName: iconName,
+      icon: mapping[prefix][iconName]
+    };
+  }
+}
+
+function toHtml(abstractNodes) {
+  var tag = abstractNodes.tag,
+      _abstractNodes$attrib = abstractNodes.attributes,
+      attributes = _abstractNodes$attrib === undefined ? {} : _abstractNodes$attrib,
+      _abstractNodes$childr = abstractNodes.children,
+      children = _abstractNodes$childr === undefined ? [] : _abstractNodes$childr;
+
+
+  if (typeof abstractNodes === 'string') {
+    return htmlEscape(abstractNodes);
+  } else {
+    return '<' + tag + ' ' + joinAttributes(attributes) + '>' + children.map(toHtml).join('') + '</' + tag + '>';
+  }
+}
+
+var noop$1 = function noop() {};
+
+function isWatched(node) {
+  var i2svg = node.getAttribute ? node.getAttribute(DATA_FA_I2SVG) : null;
+
+  return typeof i2svg === 'string';
+}
+
+function getMutator() {
+  if (config$1.autoReplaceSvg === true) {
+    return mutators.replace;
+  }
+
+  var mutator = mutators[config$1.autoReplaceSvg];
+
+  return mutator || mutators.replace;
+}
+
+var mutators = {
+  replace: function replace(mutation) {
+    var node = mutation[0];
+    var abstract = mutation[1];
+    var newOuterHTML = abstract.map(function (a) {
+      return toHtml(a);
+    }).join('\n');
+
+    if (node.parentNode && node.outerHTML) {
+      node.outerHTML = newOuterHTML + (config$1.keepOriginalSource && node.tagName.toLowerCase() !== 'svg' ? '<!-- ' + node.outerHTML + ' -->' : '');
+    } else if (node.parentNode) {
+      var newNode = document.createElement('span');
+      node.parentNode.replaceChild(newNode, node);
+      newNode.outerHTML = newOuterHTML;
+    }
+  },
+  nest: function nest(mutation) {
+    var node = mutation[0];
+    var abstract = mutation[1];
+
+    // If we already have a replaced node we do not want to continue nesting within it.
+    // Short-circuit to the standard replacement
+    if (~classArray(node).indexOf(config$1.replacementClass)) {
+      return mutators.replace(mutation);
+    }
+
+    var forSvg = new RegExp(config$1.familyPrefix + '-.*');
+
+    delete abstract[0].attributes.style;
+
+    var splitClasses = abstract[0].attributes.class.split(' ').reduce(function (acc, cls) {
+      if (cls === config$1.replacementClass || cls.match(forSvg)) {
+        acc.toSvg.push(cls);
+      } else {
+        acc.toNode.push(cls);
+      }
+
+      return acc;
+    }, { toNode: [], toSvg: [] });
+
+    abstract[0].attributes.class = splitClasses.toSvg.join(' ');
+
+    var newInnerHTML = abstract.map(function (a) {
+      return toHtml(a);
+    }).join('\n');
+    node.setAttribute('class', splitClasses.toNode.join(' '));
+    node.setAttribute(DATA_FA_I2SVG, '');
+    node.innerHTML = newInnerHTML;
+  }
+};
+
+function perform(mutations, callback) {
+  var callbackFunction = typeof callback === 'function' ? callback : noop$1;
+
+  if (mutations.length === 0) {
+    callbackFunction();
+  } else {
+    var frame = WINDOW.requestAnimationFrame || function (op) {
+      return op();
+    };
+
+    frame(function () {
+      var mutator = getMutator();
+      var mark = perf.begin('mutate');
+
+      mutations.map(mutator);
+
+      mark();
+
+      callbackFunction();
+    });
+  }
+}
+
+var disabled = false;
+
+function disableObservation(operation) {
+  disabled = true;
+  operation();
+  disabled = false;
+}
+
+var mo = null;
+
+function observe(options) {
+  if (!MUTATION_OBSERVER) return;
+
+  var treeCallback = options.treeCallback,
+      nodeCallback = options.nodeCallback,
+      pseudoElementsCallback = options.pseudoElementsCallback;
+
+
+  mo = new MUTATION_OBSERVER(function (objects) {
+    if (disabled) return;
+
+    toArray(objects).forEach(function (mutationRecord) {
+      if (mutationRecord.type === 'childList' && mutationRecord.addedNodes.length > 0 && !isWatched(mutationRecord.addedNodes[0])) {
+        if (config$1.searchPseudoElements) {
+          pseudoElementsCallback(mutationRecord.target);
+        }
+
+        treeCallback(mutationRecord.target);
+      }
+
+      if (mutationRecord.type === 'attributes' && mutationRecord.target.parentNode && config$1.searchPseudoElements) {
+        pseudoElementsCallback(mutationRecord.target.parentNode);
+      }
+
+      if (mutationRecord.type === 'attributes' && isWatched(mutationRecord.target) && ~ATTRIBUTES_WATCHED_FOR_MUTATION.indexOf(mutationRecord.attributeName)) {
+        if (mutationRecord.attributeName === 'class') {
+          var _getCanonicalIcon = getCanonicalIcon(classArray(mutationRecord.target)),
+              prefix = _getCanonicalIcon.prefix,
+              iconName = _getCanonicalIcon.iconName;
+
+          if (prefix) mutationRecord.target.setAttribute('data-prefix', prefix);
+          if (iconName) mutationRecord.target.setAttribute('data-icon', iconName);
+        } else {
+          nodeCallback(mutationRecord.target);
+        }
+      }
+    });
+  });
+
+  if (!IS_DOM) return;
+
+  mo.observe(DOCUMENT.getElementsByTagName('body')[0], {
+    childList: true, attributes: true, characterData: true, subtree: true
+  });
+}
+
+function disconnect() {
+  if (!mo) return;
+
+  mo.disconnect();
+}
+
+var styleParser = function (node) {
+  var style = node.getAttribute('style');
+
+  var val = [];
+
+  if (style) {
+    val = style.split(';').reduce(function (acc, style) {
+      var styles = style.split(':');
+      var prop = styles[0];
+      var value = styles.slice(1);
+
+      if (prop && value.length > 0) {
+        acc[prop] = value.join(':').trim();
+      }
+
+      return acc;
+    }, {});
+  }
+
+  return val;
+};
+
+function toHex(unicode) {
+  var result = '';
+
+  for (var i = 0; i < unicode.length; i++) {
+    var hex = unicode.charCodeAt(i).toString(16);
+    result += ('000' + hex).slice(-4);
+  }
+
+  return result;
+}
+
+var classParser = function (node) {
+  var existingPrefix = node.getAttribute('data-prefix');
+  var existingIconName = node.getAttribute('data-icon');
+  var innerText = node.innerText !== undefined ? node.innerText.trim() : '';
+
+  var val = getCanonicalIcon(classArray(node));
+
+  if (existingPrefix && existingIconName) {
+    val.prefix = existingPrefix;
+    val.iconName = existingIconName;
+  }
+
+  if (val.prefix && innerText.length > 1) {
+    val.iconName = byLigature(val.prefix, node.innerText);
+  } else if (val.prefix && innerText.length === 1) {
+    val.iconName = byUnicode(val.prefix, toHex(node.innerText));
+  }
+
+  return val;
+};
+
+var parseTransformString = function parseTransformString(transformString) {
+  var transform = {
+    size: 16,
+    x: 0,
+    y: 0,
+    flipX: false,
+    flipY: false,
+    rotate: 0
+  };
+
+  if (!transformString) {
+    return transform;
+  } else {
+    return transformString.toLowerCase().split(' ').reduce(function (acc, n) {
+      var parts = n.toLowerCase().split('-');
+      var first = parts[0];
+      var rest = parts.slice(1).join('-');
+
+      if (first && rest === 'h') {
+        acc.flipX = true;
+        return acc;
+      }
+
+      if (first && rest === 'v') {
+        acc.flipY = true;
+        return acc;
+      }
+
+      rest = parseFloat(rest);
+
+      if (isNaN(rest)) {
+        return acc;
+      }
+
+      switch (first) {
+        case 'grow':
+          acc.size = acc.size + rest;
+          break;
+        case 'shrink':
+          acc.size = acc.size - rest;
+          break;
+        case 'left':
+          acc.x = acc.x - rest;
+          break;
+        case 'right':
+          acc.x = acc.x + rest;
+          break;
+        case 'up':
+          acc.y = acc.y - rest;
+          break;
+        case 'down':
+          acc.y = acc.y + rest;
+          break;
+        case 'rotate':
+          acc.rotate = acc.rotate + rest;
+          break;
+      }
+
+      return acc;
+    }, transform);
+  }
+};
+
+var transformParser = function (node) {
+  return parseTransformString(node.getAttribute('data-fa-transform'));
+};
+
+var symbolParser = function (node) {
+  var symbol = node.getAttribute('data-fa-symbol');
+
+  return symbol === null ? false : symbol === '' ? true : symbol;
+};
+
+var attributesParser = function (node) {
+  var extraAttributes = toArray(node.attributes).reduce(function (acc, attr) {
+    if (acc.name !== 'class' && acc.name !== 'style') {
+      acc[attr.name] = attr.value;
+    }
+    return acc;
+  }, {});
+
+  var title = node.getAttribute('title');
+
+  if (config$1.autoA11y) {
+    if (title) {
+      extraAttributes['aria-labelledby'] = config$1.replacementClass + '-title-' + nextUniqueId();
+    } else {
+      extraAttributes['aria-hidden'] = 'true';
+    }
+  }
+
+  return extraAttributes;
+};
+
+var maskParser = function (node) {
+  var mask = node.getAttribute('data-fa-mask');
+
+  if (!mask) {
+    return emptyCanonicalIcon();
+  } else {
+    return getCanonicalIcon(mask.split(' ').map(function (i) {
+      return i.trim();
+    }));
+  }
+};
+
+function parseMeta(node) {
+  var _classParser = classParser(node),
+      iconName = _classParser.iconName,
+      prefix = _classParser.prefix,
+      extraClasses = _classParser.rest;
+
+  var extraStyles = styleParser(node);
+  var transform = transformParser(node);
+  var symbol = symbolParser(node);
+  var extraAttributes = attributesParser(node);
+  var mask = maskParser(node);
+
+  return {
+    iconName: iconName,
+    title: node.getAttribute('title'),
+    prefix: prefix,
+    transform: transform,
+    symbol: symbol,
+    mask: mask,
+    extra: {
+      classes: extraClasses,
+      styles: extraStyles,
+      attributes: extraAttributes
+    }
+  };
+}
+
+function MissingIcon(error) {
+  this.name = 'MissingIcon';
+  this.message = error || 'Icon unavailable';
+  this.stack = new Error().stack;
+}
+
+MissingIcon.prototype = Object.create(Error.prototype);
+MissingIcon.prototype.constructor = MissingIcon;
+
+var FILL = { fill: 'currentColor' };
+var ANIMATION_BASE = {
+  attributeType: 'XML',
+  repeatCount: 'indefinite',
+  dur: '2s'
+};
+var RING = {
+  tag: 'path',
+  attributes: _extends({}, FILL, {
+    d: 'M156.5,447.7l-12.6,29.5c-18.7-9.5-35.9-21.2-51.5-34.9l22.7-22.7C127.6,430.5,141.5,440,156.5,447.7z M40.6,272H8.5 c1.4,21.2,5.4,41.7,11.7,61.1L50,321.2C45.1,305.5,41.8,289,40.6,272z M40.6,240c1.4-18.8,5.2-37,11.1-54.1l-29.5-12.6 C14.7,194.3,10,216.7,8.5,240H40.6z M64.3,156.5c7.8-14.9,17.2-28.8,28.1-41.5L69.7,92.3c-13.7,15.6-25.5,32.8-34.9,51.5 L64.3,156.5z M397,419.6c-13.9,12-29.4,22.3-46.1,30.4l11.9,29.8c20.7-9.9,39.8-22.6,56.9-37.6L397,419.6z M115,92.4 c13.9-12,29.4-22.3,46.1-30.4l-11.9-29.8c-20.7,9.9-39.8,22.6-56.8,37.6L115,92.4z M447.7,355.5c-7.8,14.9-17.2,28.8-28.1,41.5 l22.7,22.7c13.7-15.6,25.5-32.9,34.9-51.5L447.7,355.5z M471.4,272c-1.4,18.8-5.2,37-11.1,54.1l29.5,12.6 c7.5-21.1,12.2-43.5,13.6-66.8H471.4z M321.2,462c-15.7,5-32.2,8.2-49.2,9.4v32.1c21.2-1.4,41.7-5.4,61.1-11.7L321.2,462z M240,471.4c-18.8-1.4-37-5.2-54.1-11.1l-12.6,29.5c21.1,7.5,43.5,12.2,66.8,13.6V471.4z M462,190.8c5,15.7,8.2,32.2,9.4,49.2h32.1 c-1.4-21.2-5.4-41.7-11.7-61.1L462,190.8z M92.4,397c-12-13.9-22.3-29.4-30.4-46.1l-29.8,11.9c9.9,20.7,22.6,39.8,37.6,56.9 L92.4,397z M272,40.6c18.8,1.4,36.9,5.2,54.1,11.1l12.6-29.5C317.7,14.7,295.3,10,272,8.5V40.6z M190.8,50 c15.7-5,32.2-8.2,49.2-9.4V8.5c-21.2,1.4-41.7,5.4-61.1,11.7L190.8,50z M442.3,92.3L419.6,115c12,13.9,22.3,29.4,30.5,46.1 l29.8-11.9C470,128.5,457.3,109.4,442.3,92.3z M397,92.4l22.7-22.7c-15.6-13.7-32.8-25.5-51.5-34.9l-12.6,29.5 C370.4,72.1,384.4,81.5,397,92.4z'
+  })
+};
+var OPACITY_ANIMATE = _extends({}, ANIMATION_BASE, {
+  attributeName: 'opacity'
+});
+var DOT = {
+  tag: 'circle',
+  attributes: _extends({}, FILL, {
+    cx: '256',
+    cy: '364',
+    r: '28'
+  }),
+  children: [{ tag: 'animate', attributes: _extends({}, ANIMATION_BASE, { attributeName: 'r', values: '28;14;28;28;14;28;' }) }, { tag: 'animate', attributes: _extends({}, OPACITY_ANIMATE, { values: '1;0;1;1;0;1;' }) }]
+};
+var QUESTION = {
+  tag: 'path',
+  attributes: _extends({}, FILL, {
+    opacity: '1',
+    d: 'M263.7,312h-16c-6.6,0-12-5.4-12-12c0-71,77.4-63.9,77.4-107.8c0-20-17.8-40.2-57.4-40.2c-29.1,0-44.3,9.6-59.2,28.7 c-3.9,5-11.1,6-16.2,2.4l-13.1-9.2c-5.6-3.9-6.9-11.8-2.6-17.2c21.2-27.2,46.4-44.7,91.2-44.7c52.3,0,97.4,29.8,97.4,80.2 c0,67.6-77.4,63.5-77.4,107.8C275.7,306.6,270.3,312,263.7,312z'
+  }),
+  children: [{ tag: 'animate', attributes: _extends({}, OPACITY_ANIMATE, { values: '1;0;0;0;0;1;' }) }]
+};
+var EXCLAMATION = {
+  tag: 'path',
+  attributes: _extends({}, FILL, {
+    opacity: '0',
+    d: 'M232.5,134.5l7,168c0.3,6.4,5.6,11.5,12,11.5h9c6.4,0,11.7-5.1,12-11.5l7-168c0.3-6.8-5.2-12.5-12-12.5h-23 C237.7,122,232.2,127.7,232.5,134.5z'
+  }),
+  children: [{ tag: 'animate', attributes: _extends({}, OPACITY_ANIMATE, { values: '0;0;1;1;0;0;' }) }]
+};
+
+var missing = { tag: 'g', children: [RING, DOT, QUESTION, EXCLAMATION] };
+
+var styles = namespace.styles;
+
+var LAYERS_TEXT_CLASSNAME = 'fa-layers-text';
+var FONT_FAMILY_PATTERN = /Font Awesome 5 (Solid|Regular|Light|Brands)/;
+var STYLE_TO_PREFIX = {
+  'Solid': 'fas',
+  'Regular': 'far',
+  'Light': 'fal',
+  'Brands': 'fab'
+};
+
+function findIcon(iconName, prefix) {
+  var val = {
+    found: false,
+    width: 512,
+    height: 512,
+    icon: missing
+  };
+
+  if (iconName && prefix && styles[prefix] && styles[prefix][iconName]) {
+    var icon = styles[prefix][iconName];
+    var width = icon[0];
+    var height = icon[1];
+    var vectorData = icon.slice(4);
+
+    val = {
+      found: true,
+      width: width,
+      height: height,
+      icon: { tag: 'path', attributes: { fill: 'currentColor', d: vectorData[0] } }
+    };
+  } else if (iconName && prefix && !config$1.showMissingIcons) {
+    throw new MissingIcon('Icon is missing for prefix ' + prefix + ' with icon name ' + iconName);
+  }
+
+  return val;
+}
+
+function generateSvgReplacementMutation(node, nodeMeta) {
+  var iconName = nodeMeta.iconName,
+      title = nodeMeta.title,
+      prefix = nodeMeta.prefix,
+      transform = nodeMeta.transform,
+      symbol = nodeMeta.symbol,
+      mask = nodeMeta.mask,
+      extra = nodeMeta.extra;
+
+
+  return [node, makeInlineSvgAbstract({
+    icons: {
+      main: findIcon(iconName, prefix),
+      mask: findIcon(mask.iconName, mask.prefix)
+    },
+    prefix: prefix,
+    iconName: iconName,
+    transform: transform,
+    symbol: symbol,
+    mask: mask,
+    title: title,
+    extra: extra,
+    watchable: true
+  })];
+}
+
+function generateLayersText(node, nodeMeta) {
+  var title = nodeMeta.title,
+      transform = nodeMeta.transform,
+      extra = nodeMeta.extra;
+
+
+  var width = null;
+  var height = null;
+
+  if (IS_IE) {
+    var computedFontSize = parseInt(getComputedStyle(node).fontSize, 10);
+    var boundingClientRect = node.getBoundingClientRect();
+    width = boundingClientRect.width / computedFontSize;
+    height = boundingClientRect.height / computedFontSize;
+  }
+
+  if (config$1.autoA11y && !title) {
+    extra.attributes['aria-hidden'] = 'true';
+  }
+
+  return [node, makeLayersTextAbstract({
+    content: node.innerHTML,
+    width: width,
+    height: height,
+    transform: transform,
+    title: title,
+    extra: extra,
+    watchable: true
+  })];
+}
+
+function generateMutation(node) {
+  var nodeMeta = parseMeta(node);
+
+  if (~nodeMeta.extra.classes.indexOf(LAYERS_TEXT_CLASSNAME)) {
+    return generateLayersText(node, nodeMeta);
+  } else {
+    return generateSvgReplacementMutation(node, nodeMeta);
+  }
+}
+
+function remove(node) {
+  if (typeof node.remove === 'function') {
+    node.remove();
+  } else if (node && node.parentNode) {
+    node.parentNode.removeChild(node);
+  }
+}
+
+function searchPseudoElements(root) {
+  if (!IS_DOM) return;
+
+  var end = perf.begin('searchPseudoElements');
+
+  disableObservation(function () {
+    toArray(root.querySelectorAll('*')).forEach(function (node) {
+      [':before', ':after'].forEach(function (pos) {
+        var styles = WINDOW.getComputedStyle(node, pos);
+        var fontFamily = styles.getPropertyValue('font-family').match(FONT_FAMILY_PATTERN);
+        var children = toArray(node.children);
+        var pseudoElement = children.filter(function (c) {
+          return c.getAttribute(DATA_FA_PSEUDO_ELEMENT) === pos;
+        })[0];
+
+        if (pseudoElement) {
+          if (pseudoElement.nextSibling && pseudoElement.nextSibling.textContent.indexOf(DATA_FA_PSEUDO_ELEMENT) > -1) {
+            remove(pseudoElement.nextSibling);
+          }
+          remove(pseudoElement);
+          pseudoElement = null;
+        }
+
+        if (fontFamily && !pseudoElement) {
+          var content = styles.getPropertyValue('content');
+          var i = DOCUMENT.createElement('i');
+          i.setAttribute('class', '' + STYLE_TO_PREFIX[fontFamily[1]]);
+          i.setAttribute(DATA_FA_PSEUDO_ELEMENT, pos);
+          i.innerText = content.length === 3 ? content.substr(1, 1) : content;
+          if (pos === ':before') {
+            node.insertBefore(i, node.firstChild);
+          } else {
+            node.appendChild(i);
+          }
+        }
+      });
+    });
+  });
+
+  end();
+}
+
+function onTree(root) {
+  var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  if (!IS_DOM) return;
+
+  var htmlClassList = DOCUMENT.documentElement.classList;
+  var hclAdd = function hclAdd(suffix) {
+    return htmlClassList.add(HTML_CLASS_I2SVG_BASE_CLASS + '-' + suffix);
+  };
+  var hclRemove = function hclRemove(suffix) {
+    return htmlClassList.remove(HTML_CLASS_I2SVG_BASE_CLASS + '-' + suffix);
+  };
+  var prefixes = Object.keys(styles);
+  var prefixesDomQuery = ['.' + LAYERS_TEXT_CLASSNAME + ':not([' + DATA_FA_I2SVG + '])'].concat(prefixes.map(function (p) {
+    return '.' + p + ':not([' + DATA_FA_I2SVG + '])';
+  })).join(', ');
+
+  if (prefixesDomQuery.length === 0) {
+    return;
+  }
+
+  var candidates = toArray(root.querySelectorAll(prefixesDomQuery));
+
+  if (candidates.length > 0) {
+    hclAdd('pending');
+    hclRemove('complete');
+  } else {
+    return;
+  }
+
+  var mark = perf.begin('onTree');
+
+  var mutations = candidates.reduce(function (acc, node) {
+    try {
+      var mutation = generateMutation(node);
+
+      if (mutation) {
+        acc.push(mutation);
+      }
+    } catch (e) {
+      if (!PRODUCTION) {
+        if (e instanceof MissingIcon) {
+          console.error(e);
+        }
+      }
+    }
+
+    return acc;
+  }, []);
+
+  mark();
+
+  perform(mutations, function () {
+    hclAdd('active');
+    hclAdd('complete');
+    hclRemove('pending');
+
+    if (typeof callback === 'function') callback();
+  });
+}
+
+function onNode(node) {
+  var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+  var mutation = generateMutation(node);
+
+  if (mutation) {
+    perform([mutation], callback);
+  }
+}
+
+var baseStyles = "svg:not(:root).svg-inline--fa {\n  overflow: visible; }\n\n.svg-inline--fa {\n  display: inline-block;\n  font-size: inherit;\n  height: 1em;\n  overflow: visible;\n  vertical-align: -.125em; }\n  .svg-inline--fa.fa-lg {\n    vertical-align: -.225em; }\n  .svg-inline--fa.fa-w-1 {\n    width: 0.0625em; }\n  .svg-inline--fa.fa-w-2 {\n    width: 0.125em; }\n  .svg-inline--fa.fa-w-3 {\n    width: 0.1875em; }\n  .svg-inline--fa.fa-w-4 {\n    width: 0.25em; }\n  .svg-inline--fa.fa-w-5 {\n    width: 0.3125em; }\n  .svg-inline--fa.fa-w-6 {\n    width: 0.375em; }\n  .svg-inline--fa.fa-w-7 {\n    width: 0.4375em; }\n  .svg-inline--fa.fa-w-8 {\n    width: 0.5em; }\n  .svg-inline--fa.fa-w-9 {\n    width: 0.5625em; }\n  .svg-inline--fa.fa-w-10 {\n    width: 0.625em; }\n  .svg-inline--fa.fa-w-11 {\n    width: 0.6875em; }\n  .svg-inline--fa.fa-w-12 {\n    width: 0.75em; }\n  .svg-inline--fa.fa-w-13 {\n    width: 0.8125em; }\n  .svg-inline--fa.fa-w-14 {\n    width: 0.875em; }\n  .svg-inline--fa.fa-w-15 {\n    width: 0.9375em; }\n  .svg-inline--fa.fa-w-16 {\n    width: 1em; }\n  .svg-inline--fa.fa-w-17 {\n    width: 1.0625em; }\n  .svg-inline--fa.fa-w-18 {\n    width: 1.125em; }\n  .svg-inline--fa.fa-w-19 {\n    width: 1.1875em; }\n  .svg-inline--fa.fa-w-20 {\n    width: 1.25em; }\n  .svg-inline--fa.fa-pull-left {\n    margin-right: .3em;\n    width: auto; }\n  .svg-inline--fa.fa-pull-right {\n    margin-left: .3em;\n    width: auto; }\n  .svg-inline--fa.fa-border {\n    height: 1.5em; }\n  .svg-inline--fa.fa-li {\n    width: 2em; }\n  .svg-inline--fa.fa-fw {\n    width: 1.25em; }\n\n.fa-layers svg.svg-inline--fa {\n  bottom: 0;\n  left: 0;\n  margin: auto;\n  position: absolute;\n  right: 0;\n  top: 0; }\n\n.fa-layers {\n  display: inline-block;\n  height: 1em;\n  position: relative;\n  text-align: center;\n  vertical-align: -.125em;\n  width: 1em; }\n  .fa-layers svg.svg-inline--fa {\n    -webkit-transform-origin: center center;\n            transform-origin: center center; }\n\n.fa-layers-text, .fa-layers-counter {\n  display: inline-block;\n  position: absolute;\n  text-align: center; }\n\n.fa-layers-text {\n  left: 50%;\n  top: 50%;\n  -webkit-transform: translate(-50%, -50%);\n          transform: translate(-50%, -50%);\n  -webkit-transform-origin: center center;\n          transform-origin: center center; }\n\n.fa-layers-counter {\n  background-color: #ff253a;\n  border-radius: 1em;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: #fff;\n  height: 1.5em;\n  line-height: 1;\n  max-width: 5em;\n  min-width: 1.5em;\n  overflow: hidden;\n  padding: .25em;\n  right: 0;\n  text-overflow: ellipsis;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top right;\n          transform-origin: top right; }\n\n.fa-layers-bottom-right {\n  bottom: 0;\n  right: 0;\n  top: auto;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: bottom right;\n          transform-origin: bottom right; }\n\n.fa-layers-bottom-left {\n  bottom: 0;\n  left: 0;\n  right: auto;\n  top: auto;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: bottom left;\n          transform-origin: bottom left; }\n\n.fa-layers-top-right {\n  right: 0;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top right;\n          transform-origin: top right; }\n\n.fa-layers-top-left {\n  left: 0;\n  right: auto;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top left;\n          transform-origin: top left; }\n\n.fa-lg {\n  font-size: 1.33333em;\n  line-height: 0.75em;\n  vertical-align: -.0667em; }\n\n.fa-xs {\n  font-size: .75em; }\n\n.fa-sm {\n  font-size: .875em; }\n\n.fa-1x {\n  font-size: 1em; }\n\n.fa-2x {\n  font-size: 2em; }\n\n.fa-3x {\n  font-size: 3em; }\n\n.fa-4x {\n  font-size: 4em; }\n\n.fa-5x {\n  font-size: 5em; }\n\n.fa-6x {\n  font-size: 6em; }\n\n.fa-7x {\n  font-size: 7em; }\n\n.fa-8x {\n  font-size: 8em; }\n\n.fa-9x {\n  font-size: 9em; }\n\n.fa-10x {\n  font-size: 10em; }\n\n.fa-fw {\n  text-align: center;\n  width: 1.25em; }\n\n.fa-ul {\n  list-style-type: none;\n  margin-left: 2.5em;\n  padding-left: 0; }\n  .fa-ul > li {\n    position: relative; }\n\n.fa-li {\n  left: -2em;\n  position: absolute;\n  text-align: center;\n  width: 2em;\n  line-height: inherit; }\n\n.fa-border {\n  border: solid 0.08em #eee;\n  border-radius: .1em;\n  padding: .2em .25em .15em; }\n\n.fa-pull-left {\n  float: left; }\n\n.fa-pull-right {\n  float: right; }\n\n.fa.fa-pull-left,\n.fas.fa-pull-left,\n.far.fa-pull-left,\n.fal.fa-pull-left,\n.fab.fa-pull-left {\n  margin-right: .3em; }\n\n.fa.fa-pull-right,\n.fas.fa-pull-right,\n.far.fa-pull-right,\n.fal.fa-pull-right,\n.fab.fa-pull-right {\n  margin-left: .3em; }\n\n.fa-spin {\n  -webkit-animation: fa-spin 2s infinite linear;\n          animation: fa-spin 2s infinite linear; }\n\n.fa-pulse {\n  -webkit-animation: fa-spin 1s infinite steps(8);\n          animation: fa-spin 1s infinite steps(8); }\n\n@-webkit-keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n            transform: rotate(0deg); }\n  100% {\n    -webkit-transform: rotate(360deg);\n            transform: rotate(360deg); } }\n\n@keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n            transform: rotate(0deg); }\n  100% {\n    -webkit-transform: rotate(360deg);\n            transform: rotate(360deg); } }\n\n.fa-rotate-90 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)\";\n  -webkit-transform: rotate(90deg);\n          transform: rotate(90deg); }\n\n.fa-rotate-180 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2)\";\n  -webkit-transform: rotate(180deg);\n          transform: rotate(180deg); }\n\n.fa-rotate-270 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=3)\";\n  -webkit-transform: rotate(270deg);\n          transform: rotate(270deg); }\n\n.fa-flip-horizontal {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)\";\n  -webkit-transform: scale(-1, 1);\n          transform: scale(-1, 1); }\n\n.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(1, -1);\n          transform: scale(1, -1); }\n\n.fa-flip-horizontal.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(-1, -1);\n          transform: scale(-1, -1); }\n\n:root .fa-rotate-90,\n:root .fa-rotate-180,\n:root .fa-rotate-270,\n:root .fa-flip-horizontal,\n:root .fa-flip-vertical {\n  -webkit-filter: none;\n          filter: none; }\n\n.fa-stack {\n  display: inline-block;\n  height: 2em;\n  position: relative;\n  width: 2em; }\n\n.fa-stack-1x,\n.fa-stack-2x {\n  bottom: 0;\n  left: 0;\n  margin: auto;\n  position: absolute;\n  right: 0;\n  top: 0; }\n\n.svg-inline--fa.fa-stack-1x {\n  height: 1em;\n  width: 1em; }\n\n.svg-inline--fa.fa-stack-2x {\n  height: 2em;\n  width: 2em; }\n\n.fa-inverse {\n  color: #fff; }\n\n.sr-only {\n  border: 0;\n  clip: rect(0, 0, 0, 0);\n  height: 1px;\n  margin: -1px;\n  overflow: hidden;\n  padding: 0;\n  position: absolute;\n  width: 1px; }\n\n.sr-only-focusable:active, .sr-only-focusable:focus {\n  clip: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  position: static;\n  width: auto; }\n";
+
+var css = function () {
+  var dfp = DEFAULT_FAMILY_PREFIX;
+  var drc = DEFAULT_REPLACEMENT_CLASS;
+  var fp = config$1.familyPrefix;
+  var rc = config$1.replacementClass;
+  var s = baseStyles;
+
+  if (fp !== dfp || rc !== drc) {
+    var dPatt = new RegExp('\\.' + dfp + '\\-', 'g');
+    var rPatt = new RegExp('\\.' + drc, 'g');
+
+    s = s.replace(dPatt, '.' + fp + '-').replace(rPatt, '.' + rc);
+  }
+
+  return s;
+};
+
+function define(prefix, icons) {
+  var normalized = Object.keys(icons).reduce(function (acc, iconName) {
+    var icon = icons[iconName];
+    var expanded = !!icon.icon;
+
+    if (expanded) {
+      acc[icon.iconName] = icon.icon;
+    } else {
+      acc[iconName] = icon;
+    }
+    return acc;
+  }, {});
+
+  if (typeof namespace.hooks.addPack === 'function') {
+    namespace.hooks.addPack(prefix, normalized);
+  } else {
+    namespace.styles[prefix] = _extends({}, namespace.styles[prefix] || {}, normalized);
+  }
+
+  /**
+   * Font Awesome 4 used the prefix of `fa` for all icons. With the introduction
+   * of new styles we needed to differentiate between them. Prefix `fa` is now an alias
+   * for `fas` so we'll easy the upgrade process for our users by automatically defining
+   * this as well.
+   */
+  if (prefix === 'fas') {
+    define('fa', icons);
+  }
+}
+
+var Library = function () {
+  function Library() {
+    classCallCheck(this, Library);
+
+    this.definitions = {};
+  }
+
+  createClass(Library, [{
+    key: 'add',
+    value: function add() {
+      var _this = this;
+
+      for (var _len = arguments.length, definitions = Array(_len), _key = 0; _key < _len; _key++) {
+        definitions[_key] = arguments[_key];
+      }
+
+      var additions = definitions.reduce(this._pullDefinitions, {});
+
+      Object.keys(additions).forEach(function (key) {
+        _this.definitions[key] = _extends({}, _this.definitions[key] || {}, additions[key]);
+        define(key, additions[key]);
+      });
+    }
+  }, {
+    key: 'reset',
+    value: function reset() {
+      this.definitions = {};
+    }
+  }, {
+    key: '_pullDefinitions',
+    value: function _pullDefinitions(additions, definition) {
+      var normalized = definition.prefix && definition.iconName && definition.icon ? { 0: definition } : definition;
+
+      Object.keys(normalized).map(function (key) {
+        var _normalized$key = normalized[key],
+            prefix = _normalized$key.prefix,
+            iconName = _normalized$key.iconName,
+            icon = _normalized$key.icon;
+
+
+        if (!additions[prefix]) additions[prefix] = {};
+
+        additions[prefix][iconName] = icon;
+      });
+
+      return additions;
+    }
+  }]);
+  return Library;
+}();
+
+function prepIcon(icon) {
+  var width = icon[0];
+  var height = icon[1];
+  var vectorData = icon.slice(4);
+
+  return {
+    found: true,
+    width: width,
+    height: height,
+    icon: { tag: 'path', attributes: { fill: 'currentColor', d: vectorData[0] } }
+  };
+}
+
+var _cssInserted = false;
+
+function ensureCss() {
+  if (!config$1.autoAddCss) {
+    return;
+  }
+
+  if (!_cssInserted) {
+    insertCss(css());
+  }
+
+  _cssInserted = true;
+}
+
+function apiObject(val, abstractCreator) {
+  Object.defineProperty(val, 'abstract', {
+    get: abstractCreator
+  });
+
+  Object.defineProperty(val, 'html', {
+    get: function get() {
+      return val.abstract.map(function (a) {
+        return toHtml(a);
+      });
+    }
+  });
+
+  Object.defineProperty(val, 'node', {
+    get: function get() {
+      if (!IS_DOM) return;
+
+      var container = DOCUMENT.createElement('div');
+      container.innerHTML = val.html;
+      return container.children;
+    }
+  });
+
+  return val;
+}
+
+function findIconDefinition(params) {
+  var _params$prefix = params.prefix,
+      prefix = _params$prefix === undefined ? 'fa' : _params$prefix,
+      iconName = params.iconName;
+
+
+  if (!iconName) return;
+
+  return iconFromMapping(library.definitions, prefix, iconName) || iconFromMapping(namespace.styles, prefix, iconName);
+}
+
+function resolveIcons(next) {
+  return function (maybeIconDefinition) {
+    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    var iconDefinition = (maybeIconDefinition || {}).icon ? maybeIconDefinition : findIconDefinition(maybeIconDefinition || {});
+
+    var mask = params.mask;
+
+
+    if (mask) {
+      mask = (mask || {}).icon ? mask : findIconDefinition(mask || {});
+    }
+
+    return next(iconDefinition, _extends({}, params, { mask: mask }));
+  };
+}
+
+var library = new Library();
+
+var noAuto = function noAuto() {
+  auto(false);
+  disconnect();
+};
+
+var dom = {
+  i2svg: function i2svg() {
+    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    if (IS_DOM) {
+      ensureCss();
+
+      var _params$node = params.node,
+          node = _params$node === undefined ? DOCUMENT : _params$node,
+          _params$callback = params.callback,
+          callback = _params$callback === undefined ? function () {} : _params$callback;
+
+
+      if (config$1.searchPseudoElements) {
+        searchPseudoElements(node);
+      }
+
+      onTree(node, callback);
+    }
+  },
+
+  css: css,
+
+  insertCss: function insertCss$$1() {
+    insertCss(css());
+  }
+};
+
+var parse = {
+  transform: function transform(transformString) {
+    return parseTransformString(transformString);
+  }
+};
+
+var icon = resolveIcons(function (iconDefinition) {
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _params$transform = params.transform,
+      transform = _params$transform === undefined ? meaninglessTransform : _params$transform,
+      _params$symbol = params.symbol,
+      symbol = _params$symbol === undefined ? false : _params$symbol,
+      _params$mask = params.mask,
+      mask = _params$mask === undefined ? null : _params$mask,
+      _params$title = params.title,
+      title = _params$title === undefined ? null : _params$title,
+      _params$classes = params.classes,
+      classes = _params$classes === undefined ? [] : _params$classes,
+      _params$attributes = params.attributes,
+      attributes = _params$attributes === undefined ? {} : _params$attributes,
+      _params$styles = params.styles,
+      styles = _params$styles === undefined ? {} : _params$styles;
+
+
+  if (!iconDefinition) return;
+
+  var prefix = iconDefinition.prefix,
+      iconName = iconDefinition.iconName,
+      icon = iconDefinition.icon;
+
+
+  return apiObject(_extends({ type: 'icon' }, iconDefinition), function () {
+    ensureCss();
+
+    if (config$1.autoA11y) {
+      if (title) {
+        attributes['aria-labelledby'] = config$1.replacementClass + '-title-' + nextUniqueId();
+      } else {
+        attributes['aria-hidden'] = 'true';
+      }
+    }
+
+    return makeInlineSvgAbstract({
+      icons: {
+        main: prepIcon(icon),
+        mask: mask ? prepIcon(mask.icon) : { found: false, width: null, height: null, icon: {} }
+      },
+      prefix: prefix,
+      iconName: iconName,
+      transform: _extends({}, meaninglessTransform, transform),
+      symbol: symbol,
+      title: title,
+      extra: {
+        attributes: attributes,
+        styles: styles,
+        classes: classes
+      }
+    });
+  });
+});
+
+var text = function text(content) {
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var _params$transform2 = params.transform,
+      transform = _params$transform2 === undefined ? meaninglessTransform : _params$transform2,
+      _params$title2 = params.title,
+      title = _params$title2 === undefined ? null : _params$title2,
+      _params$classes2 = params.classes,
+      classes = _params$classes2 === undefined ? [] : _params$classes2,
+      _params$attributes2 = params.attributes,
+      attributes = _params$attributes2 === undefined ? {} : _params$attributes2,
+      _params$styles2 = params.styles,
+      styles = _params$styles2 === undefined ? {} : _params$styles2;
+
+
+  return apiObject({ type: 'text', content: content }, function () {
+    ensureCss();
+
+    return makeLayersTextAbstract({
+      content: content,
+      transform: _extends({}, meaninglessTransform, transform),
+      title: title,
+      extra: {
+        attributes: attributes,
+        styles: styles,
+        classes: [config$1.familyPrefix + '-layers-text'].concat(toConsumableArray(classes))
+      }
+    });
+  });
+};
+
+var layer = function layer(assembler) {
+  return apiObject({ type: 'layer' }, function () {
+    ensureCss();
+
+    var children = [];
+
+    assembler(function (args) {
+      Array.isArray(args) ? args.map(function (a) {
+        children = children.concat(a.abstract);
+      }) : children = children.concat(args.abstract);
+    });
+
+    return [{
+      tag: 'span',
+      attributes: { class: config$1.familyPrefix + '-layers' },
+      children: children
+    }];
+  });
+};
+
+var api$1 = {
+  noAuto: noAuto,
+  dom: dom,
+  library: library,
+  parse: parse,
+  findIconDefinition: findIconDefinition,
+  icon: icon,
+  text: text,
+  layer: layer
+};
+
+var autoReplace = function autoReplace() {
+  if (IS_DOM && config$1.autoReplaceSvg) api$1.dom.i2svg({ node: DOCUMENT });
+};
+
+function bootstrap() {
+  if (IS_BROWSER) {
+    if (!WINDOW.FontAwesome) {
+      WINDOW.FontAwesome = api$1;
+    }
+
+    domready(function () {
+      if (Object.keys(namespace.styles).length > 0) {
+        autoReplace();
+      }
+
+      if (config$1.observeMutations && typeof MutationObserver === 'function') {
+        observe({
+          treeCallback: onTree,
+          nodeCallback: onNode,
+          pseudoElementsCallback: searchPseudoElements
+        });
+      }
+    });
+  }
+
+  namespace.hooks = _extends({}, namespace.hooks, {
+
+    addPack: function addPack(prefix, icons) {
+      namespace.styles[prefix] = _extends({}, namespace.styles[prefix] || {}, icons);
+
+      build();
+      autoReplace();
+    },
+
+    addShims: function addShims(shims) {
+      var _namespace$shims;
+
+      (_namespace$shims = namespace.shims).push.apply(_namespace$shims, toConsumableArray(shims));
+
+      build();
+      autoReplace();
+    }
+  });
+}
+
+Object.defineProperty(api$1, 'config', {
+  get: function get() {
+    return config$1;
+  },
+
+  set: function set(newConfig) {
+    update(newConfig);
+  }
+});
+
+if (IS_DOM) bunker(bootstrap);
+
+var config = api$1.config;
+
+
+/* harmony default export */ __webpack_exports__["default"] = (api$1);
 
 
 /***/ }),
@@ -30545,7 +32316,7 @@ module.exports = Component.exports
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(142);
-module.exports = __webpack_require__(208);
+module.exports = __webpack_require__(222);
 
 
 /***/ }),
@@ -30554,16 +32325,20 @@ module.exports = __webpack_require__(208);
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(171);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vee_validate__ = __webpack_require__(228);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__routes__ = __webpack_require__(172);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__fortawesome_fontawesome__ = __webpack_require__(226);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__fortawesome_vue_fontawesome__ = __webpack_require__(229);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__fortawesome_vue_fontawesome___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__fortawesome_vue_fontawesome__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__fortawesome_fontawesome_free_solid__ = __webpack_require__(230);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_router__ = __webpack_require__(176);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_vee_validate__ = __webpack_require__(177);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_paginate__ = __webpack_require__(178);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_vue_paginate___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_vue_paginate__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__routes__ = __webpack_require__(179);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__fortawesome_fontawesome__ = __webpack_require__(140);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__fortawesome_vue_fontawesome__ = __webpack_require__(206);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__fortawesome_vue_fontawesome___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_5__fortawesome_vue_fontawesome__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__fortawesome_fontawesome_free_solid__ = __webpack_require__(207);
 __webpack_require__(143);
 
-window.Vue = __webpack_require__(168);
+window.Vue = __webpack_require__(169);
+
+window.scrollIndex = __webpack_require__(172);
 
 
 
@@ -30573,20 +32348,21 @@ window.Vue = __webpack_require__(168);
 
 
 
-__WEBPACK_IMPORTED_MODULE_3__fortawesome_fontawesome__["default"].library.add(__WEBPACK_IMPORTED_MODULE_5__fortawesome_fontawesome_free_solid__["a" /* default */]);
+
+__WEBPACK_IMPORTED_MODULE_4__fortawesome_fontawesome__["default"].library.add(__WEBPACK_IMPORTED_MODULE_6__fortawesome_fontawesome_free_solid__["a" /* default */]);
 
 Vue.use(__WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]);
 Vue.use(__WEBPACK_IMPORTED_MODULE_1_vee_validate__["a" /* default */]);
+Vue.use(__WEBPACK_IMPORTED_MODULE_2_vue_paginate___default.a);
 
-Vue.component('font-awesome-icon', __WEBPACK_IMPORTED_MODULE_4__fortawesome_vue_fontawesome___default.a);
+Vue.component('font-awesome-icon', __WEBPACK_IMPORTED_MODULE_5__fortawesome_vue_fontawesome___default.a);
 
-Vue.component('main-app', __webpack_require__(197));
-Vue.component('word-writing', __webpack_require__(221));
-
-Vue.component('login', __webpack_require__(140));
+Vue.component('main-app', __webpack_require__(208));
+Vue.component('word-writing', __webpack_require__(213));
+Vue.component('menu-admin', __webpack_require__(219));
 
 var router = new __WEBPACK_IMPORTED_MODULE_0_vue_router__["a" /* default */]({
-  routes: __WEBPACK_IMPORTED_MODULE_2__routes__["a" /* default */]
+  routes: __WEBPACK_IMPORTED_MODULE_3__routes__["a" /* default */]
 });
 
 var app = new Vue({
@@ -30594,12 +32370,14 @@ var app = new Vue({
   router: router,
   data: function data() {
     return {
+      scrollMagicClass: null,
       client_id: '2',
       client_secret: 'SOcWtgo3QmzYnc87wgxxFV1vMjiEAqmGScPjmknZ',
       apiMap: {
         logout: '/logout',
         login: '/oauth/token',
-        user: '/api/user'
+        user: '/api/user',
+        makers: '/api/makers'
       },
       auth: false,
       user: {},
@@ -30633,6 +32411,7 @@ var app = new Vue({
         if (error.response.status == 401) {
           vm.token = '';
         }
+        vm.$router.push("/");
       }).then(function () {
         vm.loading = false;
         vm.loaded = true;
@@ -30674,10 +32453,10 @@ moment.locale('es');
 try {
 				window.$ = window.jQuery = __webpack_require__(147);
 				__webpack_require__(148);
-				window.anime = __webpack_require__(227);
+				window.anime = __webpack_require__(149);
 } catch (e) {}
 
-window.axios = __webpack_require__(149);
+window.axios = __webpack_require__(150);
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
@@ -47812,7 +49591,7 @@ M.getData = function (error) {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(8)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(8)(module)))
 
 /***/ }),
 /* 145 */
@@ -50341,7 +52120,7 @@ Popper.Defaults = Defaults;
 /* harmony default export */ __webpack_exports__["default"] = (Popper);
 //# sourceMappingURL=popper.js.map
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
 
 /***/ }),
 /* 146 */
@@ -73325,24 +75104,66 @@ $jscomp.polyfill = function (e, r, p, m) {
   Range.init($('input[type=range]'));
 })(cash, M.anime);
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(150);
+/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
+ 2017 Julian Garnier
+ Released under the MIT license
+*/
+var $jscomp={scope:{}};$jscomp.defineProperty="function"==typeof Object.defineProperties?Object.defineProperty:function(e,r,p){if(p.get||p.set)throw new TypeError("ES3 does not support getters and setters.");e!=Array.prototype&&e!=Object.prototype&&(e[r]=p.value)};$jscomp.getGlobal=function(e){return"undefined"!=typeof window&&window===e?e:"undefined"!=typeof global&&null!=global?global:e};$jscomp.global=$jscomp.getGlobal(this);$jscomp.SYMBOL_PREFIX="jscomp_symbol_";
+$jscomp.initSymbol=function(){$jscomp.initSymbol=function(){};$jscomp.global.Symbol||($jscomp.global.Symbol=$jscomp.Symbol)};$jscomp.symbolCounter_=0;$jscomp.Symbol=function(e){return $jscomp.SYMBOL_PREFIX+(e||"")+$jscomp.symbolCounter_++};
+$jscomp.initSymbolIterator=function(){$jscomp.initSymbol();var e=$jscomp.global.Symbol.iterator;e||(e=$jscomp.global.Symbol.iterator=$jscomp.global.Symbol("iterator"));"function"!=typeof Array.prototype[e]&&$jscomp.defineProperty(Array.prototype,e,{configurable:!0,writable:!0,value:function(){return $jscomp.arrayIterator(this)}});$jscomp.initSymbolIterator=function(){}};$jscomp.arrayIterator=function(e){var r=0;return $jscomp.iteratorPrototype(function(){return r<e.length?{done:!1,value:e[r++]}:{done:!0}})};
+$jscomp.iteratorPrototype=function(e){$jscomp.initSymbolIterator();e={next:e};e[$jscomp.global.Symbol.iterator]=function(){return this};return e};$jscomp.array=$jscomp.array||{};$jscomp.iteratorFromArray=function(e,r){$jscomp.initSymbolIterator();e instanceof String&&(e+="");var p=0,m={next:function(){if(p<e.length){var u=p++;return{value:r(u,e[u]),done:!1}}m.next=function(){return{done:!0,value:void 0}};return m.next()}};m[Symbol.iterator]=function(){return m};return m};
+$jscomp.polyfill=function(e,r,p,m){if(r){p=$jscomp.global;e=e.split(".");for(m=0;m<e.length-1;m++){var u=e[m];u in p||(p[u]={});p=p[u]}e=e[e.length-1];m=p[e];r=r(m);r!=m&&null!=r&&$jscomp.defineProperty(p,e,{configurable:!0,writable:!0,value:r})}};$jscomp.polyfill("Array.prototype.keys",function(e){return e?e:function(){return $jscomp.iteratorFromArray(this,function(e){return e})}},"es6-impl","es3");var $jscomp$this=this;
+(function(e,r){ true?!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (r),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):"object"===typeof module&&module.exports?module.exports=r():e.anime=r()})(this,function(){function e(a){if(!h.col(a))try{return document.querySelectorAll(a)}catch(c){}}function r(a,c){for(var d=a.length,b=2<=arguments.length?arguments[1]:void 0,f=[],n=0;n<d;n++)if(n in a){var k=a[n];c.call(b,k,n,a)&&f.push(k)}return f}function p(a){return a.reduce(function(a,d){return a.concat(h.arr(d)?p(d):d)},[])}function m(a){if(h.arr(a))return a;
+h.str(a)&&(a=e(a)||a);return a instanceof NodeList||a instanceof HTMLCollection?[].slice.call(a):[a]}function u(a,c){return a.some(function(a){return a===c})}function C(a){var c={},d;for(d in a)c[d]=a[d];return c}function D(a,c){var d=C(a),b;for(b in a)d[b]=c.hasOwnProperty(b)?c[b]:a[b];return d}function z(a,c){var d=C(a),b;for(b in c)d[b]=h.und(a[b])?c[b]:a[b];return d}function T(a){a=a.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,function(a,c,d,k){return c+c+d+d+k+k});var c=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(a);
+a=parseInt(c[1],16);var d=parseInt(c[2],16),c=parseInt(c[3],16);return"rgba("+a+","+d+","+c+",1)"}function U(a){function c(a,c,b){0>b&&(b+=1);1<b&&--b;return b<1/6?a+6*(c-a)*b:.5>b?c:b<2/3?a+(c-a)*(2/3-b)*6:a}var d=/hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)/g.exec(a)||/hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*([\d.]+)\)/g.exec(a);a=parseInt(d[1])/360;var b=parseInt(d[2])/100,f=parseInt(d[3])/100,d=d[4]||1;if(0==b)f=b=a=f;else{var n=.5>f?f*(1+b):f+b-f*b,k=2*f-n,f=c(k,n,a+1/3),b=c(k,n,a);a=c(k,n,a-1/3)}return"rgba("+
+255*f+","+255*b+","+255*a+","+d+")"}function y(a){if(a=/([\+\-]?[0-9#\.]+)(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(a))return a[2]}function V(a){if(-1<a.indexOf("translate")||"perspective"===a)return"px";if(-1<a.indexOf("rotate")||-1<a.indexOf("skew"))return"deg"}function I(a,c){return h.fnc(a)?a(c.target,c.id,c.total):a}function E(a,c){if(c in a.style)return getComputedStyle(a).getPropertyValue(c.replace(/([a-z])([A-Z])/g,"$1-$2").toLowerCase())||"0"}function J(a,c){if(h.dom(a)&&
+u(W,c))return"transform";if(h.dom(a)&&(a.getAttribute(c)||h.svg(a)&&a[c]))return"attribute";if(h.dom(a)&&"transform"!==c&&E(a,c))return"css";if(null!=a[c])return"object"}function X(a,c){var d=V(c),d=-1<c.indexOf("scale")?1:0+d;a=a.style.transform;if(!a)return d;for(var b=[],f=[],n=[],k=/(\w+)\((.+?)\)/g;b=k.exec(a);)f.push(b[1]),n.push(b[2]);a=r(n,function(a,b){return f[b]===c});return a.length?a[0]:d}function K(a,c){switch(J(a,c)){case "transform":return X(a,c);case "css":return E(a,c);case "attribute":return a.getAttribute(c)}return a[c]||
+0}function L(a,c){var d=/^(\*=|\+=|-=)/.exec(a);if(!d)return a;var b=y(a)||0;c=parseFloat(c);a=parseFloat(a.replace(d[0],""));switch(d[0][0]){case "+":return c+a+b;case "-":return c-a+b;case "*":return c*a+b}}function F(a,c){return Math.sqrt(Math.pow(c.x-a.x,2)+Math.pow(c.y-a.y,2))}function M(a){a=a.points;for(var c=0,d,b=0;b<a.numberOfItems;b++){var f=a.getItem(b);0<b&&(c+=F(d,f));d=f}return c}function N(a){if(a.getTotalLength)return a.getTotalLength();switch(a.tagName.toLowerCase()){case "circle":return 2*
+Math.PI*a.getAttribute("r");case "rect":return 2*a.getAttribute("width")+2*a.getAttribute("height");case "line":return F({x:a.getAttribute("x1"),y:a.getAttribute("y1")},{x:a.getAttribute("x2"),y:a.getAttribute("y2")});case "polyline":return M(a);case "polygon":var c=a.points;return M(a)+F(c.getItem(c.numberOfItems-1),c.getItem(0))}}function Y(a,c){function d(b){b=void 0===b?0:b;return a.el.getPointAtLength(1<=c+b?c+b:0)}var b=d(),f=d(-1),n=d(1);switch(a.property){case "x":return b.x;case "y":return b.y;
+case "angle":return 180*Math.atan2(n.y-f.y,n.x-f.x)/Math.PI}}function O(a,c){var d=/-?\d*\.?\d+/g,b;b=h.pth(a)?a.totalLength:a;if(h.col(b))if(h.rgb(b)){var f=/rgb\((\d+,\s*[\d]+,\s*[\d]+)\)/g.exec(b);b=f?"rgba("+f[1]+",1)":b}else b=h.hex(b)?T(b):h.hsl(b)?U(b):void 0;else f=(f=y(b))?b.substr(0,b.length-f.length):b,b=c&&!/\s/g.test(b)?f+c:f;b+="";return{original:b,numbers:b.match(d)?b.match(d).map(Number):[0],strings:h.str(a)||c?b.split(d):[]}}function P(a){a=a?p(h.arr(a)?a.map(m):m(a)):[];return r(a,
+function(a,d,b){return b.indexOf(a)===d})}function Z(a){var c=P(a);return c.map(function(a,b){return{target:a,id:b,total:c.length}})}function aa(a,c){var d=C(c);if(h.arr(a)){var b=a.length;2!==b||h.obj(a[0])?h.fnc(c.duration)||(d.duration=c.duration/b):a={value:a}}return m(a).map(function(a,b){b=b?0:c.delay;a=h.obj(a)&&!h.pth(a)?a:{value:a};h.und(a.delay)&&(a.delay=b);return a}).map(function(a){return z(a,d)})}function ba(a,c){var d={},b;for(b in a){var f=I(a[b],c);h.arr(f)&&(f=f.map(function(a){return I(a,
+c)}),1===f.length&&(f=f[0]));d[b]=f}d.duration=parseFloat(d.duration);d.delay=parseFloat(d.delay);return d}function ca(a){return h.arr(a)?A.apply(this,a):Q[a]}function da(a,c){var d;return a.tweens.map(function(b){b=ba(b,c);var f=b.value,e=K(c.target,a.name),k=d?d.to.original:e,k=h.arr(f)?f[0]:k,w=L(h.arr(f)?f[1]:f,k),e=y(w)||y(k)||y(e);b.from=O(k,e);b.to=O(w,e);b.start=d?d.end:a.offset;b.end=b.start+b.delay+b.duration;b.easing=ca(b.easing);b.elasticity=(1E3-Math.min(Math.max(b.elasticity,1),999))/
+1E3;b.isPath=h.pth(f);b.isColor=h.col(b.from.original);b.isColor&&(b.round=1);return d=b})}function ea(a,c){return r(p(a.map(function(a){return c.map(function(b){var c=J(a.target,b.name);if(c){var d=da(b,a);b={type:c,property:b.name,animatable:a,tweens:d,duration:d[d.length-1].end,delay:d[0].delay}}else b=void 0;return b})})),function(a){return!h.und(a)})}function R(a,c,d,b){var f="delay"===a;return c.length?(f?Math.min:Math.max).apply(Math,c.map(function(b){return b[a]})):f?b.delay:d.offset+b.delay+
+b.duration}function fa(a){var c=D(ga,a),d=D(S,a),b=Z(a.targets),f=[],e=z(c,d),k;for(k in a)e.hasOwnProperty(k)||"targets"===k||f.push({name:k,offset:e.offset,tweens:aa(a[k],d)});a=ea(b,f);return z(c,{children:[],animatables:b,animations:a,duration:R("duration",a,c,d),delay:R("delay",a,c,d)})}function q(a){function c(){return window.Promise&&new Promise(function(a){return p=a})}function d(a){return g.reversed?g.duration-a:a}function b(a){for(var b=0,c={},d=g.animations,f=d.length;b<f;){var e=d[b],
+k=e.animatable,h=e.tweens,n=h.length-1,l=h[n];n&&(l=r(h,function(b){return a<b.end})[0]||l);for(var h=Math.min(Math.max(a-l.start-l.delay,0),l.duration)/l.duration,w=isNaN(h)?1:l.easing(h,l.elasticity),h=l.to.strings,p=l.round,n=[],m=void 0,m=l.to.numbers.length,t=0;t<m;t++){var x=void 0,x=l.to.numbers[t],q=l.from.numbers[t],x=l.isPath?Y(l.value,w*x):q+w*(x-q);p&&(l.isColor&&2<t||(x=Math.round(x*p)/p));n.push(x)}if(l=h.length)for(m=h[0],w=0;w<l;w++)p=h[w+1],t=n[w],isNaN(t)||(m=p?m+(t+p):m+(t+" "));
+else m=n[0];ha[e.type](k.target,e.property,m,c,k.id);e.currentValue=m;b++}if(b=Object.keys(c).length)for(d=0;d<b;d++)H||(H=E(document.body,"transform")?"transform":"-webkit-transform"),g.animatables[d].target.style[H]=c[d].join(" ");g.currentTime=a;g.progress=a/g.duration*100}function f(a){if(g[a])g[a](g)}function e(){g.remaining&&!0!==g.remaining&&g.remaining--}function k(a){var k=g.duration,n=g.offset,w=n+g.delay,r=g.currentTime,x=g.reversed,q=d(a);if(g.children.length){var u=g.children,v=u.length;
+if(q>=g.currentTime)for(var G=0;G<v;G++)u[G].seek(q);else for(;v--;)u[v].seek(q)}if(q>=w||!k)g.began||(g.began=!0,f("begin")),f("run");if(q>n&&q<k)b(q);else if(q<=n&&0!==r&&(b(0),x&&e()),q>=k&&r!==k||!k)b(k),x||e();f("update");a>=k&&(g.remaining?(t=h,"alternate"===g.direction&&(g.reversed=!g.reversed)):(g.pause(),g.completed||(g.completed=!0,f("complete"),"Promise"in window&&(p(),m=c()))),l=0)}a=void 0===a?{}:a;var h,t,l=0,p=null,m=c(),g=fa(a);g.reset=function(){var a=g.direction,c=g.loop;g.currentTime=
+0;g.progress=0;g.paused=!0;g.began=!1;g.completed=!1;g.reversed="reverse"===a;g.remaining="alternate"===a&&1===c?2:c;b(0);for(a=g.children.length;a--;)g.children[a].reset()};g.tick=function(a){h=a;t||(t=h);k((l+h-t)*q.speed)};g.seek=function(a){k(d(a))};g.pause=function(){var a=v.indexOf(g);-1<a&&v.splice(a,1);g.paused=!0};g.play=function(){g.paused&&(g.paused=!1,t=0,l=d(g.currentTime),v.push(g),B||ia())};g.reverse=function(){g.reversed=!g.reversed;t=0;l=d(g.currentTime)};g.restart=function(){g.pause();
+g.reset();g.play()};g.finished=m;g.reset();g.autoplay&&g.play();return g}var ga={update:void 0,begin:void 0,run:void 0,complete:void 0,loop:1,direction:"normal",autoplay:!0,offset:0},S={duration:1E3,delay:0,easing:"easeOutElastic",elasticity:500,round:0},W="translateX translateY translateZ rotate rotateX rotateY rotateZ scale scaleX scaleY scaleZ skewX skewY perspective".split(" "),H,h={arr:function(a){return Array.isArray(a)},obj:function(a){return-1<Object.prototype.toString.call(a).indexOf("Object")},
+pth:function(a){return h.obj(a)&&a.hasOwnProperty("totalLength")},svg:function(a){return a instanceof SVGElement},dom:function(a){return a.nodeType||h.svg(a)},str:function(a){return"string"===typeof a},fnc:function(a){return"function"===typeof a},und:function(a){return"undefined"===typeof a},hex:function(a){return/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(a)},rgb:function(a){return/^rgb/.test(a)},hsl:function(a){return/^hsl/.test(a)},col:function(a){return h.hex(a)||h.rgb(a)||h.hsl(a)}},A=function(){function a(a,
+d,b){return(((1-3*b+3*d)*a+(3*b-6*d))*a+3*d)*a}return function(c,d,b,f){if(0<=c&&1>=c&&0<=b&&1>=b){var e=new Float32Array(11);if(c!==d||b!==f)for(var k=0;11>k;++k)e[k]=a(.1*k,c,b);return function(k){if(c===d&&b===f)return k;if(0===k)return 0;if(1===k)return 1;for(var h=0,l=1;10!==l&&e[l]<=k;++l)h+=.1;--l;var l=h+(k-e[l])/(e[l+1]-e[l])*.1,n=3*(1-3*b+3*c)*l*l+2*(3*b-6*c)*l+3*c;if(.001<=n){for(h=0;4>h;++h){n=3*(1-3*b+3*c)*l*l+2*(3*b-6*c)*l+3*c;if(0===n)break;var m=a(l,c,b)-k,l=l-m/n}k=l}else if(0===
+n)k=l;else{var l=h,h=h+.1,g=0;do m=l+(h-l)/2,n=a(m,c,b)-k,0<n?h=m:l=m;while(1e-7<Math.abs(n)&&10>++g);k=m}return a(k,d,f)}}}}(),Q=function(){function a(a,b){return 0===a||1===a?a:-Math.pow(2,10*(a-1))*Math.sin(2*(a-1-b/(2*Math.PI)*Math.asin(1))*Math.PI/b)}var c="Quad Cubic Quart Quint Sine Expo Circ Back Elastic".split(" "),d={In:[[.55,.085,.68,.53],[.55,.055,.675,.19],[.895,.03,.685,.22],[.755,.05,.855,.06],[.47,0,.745,.715],[.95,.05,.795,.035],[.6,.04,.98,.335],[.6,-.28,.735,.045],a],Out:[[.25,
+.46,.45,.94],[.215,.61,.355,1],[.165,.84,.44,1],[.23,1,.32,1],[.39,.575,.565,1],[.19,1,.22,1],[.075,.82,.165,1],[.175,.885,.32,1.275],function(b,c){return 1-a(1-b,c)}],InOut:[[.455,.03,.515,.955],[.645,.045,.355,1],[.77,0,.175,1],[.86,0,.07,1],[.445,.05,.55,.95],[1,0,0,1],[.785,.135,.15,.86],[.68,-.55,.265,1.55],function(b,c){return.5>b?a(2*b,c)/2:1-a(-2*b+2,c)/2}]},b={linear:A(.25,.25,.75,.75)},f={},e;for(e in d)f.type=e,d[f.type].forEach(function(a){return function(d,f){b["ease"+a.type+c[f]]=h.fnc(d)?
+d:A.apply($jscomp$this,d)}}(f)),f={type:f.type};return b}(),ha={css:function(a,c,d){return a.style[c]=d},attribute:function(a,c,d){return a.setAttribute(c,d)},object:function(a,c,d){return a[c]=d},transform:function(a,c,d,b,f){b[f]||(b[f]=[]);b[f].push(c+"("+d+")")}},v=[],B=0,ia=function(){function a(){B=requestAnimationFrame(c)}function c(c){var b=v.length;if(b){for(var d=0;d<b;)v[d]&&v[d].tick(c),d++;a()}else cancelAnimationFrame(B),B=0}return a}();q.version="2.2.0";q.speed=1;q.running=v;q.remove=
+function(a){a=P(a);for(var c=v.length;c--;)for(var d=v[c],b=d.animations,f=b.length;f--;)u(a,b[f].animatable.target)&&(b.splice(f,1),b.length||d.pause())};q.getValue=K;q.path=function(a,c){var d=h.str(a)?e(a)[0]:a,b=c||100;return function(a){return{el:d,property:a,totalLength:N(d)*(b/100)}}};q.setDashoffset=function(a){var c=N(a);a.setAttribute("stroke-dasharray",c);return c};q.bezier=A;q.easings=Q;q.timeline=function(a){var c=q(a);c.pause();c.duration=0;c.add=function(d){c.children.forEach(function(a){a.began=
+!0;a.completed=!0});m(d).forEach(function(b){var d=z(b,D(S,a||{}));d.targets=d.targets||a.targets;b=c.duration;var e=d.offset;d.autoplay=!1;d.direction=c.direction;d.offset=h.und(e)?b:L(e,b);c.began=!0;c.completed=!0;c.seek(d.offset);d=q(d);d.began=!0;d.completed=!0;d.duration>b&&(c.duration=d.duration);c.children.push(d)});c.seek(0);c.reset();c.autoplay&&c.restart();return c};return c};q.random=function(a,c){return Math.floor(Math.random()*(c-a+1))+a};return q});
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
 /* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
+module.exports = __webpack_require__(151);
+
+/***/ }),
+/* 151 */
+/***/ (function(module, exports, __webpack_require__) {
+
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 var bind = __webpack_require__(132);
-var Axios = __webpack_require__(152);
+var Axios = __webpack_require__(153);
 var defaults = __webpack_require__(6);
 
 /**
@@ -73377,14 +75198,14 @@ axios.create = function create(instanceConfig) {
 
 // Expose Cancel & CancelToken
 axios.Cancel = __webpack_require__(137);
-axios.CancelToken = __webpack_require__(166);
+axios.CancelToken = __webpack_require__(167);
 axios.isCancel = __webpack_require__(136);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(167);
+axios.spread = __webpack_require__(168);
 
 module.exports = axios;
 
@@ -73393,7 +75214,7 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 151 */
+/* 152 */
 /***/ (function(module, exports) {
 
 /*!
@@ -73420,16 +75241,16 @@ function isSlowBuffer (obj) {
 
 
 /***/ }),
-/* 152 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var defaults = __webpack_require__(6);
-var utils = __webpack_require__(1);
-var InterceptorManager = __webpack_require__(161);
-var dispatchRequest = __webpack_require__(162);
+var utils = __webpack_require__(2);
+var InterceptorManager = __webpack_require__(162);
+var dispatchRequest = __webpack_require__(163);
 
 /**
  * Create a new instance of Axios
@@ -73506,13 +75327,13 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 153 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 
 module.exports = function normalizeHeaderName(headers, normalizedName) {
   utils.forEach(headers, function processHeader(value, name) {
@@ -73525,7 +75346,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 154 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73558,7 +75379,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 155 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73586,13 +75407,13 @@ module.exports = function enhanceError(error, config, code, request, response) {
 
 
 /***/ }),
-/* 156 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 
 function encode(val) {
   return encodeURIComponent(val).
@@ -73659,13 +75480,13 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 157 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 
 // Headers whose duplicates are ignored by node
 // c.f. https://nodejs.org/api/http.html#http_message_headers
@@ -73719,13 +75540,13 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 158 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -73794,7 +75615,7 @@ module.exports = (
 
 
 /***/ }),
-/* 159 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -73837,13 +75658,13 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 160 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 
 module.exports = (
   utils.isStandardBrowserEnv() ?
@@ -73897,13 +75718,13 @@ module.exports = (
 
 
 /***/ }),
-/* 161 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 
 function InterceptorManager() {
   this.handlers = [];
@@ -73956,18 +75777,18 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 162 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
-var transformData = __webpack_require__(163);
+var utils = __webpack_require__(2);
+var transformData = __webpack_require__(164);
 var isCancel = __webpack_require__(136);
 var defaults = __webpack_require__(6);
-var isAbsoluteURL = __webpack_require__(164);
-var combineURLs = __webpack_require__(165);
+var isAbsoluteURL = __webpack_require__(165);
+var combineURLs = __webpack_require__(166);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -74049,13 +75870,13 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 163 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var utils = __webpack_require__(1);
+var utils = __webpack_require__(2);
 
 /**
  * Transform the data for a request or a response
@@ -74076,7 +75897,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 164 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -74097,7 +75918,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 165 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -74118,7 +75939,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 166 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -74182,7 +76003,7 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 167 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -74216,7 +76037,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 168 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -85179,10 +87000,10 @@ Vue.compile = compileToFunctions;
 
 module.exports = Vue;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(169).setImmediate))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(170).setImmediate))
 
 /***/ }),
-/* 169 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var scope = (typeof global !== "undefined" && global) ||
@@ -85238,7 +87059,7 @@ exports._unrefActive = exports.active = function(item) {
 };
 
 // setimmediate attaches itself to the global object
-__webpack_require__(170);
+__webpack_require__(171);
 // On some exotic environments, it's not clear which object `setimmediate` was
 // able to install onto.  Search each possibility in the same order as the
 // `setimmediate` library.
@@ -85249,10 +87070,10 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
                          (typeof global !== "undefined" && global.clearImmediate) ||
                          (this && this.clearImmediate);
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 170 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {(function (global, undefined) {
@@ -85442,10 +87263,2415 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2), __webpack_require__(133)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(133)))
 
 /***/ }),
-/* 171 */
+/* 172 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+window.ScrollMagic = __webpack_require__(7);
+__webpack_require__(173);
+window.TweenMax = __webpack_require__(138);
+__webpack_require__(175);
+
+var scrollIndex = function () {
+            function scroll() {
+                        _classCallCheck(this, scroll);
+
+                        if (window.innerWidth > 993) {
+                                    this.destroy();
+                                    window.controller = new ScrollMagic.Controller();
+                                    this.start();
+                        }
+            }
+
+            _createClass(scroll, [{
+                        key: 'destroy',
+                        value: function destroy() {
+                                    if (window.controller != undefined) {
+                                                window.controller.destroy();
+                                                delete window.controller;
+                                    }
+                        }
+            }, {
+                        key: 'start',
+                        value: function start() {
+                                    var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { right: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0), TweenMax.staggerFromTo(".console", 2, { left: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { left: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0)]);
+                                    var tween_2 = new TimelineMax().add([TweenMax.to("#info", 0.2, { opacity: 1 }), TweenMax.to("#info", 0.5, { backgroundPositionX: 'calc(50% + 800px)', backgroundPositionY: 'center' })]);
+
+                                    var tween_3 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -60, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
+
+                                    var tween_4 = new TimelineMax().add([TweenMax.to("#we-search", 0.2, { opacity: 1 }), TweenMax.to("#we-search", 0.5, { backgroundPositionX: 'calc(50% + 20px)', backgroundPositionY: 'center' })]);
+                                    var tween_5 = new TimelineMax().add([TweenMax.to("#participate", 0.2, { opacity: 1 }), TweenMax.to("#participate", 0.5, { backgroundPositionX: 'calc(50% - 964px)', backgroundPositionY: 'center' })]);
+                                    var tween_6 = new TimelineMax().add([TweenMax.staggerFromTo(".enterprise", 2, { right: '120%' }, { right: 0, ease: Back.ease }, 0), TweenMax.staggerFromTo(".developer", 2, { left: '120%' }, { left: 0, ease: Back.ease }, 0)]);
+
+                                    var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
+
+                                    var scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
+
+                                    var scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
+                                    var scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).setTween(tween_4).addTo(controller).addIndicators();
+
+                                    var scene_5 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).setTween(tween_5).addTo(controller).addIndicators();
+
+                                    var scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight - 300 }).setTween(tween_6).addTo(controller).addIndicators();
+
+                                    // nav items activate
+                                    var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
+
+                                    var nav_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#info-item", 'active');
+
+                                    var nav_2 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#search-item", 'active');
+
+                                    var nav_3 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#participate-item", 'active');
+
+                                    var nav_4 = new ScrollMagic.Scene({ triggerElement: "#schedule", duration: document.getElementById('schedule').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#schedule-item", 'active');
+
+                                    var nav_5 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
+
+                                    var nav_6 = new ScrollMagic.Scene({ triggerElement: "#awards", duration: document.getElementById('awards').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#award-item", 'active');
+
+                                    var nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
+
+                                    var nav_8 = new ScrollMagic.Scene({ triggerElement: "#conctact", duration: document.getElementById('conctact').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#conctact-item", 'active');
+                        }
+            }]);
+
+            return scroll;
+}();
+/* harmony default export */ __webpack_exports__["default"] = (scrollIndex);
+
+/***/ }),
+/* 173 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * ScrollMagic v2.0.5 (2015-04-29)
+ * The javascript library for magical scroll interactions.
+ * (c) 2015 Jan Paepke (@janpaepke)
+ * Project Website: http://scrollmagic.io
+ * 
+ * @version 2.0.5
+ * @license Dual licensed under MIT license and GPL.
+ * @author Jan Paepke - e-mail@janpaepke.de
+ *
+ * @file ScrollMagic GSAP Animation Plugin.
+ *
+ * requires: GSAP ~1.14
+ * Powered by the Greensock Animation Platform (GSAP): http://www.greensock.com/js
+ * Greensock License info at http://www.greensock.com/licensing/
+ */
+/**
+ * This plugin is meant to be used in conjunction with the Greensock Animation Plattform.  
+ * It offers an easy API to trigger Tweens or synchronize them to the scrollbar movement.
+ *
+ * Both the `lite` and the `max` versions of the GSAP library are supported.  
+ * The most basic requirement is `TweenLite`.
+ * 
+ * To have access to this extension, please include `plugins/animation.gsap.js`.
+ * @requires {@link http://greensock.com/gsap|GSAP ~1.14.x}
+ * @mixin animation.GSAP
+ */
+(function (root, factory) {
+	if (true) {
+		// AMD. Register as an anonymous module.
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(7), __webpack_require__(138), __webpack_require__(174)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else if (typeof exports === 'object') {
+		// CommonJS
+		// Loads whole gsap package onto global scope.
+		require('gsap');
+		factory(require('scrollmagic'), TweenMax, TimelineMax);
+	} else {
+		// Browser globals
+		factory(root.ScrollMagic || (root.jQuery && root.jQuery.ScrollMagic), root.TweenMax || root.TweenLite, root.TimelineMax || root.TimelineLite);
+	}
+}(this, function (ScrollMagic, Tween, Timeline) {
+	"use strict";
+	var NAMESPACE = "animation.gsap";
+
+	var
+	console = window.console || {},
+		err = Function.prototype.bind.call(console.error || console.log ||
+		function () {}, console);
+	if (!ScrollMagic) {
+		err("(" + NAMESPACE + ") -> ERROR: The ScrollMagic main module could not be found. Please make sure it's loaded before this plugin or use an asynchronous loader like requirejs.");
+	}
+	if (!Tween) {
+		err("(" + NAMESPACE + ") -> ERROR: TweenLite or TweenMax could not be found. Please make sure GSAP is loaded before ScrollMagic or use an asynchronous loader like requirejs.");
+	}
+
+/*
+	 * ----------------------------------------------------------------
+	 * Extensions for Scene
+	 * ----------------------------------------------------------------
+	 */
+	/**
+	 * Every instance of ScrollMagic.Scene now accepts an additional option.  
+	 * See {@link ScrollMagic.Scene} for a complete list of the standard options.
+	 * @memberof! animation.GSAP#
+	 * @method new ScrollMagic.Scene(options)
+	 * @example
+	 * var scene = new ScrollMagic.Scene({tweenChanges: true});
+	 *
+	 * @param {object} [options] - Options for the Scene. The options can be updated at any time.
+	 * @param {boolean} [options.tweenChanges=false] - Tweens Animation to the progress target instead of setting it.  
+	 Does not affect animations where duration is `0`.
+	 */
+	/**
+	 * **Get** or **Set** the tweenChanges option value.  
+	 * This only affects scenes with a duration. If `tweenChanges` is `true`, the progress update when scrolling will not be immediate, but instead the animation will smoothly animate to the target state.  
+	 * For a better understanding, try enabling and disabling this option in the [Scene Manipulation Example](../examples/basic/scene_manipulation.html).
+	 * @memberof! animation.GSAP#
+	 * @method Scene.tweenChanges
+	 * 
+	 * @example
+	 * // get the current tweenChanges option
+	 * var tweenChanges = scene.tweenChanges();
+	 *
+	 * // set new tweenChanges option
+	 * scene.tweenChanges(true);
+	 *
+	 * @fires {@link Scene.change}, when used as setter
+	 * @param {boolean} [newTweenChanges] - The new tweenChanges setting of the scene.
+	 * @returns {boolean} `get` -  Current tweenChanges option value.
+	 * @returns {Scene} `set` -  Parent object for chaining.
+	 */
+	// add option (TODO: DOC (private for dev))
+	ScrollMagic.Scene.addOption("tweenChanges", // name
+	false, // default
+
+
+	function (val) { // validation callback
+		return !!val;
+	});
+	// extend scene
+	ScrollMagic.Scene.extend(function () {
+		var Scene = this,
+			_tween;
+
+		var log = function () {
+			if (Scene._log) { // not available, when main source minified
+				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
+				Scene._log.apply(this, arguments);
+			}
+		};
+
+		// set listeners
+		Scene.on("progress.plugin_gsap", function () {
+			updateTweenProgress();
+		});
+		Scene.on("destroy.plugin_gsap", function (e) {
+			Scene.removeTween(e.reset);
+		});
+
+		/**
+		 * Update the tween progress to current position.
+		 * @private
+		 */
+		var updateTweenProgress = function () {
+			if (_tween) {
+				var
+				progress = Scene.progress(),
+					state = Scene.state();
+				if (_tween.repeat && _tween.repeat() === -1) {
+					// infinite loop, so not in relation to progress
+					if (state === 'DURING' && _tween.paused()) {
+						_tween.play();
+					} else if (state !== 'DURING' && !_tween.paused()) {
+						_tween.pause();
+					}
+				} else if (progress != _tween.progress()) { // do we even need to update the progress?
+					// no infinite loop - so should we just play or go to a specific point in time?
+					if (Scene.duration() === 0) {
+						// play the animation
+						if (progress > 0) { // play from 0 to 1
+							_tween.play();
+						} else { // play from 1 to 0
+							_tween.reverse();
+						}
+					} else {
+						// go to a specific point in time
+						if (Scene.tweenChanges() && _tween.tweenTo) {
+							// go smooth
+							_tween.tweenTo(progress * _tween.duration());
+						} else {
+							// just hard set it
+							_tween.progress(progress).pause();
+						}
+					}
+				}
+			}
+		};
+
+		/**
+		 * Add a tween to the scene.  
+		 * If you want to add multiple tweens, add them into a GSAP Timeline object and supply it instead (see example below).  
+		 * 
+		 * If the scene has a duration, the tween's duration will be projected to the scroll distance of the scene, meaning its progress will be synced to scrollbar movement.  
+		 * For a scene with a duration of `0`, the tween will be triggered when scrolling forward past the scene's trigger position and reversed, when scrolling back.  
+		 * To gain better understanding, check out the [Simple Tweening example](../examples/basic/simple_tweening.html).
+		 *
+		 * Instead of supplying a tween this method can also be used as a shorthand for `TweenMax.to()` (see example below).
+		 * @memberof! animation.GSAP#
+		 *
+		 * @example
+		 * // add a single tween directly
+		 * scene.setTween(TweenMax.to("obj"), 1, {x: 100});
+		 *
+		 * // add a single tween via variable
+		 * var tween = TweenMax.to("obj"), 1, {x: 100};
+		 * scene.setTween(tween);
+		 *
+		 * // add multiple tweens, wrapped in a timeline.
+		 * var timeline = new TimelineMax();
+		 * var tween1 = TweenMax.from("obj1", 1, {x: 100});
+		 * var tween2 = TweenMax.to("obj2", 1, {y: 100});
+		 * timeline
+		 *		.add(tween1)
+		 *		.add(tween2);
+		 * scene.addTween(timeline);
+		 *
+		 * // short hand to add a TweenMax.to() tween
+		 * scene.setTween("obj3", 0.5, {y: 100});
+		 *
+		 * // short hand to add a TweenMax.to() tween for 1 second
+		 * // this is useful, when the scene has a duration and the tween duration isn't important anyway
+		 * scene.setTween("obj3", {y: 100});
+		 *
+		 * @param {(object|string)} TweenObject - A TweenMax, TweenLite, TimelineMax or TimelineLite object that should be animated in the scene. Can also be a Dom Element or Selector, when using direct tween definition (see examples).
+		 * @param {(number|object)} duration - A duration for the tween, or tween parameters. If an object containing parameters are supplied, a default duration of 1 will be used.
+		 * @param {object} params - The parameters for the tween
+		 * @returns {Scene} Parent object for chaining.
+		 */
+		Scene.setTween = function (TweenObject, duration, params) {
+			var newTween;
+			if (arguments.length > 1) {
+				if (arguments.length < 3) {
+					params = duration;
+					duration = 1;
+				}
+				TweenObject = Tween.to(TweenObject, duration, params);
+			}
+			try {
+				// wrap Tween into a Timeline Object if available to include delay and repeats in the duration and standardize methods.
+				if (Timeline) {
+					newTween = new Timeline({
+						smoothChildTiming: true
+					}).add(TweenObject);
+				} else {
+					newTween = TweenObject;
+				}
+				newTween.pause();
+			} catch (e) {
+				log(1, "ERROR calling method 'setTween()': Supplied argument is not a valid TweenObject");
+				return Scene;
+			}
+			if (_tween) { // kill old tween?
+				Scene.removeTween();
+			}
+			_tween = newTween;
+
+			// some properties need to be transferred it to the wrapper, otherwise they would get lost.
+			if (TweenObject.repeat && TweenObject.repeat() === -1) { // TweenMax or TimelineMax Object?
+				_tween.repeat(-1);
+				_tween.yoyo(TweenObject.yoyo());
+			}
+			// Some tween validations and debugging helpers
+			if (Scene.tweenChanges() && !_tween.tweenTo) {
+				log(2, "WARNING: tweenChanges will only work if the TimelineMax object is available for ScrollMagic.");
+			}
+
+			// check if there are position tweens defined for the trigger and warn about it :)
+			if (_tween && Scene.controller() && Scene.triggerElement() && Scene.loglevel() >= 2) { // controller is needed to know scroll direction.
+				var
+				triggerTweens = Tween.getTweensOf(Scene.triggerElement()),
+					vertical = Scene.controller().info("vertical");
+				triggerTweens.forEach(function (value, index) {
+					var
+					tweenvars = value.vars.css || value.vars,
+						condition = vertical ? (tweenvars.top !== undefined || tweenvars.bottom !== undefined) : (tweenvars.left !== undefined || tweenvars.right !== undefined);
+					if (condition) {
+						log(2, "WARNING: Tweening the position of the trigger element affects the scene timing and should be avoided!");
+						return false;
+					}
+				});
+			}
+
+			// warn about tween overwrites, when an element is tweened multiple times
+			if (parseFloat(TweenLite.version) >= 1.14) { // onOverwrite only present since GSAP v1.14.0
+				var
+				list = _tween.getChildren ? _tween.getChildren(true, true, false) : [_tween],
+					// get all nested tween objects
+					newCallback = function () {
+						log(2, "WARNING: tween was overwritten by another. To learn how to avoid this issue see here: https://github.com/janpaepke/ScrollMagic/wiki/WARNING:-tween-was-overwritten-by-another");
+					};
+				for (var i = 0, thisTween, oldCallback; i < list.length; i++) { /*jshint loopfunc: true */
+					thisTween = list[i];
+					if (oldCallback !== newCallback) { // if tweens is added more than once
+						oldCallback = thisTween.vars.onOverwrite;
+						thisTween.vars.onOverwrite = function () {
+							if (oldCallback) {
+								oldCallback.apply(this, arguments);
+							}
+							newCallback.apply(this, arguments);
+						};
+					}
+				}
+			}
+			log(3, "added tween");
+
+			updateTweenProgress();
+			return Scene;
+		};
+
+		/**
+		 * Remove the tween from the scene.  
+		 * This will terminate the control of the Scene over the tween.
+		 *
+		 * Using the reset option you can decide if the tween should remain in the current state or be rewound to set the target elements back to the state they were in before the tween was added to the scene.
+		 * @memberof! animation.GSAP#
+		 *
+		 * @example
+		 * // remove the tween from the scene without resetting it
+		 * scene.removeTween();
+		 *
+		 * // remove the tween from the scene and reset it to initial position
+		 * scene.removeTween(true);
+		 *
+		 * @param {boolean} [reset=false] - If `true` the tween will be reset to its initial values.
+		 * @returns {Scene} Parent object for chaining.
+		 */
+		Scene.removeTween = function (reset) {
+			if (_tween) {
+				if (reset) {
+					_tween.progress(0).pause();
+				}
+				_tween.kill();
+				_tween = undefined;
+				log(3, "removed tween (reset: " + (reset ? "true" : "false") + ")");
+			}
+			return Scene;
+		};
+
+	});
+}));
+
+/***/ }),
+/* 174 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * VERSION: 1.20.4
+ * DATE: 2018-02-15
+ * UPDATES AND DOCS AT: http://greensock.com
+ *
+ * @license Copyright (c) 2008-2018, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://greensock.com/standard-license or for
+ * Club GreenSock members, the software agreement that was issued with your membership.
+ * 
+ * @author: Jack Doyle, jack@greensock.com
+ */
+var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
+(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
+
+	"use strict";
+
+	_gsScope._gsDefine("TimelineMax", ["TimelineLite","TweenLite","easing.Ease"], function(TimelineLite, TweenLite, Ease) {
+		
+		var TimelineMax = function(vars) {
+				TimelineLite.call(this, vars);
+				this._repeat = this.vars.repeat || 0;
+				this._repeatDelay = this.vars.repeatDelay || 0;
+				this._cycle = 0;
+				this._yoyo = (this.vars.yoyo === true);
+				this._dirty = true;
+			},
+			_tinyNum = 0.0000000001,
+			TweenLiteInternals = TweenLite._internals,
+			_lazyTweens = TweenLiteInternals.lazyTweens,
+			_lazyRender = TweenLiteInternals.lazyRender,
+			_globals = _gsScope._gsDefine.globals,
+			_easeNone = new Ease(null, null, 1, 0),
+			p = TimelineMax.prototype = new TimelineLite();
+			
+		p.constructor = TimelineMax;
+		p.kill()._gc = false;
+		TimelineMax.version = "1.20.4";
+		
+		p.invalidate = function() {
+			this._yoyo = (this.vars.yoyo === true);
+			this._repeat = this.vars.repeat || 0;
+			this._repeatDelay = this.vars.repeatDelay || 0;
+			this._uncache(true);
+			return TimelineLite.prototype.invalidate.call(this);
+		};
+		
+		p.addCallback = function(callback, position, params, scope) {
+			return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
+		};
+		
+		p.removeCallback = function(callback, position) {
+			if (callback) {
+				if (position == null) {
+					this._kill(null, callback);
+				} else {
+					var a = this.getTweensOf(callback, false),
+						i = a.length,
+						time = this._parseTimeOrLabel(position);
+					while (--i > -1) {
+						if (a[i]._startTime === time) {
+							a[i]._enabled(false, false);
+						}
+					}
+				}
+			}
+			return this;
+		};
+
+		p.removePause = function(position) {
+			return this.removeCallback(TimelineLite._internals.pauseCallback, position);
+		};
+
+		p.tweenTo = function(position, vars) {
+			vars = vars || {};
+			var copy = {ease:_easeNone, useFrames:this.usesFrames(), immediateRender:false, lazy:false},
+				Engine = (vars.repeat && _globals.TweenMax) || TweenLite,
+				duration, p, t;
+			for (p in vars) {
+				copy[p] = vars[p];
+			}
+			copy.time = this._parseTimeOrLabel(position);
+			duration = (Math.abs(Number(copy.time) - this._time) / this._timeScale) || 0.001;
+			t = new Engine(this, duration, copy);
+			copy.onStart = function() {
+				t.target.paused(true);
+				if (t.vars.time !== t.target.time() && duration === t.duration() && !t.isFromTo) { //don't make the duration zero - if it's supposed to be zero, don't worry because it's already initting the tween and will complete immediately, effectively making the duration zero anyway. If we make duration zero, the tween won't run at all.
+					t.duration( Math.abs( t.vars.time - t.target.time()) / t.target._timeScale ).render(t.time(), true, true); //render() right away to ensure that things look right, especially in the case of .tweenTo(0).
+				}
+				if (vars.onStart) { //in case the user had an onStart in the vars - we don't want to overwrite it.
+					vars.onStart.apply(vars.onStartScope || vars.callbackScope || t, vars.onStartParams || []); //don't use t._callback("onStart") or it'll point to the copy.onStart and we'll get a recursion error.
+				}
+			};
+			return t;
+		};
+
+		p.tweenFromTo = function(fromPosition, toPosition, vars) {
+			vars = vars || {};
+			fromPosition = this._parseTimeOrLabel(fromPosition);
+			vars.startAt = {onComplete:this.seek, onCompleteParams:[fromPosition], callbackScope:this};
+			vars.immediateRender = (vars.immediateRender !== false);
+			var t = this.tweenTo(toPosition, vars);
+			t.isFromTo = 1; //to ensure we don't mess with the duration in the onStart (we've got the start and end values here, so lock it in)
+			return t.duration((Math.abs( t.vars.time - fromPosition) / this._timeScale) || 0.001);
+		};
+		
+		p.render = function(time, suppressEvents, force) {
+			if (this._gc) {
+				this._enabled(true, false);
+			}
+			var prevTime = this._time,
+				totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(),
+				dur = this._duration,
+				prevTotalTime = this._totalTime,
+				prevStart = this._startTime, 
+				prevTimeScale = this._timeScale, 
+				prevRawPrevTime = this._rawPrevTime,
+				prevPaused = this._paused, 
+				prevCycle = this._cycle, 
+				tween, isComplete, next, callback, internalForce, cycleDuration, pauseTween, curTime;
+			if (prevTime !== this._time) { //if totalDuration() finds a child with a negative startTime and smoothChildTiming is true, things get shifted around internally so we need to adjust the time accordingly. For example, if a tween starts at -30 we must shift EVERYTHING forward 30 seconds and move this timeline's startTime backward by 30 seconds so that things align with the playhead (no jump).
+				time += this._time - prevTime;
+			}
+			if (time >= totalDur - 0.0000001 && time >= 0) { //to work around occasional floating point math artifacts.
+				if (!this._locked) {
+					this._totalTime = totalDur;
+					this._cycle = this._repeat;
+				}
+				if (!this._reversed) if (!this._hasPausedChild()) {
+					isComplete = true;
+					callback = "onComplete";
+					internalForce = !!this._timeline.autoRemoveChildren; //otherwise, if the animation is unpaused/activated after it's already finished, it doesn't get removed from the parent timeline.
+					if (this._duration === 0) if ((time <= 0 && time >= -0.0000001) || prevRawPrevTime < 0 || prevRawPrevTime === _tinyNum) if (prevRawPrevTime !== time && this._first) {
+						internalForce = true;
+						if (prevRawPrevTime > _tinyNum) {
+							callback = "onReverseComplete";
+						}
+					}
+				}
+				this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
+				if (this._yoyo && (this._cycle & 1) !== 0) {
+					this._time = time = 0;
+				} else {
+					this._time = dur;
+					time = dur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7. We cannot do less then 0.0001 because the same issue can occur when the duration is extremely large like 999999999999 in which case adding 0.00000001, for example, causes it to act like nothing was added.
+				}
+				
+			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
+				if (!this._locked) {
+					this._totalTime = this._cycle = 0;
+				}
+				this._time = 0;
+				if (prevTime !== 0 || (dur === 0 && prevRawPrevTime !== _tinyNum && (prevRawPrevTime > 0 || (time < 0 && prevRawPrevTime >= 0)) && !this._locked)) { //edge case for checking time < 0 && prevRawPrevTime >= 0: a zero-duration fromTo() tween inside a zero-duration timeline (yeah, very rare)
+					callback = "onReverseComplete";
+					isComplete = this._reversed;
+				}
+				if (time < 0) {
+					this._active = false;
+					if (this._timeline.autoRemoveChildren && this._reversed) {
+						internalForce = isComplete = true;
+						callback = "onReverseComplete";
+					} else if (prevRawPrevTime >= 0 && this._first) { //when going back beyond the start, force a render so that zero-duration tweens that sit at the very beginning render their start values properly. Otherwise, if the parent timeline's playhead lands exactly at this timeline's startTime, and then moves backwards, the zero-duration tweens at the beginning would still be at their end state.
+						internalForce = true;
+					}
+					this._rawPrevTime = time;
+				} else {
+					this._rawPrevTime = (dur || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
+					if (time === 0 && isComplete) { //if there's a zero-duration tween at the very beginning of a timeline and the playhead lands EXACTLY at time 0, that tween will correctly render its end values, but we need to keep the timeline alive for one more render so that the beginning values render properly as the parent's playhead keeps moving beyond the begining. Imagine obj.x starts at 0 and then we do tl.set(obj, {x:100}).to(obj, 1, {x:200}) and then later we tl.reverse()...the goal is to have obj.x revert to 0. If the playhead happens to land on exactly 0, without this chunk of code, it'd complete the timeline and remove it from the rendering queue (not good).
+						tween = this._first;
+						while (tween && tween._startTime === 0) {
+							if (!tween._duration) {
+								isComplete = false;
+							}
+							tween = tween._next;
+						}
+					}
+					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
+					if (!this._initted) {
+						internalForce = true;
+					}
+				}
+				
+			} else {
+				if (dur === 0 && prevRawPrevTime < 0) { //without this, zero-duration repeating timelines (like with a simple callback nested at the very beginning and a repeatDelay) wouldn't render the first time through.
+					internalForce = true;
+				}
+				this._time = this._rawPrevTime = time;
+				if (!this._locked) {
+					this._totalTime = time;
+					if (this._repeat !== 0) {
+						cycleDuration = dur + this._repeatDelay;
+						this._cycle = (this._totalTime / cycleDuration) >> 0; //originally _totalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but it gets reported as 0.79999999!)
+						if (this._cycle !== 0) if (this._cycle === this._totalTime / cycleDuration && prevTotalTime <= time) {
+							this._cycle--; //otherwise when rendered exactly at the end time, it will act as though it is repeating (at the beginning)
+						}
+						this._time = this._totalTime - (this._cycle * cycleDuration);
+						if (this._yoyo) if ((this._cycle & 1) !== 0) {
+							this._time = dur - this._time;
+						}
+						if (this._time > dur) {
+							this._time = dur;
+							time = dur + 0.0001; //to avoid occasional floating point rounding error
+						} else if (this._time < 0) {
+							this._time = time = 0;
+						} else {
+							time = this._time;
+						}
+					}
+				}
+
+				if (this._hasPause && !this._forcingPlayhead && !suppressEvents) {
+					time = this._time;
+					if (time >= prevTime || (this._repeat && prevCycle !== this._cycle)) {
+						tween = this._first;
+						while (tween && tween._startTime <= time && !pauseTween) {
+							if (!tween._duration) if (tween.data === "isPause" && !tween.ratio && !(tween._startTime === 0 && this._rawPrevTime === 0)) {
+								pauseTween = tween;
+							}
+							tween = tween._next;
+						}
+					} else {
+						tween = this._last;
+						while (tween && tween._startTime >= time && !pauseTween) {
+							if (!tween._duration) if (tween.data === "isPause" && tween._rawPrevTime > 0) {
+								pauseTween = tween;
+							}
+							tween = tween._prev;
+						}
+					}
+					if (pauseTween && pauseTween._startTime < dur) {
+						this._time = time = pauseTween._startTime;
+						this._totalTime = time + (this._cycle * (this._totalDuration + this._repeatDelay));
+					}
+				}
+
+			}
+			
+			if (this._cycle !== prevCycle) if (!this._locked) {
+				/*
+				make sure children at the end/beginning of the timeline are rendered properly. If, for example, 
+				a 3-second long timeline rendered at 2.9 seconds previously, and now renders at 3.2 seconds (which
+				would get transated to 2.8 seconds if the timeline yoyos or 0.2 seconds if it just repeats), there
+				could be a callback or a short tween that's at 2.95 or 3 seconds in which wouldn't render. So 
+				we need to push the timeline to the end (and/or beginning depending on its yoyo value). Also we must
+				ensure that zero-duration tweens at the very beginning or end of the TimelineMax work. 
+				*/
+				var backwards = (this._yoyo && (prevCycle & 1) !== 0),
+					wrap = (backwards === (this._yoyo && (this._cycle & 1) !== 0)),
+					recTotalTime = this._totalTime,
+					recCycle = this._cycle,
+					recRawPrevTime = this._rawPrevTime,
+					recTime = this._time;
+				
+				this._totalTime = prevCycle * dur;
+				if (this._cycle < prevCycle) {
+					backwards = !backwards;
+				} else {
+					this._totalTime += dur;
+				}
+				this._time = prevTime; //temporarily revert _time so that render() renders the children in the correct order. Without this, tweens won't rewind correctly. We could arhictect things in a "cleaner" way by splitting out the rendering queue into a separate method but for performance reasons, we kept it all inside this method.
+				
+				this._rawPrevTime = (dur === 0) ? prevRawPrevTime - 0.0001 : prevRawPrevTime;
+				this._cycle = prevCycle;
+				this._locked = true; //prevents changes to totalTime and skips repeat/yoyo behavior when we recursively call render()
+				prevTime = (backwards) ? 0 : dur;
+				this.render(prevTime, suppressEvents, (dur === 0));
+				if (!suppressEvents) if (!this._gc) {
+					if (this.vars.onRepeat) {
+						this._cycle = recCycle; //in case the onRepeat alters the playhead or invalidates(), we shouldn't stay locked or use the previous cycle.
+						this._locked = false;
+						this._callback("onRepeat");
+					}
+				}
+				if (prevTime !== this._time) { //in case there's a callback like onComplete in a nested tween/timeline that changes the playhead position, like via seek(), we should just abort.
+					return;
+				}
+				if (wrap) {
+					this._cycle = prevCycle; //if there's an onRepeat, we reverted this above, so make sure it's set properly again. We also unlocked in that scenario, so reset that too.
+					this._locked = true;
+					prevTime = (backwards) ? dur + 0.0001 : -0.0001;
+					this.render(prevTime, true, false);
+				}
+				this._locked = false;
+				if (this._paused && !prevPaused) { //if the render() triggered callback that paused this timeline, we should abort (very rare, but possible)
+					return;
+				}
+				this._time = recTime;
+				this._totalTime = recTotalTime;
+				this._cycle = recCycle;
+				this._rawPrevTime = recRawPrevTime;
+			}
+
+			if ((this._time === prevTime || !this._first) && !force && !internalForce && !pauseTween) {
+				if (prevTotalTime !== this._totalTime) if (this._onUpdate) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
+					this._callback("onUpdate");
+				}
+				return;
+			} else if (!this._initted) {
+				this._initted = true;
+			}
+
+			if (!this._active) if (!this._paused && this._totalTime !== prevTotalTime && time > 0) {
+				this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
+			}
+			
+			if (prevTotalTime === 0) if (this.vars.onStart) if (this._totalTime !== 0 || !this._totalDuration) if (!suppressEvents) {
+				this._callback("onStart");
+			}
+
+			curTime = this._time;
+			if (curTime >= prevTime) {
+				tween = this._first;
+				while (tween) {
+					next = tween._next; //record it here because the value could change after rendering...
+					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
+						break;
+					} else if (tween._active || (tween._startTime <= this._time && !tween._paused && !tween._gc)) {
+						if (pauseTween === tween) {
+							this.pause();
+						}
+						if (!tween._reversed) {
+							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
+						} else {
+							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
+						}
+					}
+					tween = next;
+				}
+			} else {
+				tween = this._last;
+				while (tween) {
+					next = tween._prev; //record it here because the value could change after rendering...
+					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
+						break;
+					} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
+						if (pauseTween === tween) {
+							pauseTween = tween._prev; //the linked list is organized by _startTime, thus it's possible that a tween could start BEFORE the pause and end after it, in which case it would be positioned before the pause tween in the linked list, but we should render it before we pause() the timeline and cease rendering. This is only a concern when going in reverse.
+							while (pauseTween && pauseTween.endTime() > this._time) {
+								pauseTween.render( (pauseTween._reversed ? pauseTween.totalDuration() - ((time - pauseTween._startTime) * pauseTween._timeScale) : (time - pauseTween._startTime) * pauseTween._timeScale), suppressEvents, force);
+								pauseTween = pauseTween._prev;
+							}
+							pauseTween = null;
+							this.pause();
+						}
+						if (!tween._reversed) {
+							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
+						} else {
+							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
+						}
+					}
+					tween = next;
+				}
+			}
+			
+			if (this._onUpdate) if (!suppressEvents) {
+				if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
+					_lazyRender();
+				}
+				this._callback("onUpdate");
+			}
+			if (callback) if (!this._locked) if (!this._gc) if (prevStart === this._startTime || prevTimeScale !== this._timeScale) if (this._time === 0 || totalDur >= this.totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
+				if (isComplete) {
+					if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onComplete on a timeline that reports/checks tweened values.
+						_lazyRender();
+					}
+					if (this._timeline.autoRemoveChildren) {
+						this._enabled(false, false);
+					}
+					this._active = false;
+				}
+				if (!suppressEvents && this.vars[callback]) {
+					this._callback(callback);
+				}
+			}
+		};
+		
+		p.getActive = function(nested, tweens, timelines) {
+			if (nested == null) {
+				nested = true;
+			}
+			if (tweens == null) {
+				tweens = true;
+			}
+			if (timelines == null) {
+				timelines = false;
+			}
+			var a = [], 
+				all = this.getChildren(nested, tweens, timelines), 
+				cnt = 0, 
+				l = all.length,
+				i, tween;
+			for (i = 0; i < l; i++) {
+				tween = all[i];
+				if (tween.isActive()) {
+					a[cnt++] = tween;
+				}
+			}
+			return a;
+		};
+		
+		
+		p.getLabelAfter = function(time) {
+			if (!time) if (time !== 0) { //faster than isNan()
+				time = this._time;
+			}
+			var labels = this.getLabelsArray(),
+				l = labels.length,
+				i;
+			for (i = 0; i < l; i++) {
+				if (labels[i].time > time) {
+					return labels[i].name;
+				}
+			}
+			return null;
+		};
+		
+		p.getLabelBefore = function(time) {
+			if (time == null) {
+				time = this._time;
+			}
+			var labels = this.getLabelsArray(),
+				i = labels.length;
+			while (--i > -1) {
+				if (labels[i].time < time) {
+					return labels[i].name;
+				}
+			}
+			return null;
+		};
+		
+		p.getLabelsArray = function() {
+			var a = [],
+				cnt = 0,
+				p;
+			for (p in this._labels) {
+				a[cnt++] = {time:this._labels[p], name:p};
+			}
+			a.sort(function(a,b) {
+				return a.time - b.time;
+			});
+			return a;
+		};
+
+		p.invalidate = function() {
+			this._locked = false; //unlock and set cycle in case invalidate() is called from inside an onRepeat
+			return TimelineLite.prototype.invalidate.call(this);
+		};
+
+		
+//---- GETTERS / SETTERS -------------------------------------------------------------------------------------------------------
+		
+		p.progress = function(value, suppressEvents) {
+			return (!arguments.length) ? (this._time / this.duration()) || 0 : this.totalTime( this.duration() * ((this._yoyo && (this._cycle & 1) !== 0) ? 1 - value : value) + (this._cycle * (this._duration + this._repeatDelay)), suppressEvents);
+		};
+		
+		p.totalProgress = function(value, suppressEvents) {
+			return (!arguments.length) ? (this._totalTime / this.totalDuration()) || 0 : this.totalTime( this.totalDuration() * value, suppressEvents);
+		};
+
+		p.totalDuration = function(value) {
+			if (!arguments.length) {
+				if (this._dirty) {
+					TimelineLite.prototype.totalDuration.call(this); //just forces refresh
+					//Instead of Infinity, we use 999999999999 so that we can accommodate reverses.
+					this._totalDuration = (this._repeat === -1) ? 999999999999 : this._duration * (this._repeat + 1) + (this._repeatDelay * this._repeat);
+				}
+				return this._totalDuration;
+			}
+			return (this._repeat === -1 || !value) ? this : this.timeScale( this.totalDuration() / value );
+		};
+		
+		p.time = function(value, suppressEvents) {
+			if (!arguments.length) {
+				return this._time;
+			}
+			if (this._dirty) {
+				this.totalDuration();
+			}
+			if (value > this._duration) {
+				value = this._duration;
+			}
+			if (this._yoyo && (this._cycle & 1) !== 0) {
+				value = (this._duration - value) + (this._cycle * (this._duration + this._repeatDelay));
+			} else if (this._repeat !== 0) {
+				value += this._cycle * (this._duration + this._repeatDelay);
+			}
+			return this.totalTime(value, suppressEvents);
+		};
+		
+		p.repeat = function(value) {
+			if (!arguments.length) {
+				return this._repeat;
+			}
+			this._repeat = value;
+			return this._uncache(true);
+		};
+		
+		p.repeatDelay = function(value) {
+			if (!arguments.length) {
+				return this._repeatDelay;
+			}
+			this._repeatDelay = value;
+			return this._uncache(true);
+		};
+		
+		p.yoyo = function(value) {
+			if (!arguments.length) {
+				return this._yoyo;
+			}
+			this._yoyo = value;
+			return this;
+		};
+		
+		p.currentLabel = function(value) {
+			if (!arguments.length) {
+				return this.getLabelBefore(this._time + 0.00000001);
+			}
+			return this.seek(value, true);
+		};
+		
+		return TimelineMax;
+		
+	}, true);
+
+
+
+
+
+
+
+/*
+ * ----------------------------------------------------------------
+ * TimelineLite
+ * ----------------------------------------------------------------
+ */
+
+	_gsScope._gsDefine("TimelineLite", ["core.Animation","core.SimpleTimeline","TweenLite"], function(Animation, SimpleTimeline, TweenLite) {
+
+		var TimelineLite = function(vars) {
+				SimpleTimeline.call(this, vars);
+				this._labels = {};
+				this.autoRemoveChildren = (this.vars.autoRemoveChildren === true);
+				this.smoothChildTiming = (this.vars.smoothChildTiming === true);
+				this._sortChildren = true;
+				this._onUpdate = this.vars.onUpdate;
+				var v = this.vars,
+					val, p;
+				for (p in v) {
+					val = v[p];
+					if (_isArray(val)) if (val.join("").indexOf("{self}") !== -1) {
+						v[p] = this._swapSelfInParams(val);
+					}
+				}
+				if (_isArray(v.tweens)) {
+					this.add(v.tweens, 0, v.align, v.stagger);
+				}
+			},
+			_tinyNum = 0.0000000001,
+			TweenLiteInternals = TweenLite._internals,
+			_internals = TimelineLite._internals = {},
+			_isSelector = TweenLiteInternals.isSelector,
+			_isArray = TweenLiteInternals.isArray,
+			_lazyTweens = TweenLiteInternals.lazyTweens,
+			_lazyRender = TweenLiteInternals.lazyRender,
+			_globals = _gsScope._gsDefine.globals,
+			_copy = function(vars) {
+				var copy = {}, p;
+				for (p in vars) {
+					copy[p] = vars[p];
+				}
+				return copy;
+			},
+			_applyCycle = function(vars, targets, i) {
+				var alt = vars.cycle,
+					p, val;
+				for (p in alt) {
+					val = alt[p];
+					vars[p] = (typeof(val) === "function") ? val(i, targets[i]) : val[i % val.length];
+				}
+				delete vars.cycle;
+			},
+			_pauseCallback = _internals.pauseCallback = function() {},
+			_slice = function(a) { //don't use [].slice because that doesn't work in IE8 with a NodeList that's returned by querySelectorAll()
+				var b = [],
+					l = a.length,
+					i;
+				for (i = 0; i !== l; b.push(a[i++]));
+				return b;
+			},
+			p = TimelineLite.prototype = new SimpleTimeline();
+
+		TimelineLite.version = "1.20.4";
+		p.constructor = TimelineLite;
+		p.kill()._gc = p._forcingPlayhead = p._hasPause = false;
+
+		/* might use later...
+		//translates a local time inside an animation to the corresponding time on the root/global timeline, factoring in all nesting and timeScales.
+		function localToGlobal(time, animation) {
+			while (animation) {
+				time = (time / animation._timeScale) + animation._startTime;
+				animation = animation.timeline;
+			}
+			return time;
+		}
+
+		//translates the supplied time on the root/global timeline into the corresponding local time inside a particular animation, factoring in all nesting and timeScales
+		function globalToLocal(time, animation) {
+			var scale = 1;
+			time -= localToGlobal(0, animation);
+			while (animation) {
+				scale *= animation._timeScale;
+				animation = animation.timeline;
+			}
+			return time * scale;
+		}
+		*/
+
+		p.to = function(target, duration, vars, position) {
+			var Engine = (vars.repeat && _globals.TweenMax) || TweenLite;
+			return duration ? this.add( new Engine(target, duration, vars), position) : this.set(target, vars, position);
+		};
+
+		p.from = function(target, duration, vars, position) {
+			return this.add( ((vars.repeat && _globals.TweenMax) || TweenLite).from(target, duration, vars), position);
+		};
+
+		p.fromTo = function(target, duration, fromVars, toVars, position) {
+			var Engine = (toVars.repeat && _globals.TweenMax) || TweenLite;
+			return duration ? this.add( Engine.fromTo(target, duration, fromVars, toVars), position) : this.set(target, toVars, position);
+		};
+
+		p.staggerTo = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
+			var tl = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams, callbackScope:onCompleteAllScope, smoothChildTiming:this.smoothChildTiming}),
+				cycle = vars.cycle,
+				copy, i;
+			if (typeof(targets) === "string") {
+				targets = TweenLite.selector(targets) || targets;
+			}
+			targets = targets || [];
+			if (_isSelector(targets)) { //senses if the targets object is a selector. If it is, we should translate it into an array.
+				targets = _slice(targets);
+			}
+			stagger = stagger || 0;
+			if (stagger < 0) {
+				targets = _slice(targets);
+				targets.reverse();
+				stagger *= -1;
+			}
+			for (i = 0; i < targets.length; i++) {
+				copy = _copy(vars);
+				if (copy.startAt) {
+					copy.startAt = _copy(copy.startAt);
+					if (copy.startAt.cycle) {
+						_applyCycle(copy.startAt, targets, i);
+					}
+				}
+				if (cycle) {
+					_applyCycle(copy, targets, i);
+					if (copy.duration != null) {
+						duration = copy.duration;
+						delete copy.duration;
+					}
+				}
+				tl.to(targets[i], duration, copy, i * stagger);
+			}
+			return this.add(tl, position);
+		};
+
+		p.staggerFrom = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
+			vars.immediateRender = (vars.immediateRender != false);
+			vars.runBackwards = true;
+			return this.staggerTo(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
+		};
+
+		p.staggerFromTo = function(targets, duration, fromVars, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
+			toVars.startAt = fromVars;
+			toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
+			return this.staggerTo(targets, duration, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
+		};
+
+		p.call = function(callback, params, scope, position) {
+			return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
+		};
+
+		p.set = function(target, vars, position) {
+			position = this._parseTimeOrLabel(position, 0, true);
+			if (vars.immediateRender == null) {
+				vars.immediateRender = (position === this._time && !this._paused);
+			}
+			return this.add( new TweenLite(target, 0, vars), position);
+		};
+
+		TimelineLite.exportRoot = function(vars, ignoreDelayedCalls) {
+			vars = vars || {};
+			if (vars.smoothChildTiming == null) {
+				vars.smoothChildTiming = true;
+			}
+			var tl = new TimelineLite(vars),
+				root = tl._timeline,
+				hasNegativeStart, time,	tween, next;
+			if (ignoreDelayedCalls == null) {
+				ignoreDelayedCalls = true;
+			}
+			root._remove(tl, true);
+			tl._startTime = 0;
+			tl._rawPrevTime = tl._time = tl._totalTime = root._time;
+			tween = root._first;
+			while (tween) {
+				next = tween._next;
+				if (!ignoreDelayedCalls || !(tween instanceof TweenLite && tween.target === tween.vars.onComplete)) {
+					time = tween._startTime - tween._delay;
+					if (time < 0) {
+						hasNegativeStart = 1;
+					}
+					tl.add(tween, time);
+				}
+				tween = next;
+			}
+			root.add(tl, 0);
+			if (hasNegativeStart) { //calling totalDuration() will force the adjustment necessary to shift the children forward so none of them start before zero, and moves the timeline backwards the same amount, so the playhead is still aligned where it should be globally, but the timeline doesn't have illegal children that start before zero.
+				tl.totalDuration();
+			}
+			return tl;
+		};
+
+		p.add = function(value, position, align, stagger) {
+			var curTime, l, i, child, tl, beforeRawTime;
+			if (typeof(position) !== "number") {
+				position = this._parseTimeOrLabel(position, 0, true, value);
+			}
+			if (!(value instanceof Animation)) {
+				if ((value instanceof Array) || (value && value.push && _isArray(value))) {
+					align = align || "normal";
+					stagger = stagger || 0;
+					curTime = position;
+					l = value.length;
+					for (i = 0; i < l; i++) {
+						if (_isArray(child = value[i])) {
+							child = new TimelineLite({tweens:child});
+						}
+						this.add(child, curTime);
+						if (typeof(child) !== "string" && typeof(child) !== "function") {
+							if (align === "sequence") {
+								curTime = child._startTime + (child.totalDuration() / child._timeScale);
+							} else if (align === "start") {
+								child._startTime -= child.delay();
+							}
+						}
+						curTime += stagger;
+					}
+					return this._uncache(true);
+				} else if (typeof(value) === "string") {
+					return this.addLabel(value, position);
+				} else if (typeof(value) === "function") {
+					value = TweenLite.delayedCall(0, value);
+				} else {
+					throw("Cannot add " + value + " into the timeline; it is not a tween, timeline, function, or string.");
+				}
+			}
+
+			SimpleTimeline.prototype.add.call(this, value, position);
+
+			if (value._time) { //in case, for example, the _startTime is moved on a tween that has already rendered. Imagine it's at its end state, then the startTime is moved WAY later (after the end of this timeline), it should render at its beginning.
+				value.render((this.rawTime() - value._startTime) * value._timeScale, false, false);
+			}
+
+			//if the timeline has already ended but the inserted tween/timeline extends the duration, we should enable this timeline again so that it renders properly. We should also align the playhead with the parent timeline's when appropriate.
+			if (this._gc || this._time === this._duration) if (!this._paused) if (this._duration < this.duration()) {
+				//in case any of the ancestors had completed but should now be enabled...
+				tl = this;
+				beforeRawTime = (tl.rawTime() > value._startTime); //if the tween is placed on the timeline so that it starts BEFORE the current rawTime, we should align the playhead (move the timeline). This is because sometimes users will create a timeline, let it finish, and much later append a tween and expect it to run instead of jumping to its end state. While technically one could argue that it should jump to its end state, that's not what users intuitively expect.
+				while (tl._timeline) {
+					if (beforeRawTime && tl._timeline.smoothChildTiming) {
+						tl.totalTime(tl._totalTime, true); //moves the timeline (shifts its startTime) if necessary, and also enables it.
+					} else if (tl._gc) {
+						tl._enabled(true, false);
+					}
+					tl = tl._timeline;
+				}
+			}
+
+			return this;
+		};
+
+		p.remove = function(value) {
+			if (value instanceof Animation) {
+				this._remove(value, false);
+				var tl = value._timeline = value.vars.useFrames ? Animation._rootFramesTimeline : Animation._rootTimeline; //now that it's removed, default it to the root timeline so that if it gets played again, it doesn't jump back into this timeline.
+				value._startTime = (value._paused ? value._pauseTime : tl._time) - ((!value._reversed ? value._totalTime : value.totalDuration() - value._totalTime) / value._timeScale); //ensure that if it gets played again, the timing is correct.
+				return this;
+			} else if (value instanceof Array || (value && value.push && _isArray(value))) {
+				var i = value.length;
+				while (--i > -1) {
+					this.remove(value[i]);
+				}
+				return this;
+			} else if (typeof(value) === "string") {
+				return this.removeLabel(value);
+			}
+			return this.kill(null, value);
+		};
+
+		p._remove = function(tween, skipDisable) {
+			SimpleTimeline.prototype._remove.call(this, tween, skipDisable);
+			var last = this._last;
+			if (!last) {
+				this._time = this._totalTime = this._duration = this._totalDuration = 0;
+			} else if (this._time > this.duration()) {
+				this._time = this._duration;
+				this._totalTime = this._totalDuration;
+			}
+			return this;
+		};
+
+		p.append = function(value, offsetOrLabel) {
+			return this.add(value, this._parseTimeOrLabel(null, offsetOrLabel, true, value));
+		};
+
+		p.insert = p.insertMultiple = function(value, position, align, stagger) {
+			return this.add(value, position || 0, align, stagger);
+		};
+
+		p.appendMultiple = function(tweens, offsetOrLabel, align, stagger) {
+			return this.add(tweens, this._parseTimeOrLabel(null, offsetOrLabel, true, tweens), align, stagger);
+		};
+
+		p.addLabel = function(label, position) {
+			this._labels[label] = this._parseTimeOrLabel(position);
+			return this;
+		};
+
+		p.addPause = function(position, callback, params, scope) {
+			var t = TweenLite.delayedCall(0, _pauseCallback, params, scope || this);
+			t.vars.onComplete = t.vars.onReverseComplete = callback;
+			t.data = "isPause";
+			this._hasPause = true;
+			return this.add(t, position);
+		};
+
+		p.removeLabel = function(label) {
+			delete this._labels[label];
+			return this;
+		};
+
+		p.getLabelTime = function(label) {
+			return (this._labels[label] != null) ? this._labels[label] : -1;
+		};
+
+		p._parseTimeOrLabel = function(timeOrLabel, offsetOrLabel, appendIfAbsent, ignore) {
+			var clippedDuration, i;
+			//if we're about to add a tween/timeline (or an array of them) that's already a child of this timeline, we should remove it first so that it doesn't contaminate the duration().
+			if (ignore instanceof Animation && ignore.timeline === this) {
+				this.remove(ignore);
+			} else if (ignore && ((ignore instanceof Array) || (ignore.push && _isArray(ignore)))) {
+				i = ignore.length;
+				while (--i > -1) {
+					if (ignore[i] instanceof Animation && ignore[i].timeline === this) {
+						this.remove(ignore[i]);
+					}
+				}
+			}
+			clippedDuration = (typeof(timeOrLabel) === "number" && !offsetOrLabel) ? 0 : (this.duration() > 99999999999) ? this.recent().endTime(false) : this._duration; //in case there's a child that infinitely repeats, users almost never intend for the insertion point of a new child to be based on a SUPER long value like that so we clip it and assume the most recently-added child's endTime should be used instead.
+			if (typeof(offsetOrLabel) === "string") {
+				return this._parseTimeOrLabel(offsetOrLabel, (appendIfAbsent && typeof(timeOrLabel) === "number" && this._labels[offsetOrLabel] == null) ? timeOrLabel - clippedDuration : 0, appendIfAbsent);
+			}
+			offsetOrLabel = offsetOrLabel || 0;
+			if (typeof(timeOrLabel) === "string" && (isNaN(timeOrLabel) || this._labels[timeOrLabel] != null)) { //if the string is a number like "1", check to see if there's a label with that name, otherwise interpret it as a number (absolute value).
+				i = timeOrLabel.indexOf("=");
+				if (i === -1) {
+					if (this._labels[timeOrLabel] == null) {
+						return appendIfAbsent ? (this._labels[timeOrLabel] = clippedDuration + offsetOrLabel) : offsetOrLabel;
+					}
+					return this._labels[timeOrLabel] + offsetOrLabel;
+				}
+				offsetOrLabel = parseInt(timeOrLabel.charAt(i-1) + "1", 10) * Number(timeOrLabel.substr(i+1));
+				timeOrLabel = (i > 1) ? this._parseTimeOrLabel(timeOrLabel.substr(0, i-1), 0, appendIfAbsent) : clippedDuration;
+			} else if (timeOrLabel == null) {
+				timeOrLabel = clippedDuration;
+			}
+			return Number(timeOrLabel) + offsetOrLabel;
+		};
+
+		p.seek = function(position, suppressEvents) {
+			return this.totalTime((typeof(position) === "number") ? position : this._parseTimeOrLabel(position), (suppressEvents !== false));
+		};
+
+		p.stop = function() {
+			return this.paused(true);
+		};
+
+		p.gotoAndPlay = function(position, suppressEvents) {
+			return this.play(position, suppressEvents);
+		};
+
+		p.gotoAndStop = function(position, suppressEvents) {
+			return this.pause(position, suppressEvents);
+		};
+
+		p.render = function(time, suppressEvents, force) {
+			if (this._gc) {
+				this._enabled(true, false);
+			}
+			var totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(),
+				prevTime = this._time,
+				prevStart = this._startTime,
+				prevTimeScale = this._timeScale,
+				prevPaused = this._paused,
+				tween, isComplete, next, callback, internalForce, pauseTween, curTime;
+			if (time >= totalDur - 0.0000001 && time >= 0) { //to work around occasional floating point math artifacts.
+				this._totalTime = this._time = totalDur;
+				if (!this._reversed) if (!this._hasPausedChild()) {
+					isComplete = true;
+					callback = "onComplete";
+					internalForce = !!this._timeline.autoRemoveChildren; //otherwise, if the animation is unpaused/activated after it's already finished, it doesn't get removed from the parent timeline.
+					if (this._duration === 0) if ((time <= 0 && time >= -0.0000001) || this._rawPrevTime < 0 || this._rawPrevTime === _tinyNum) if (this._rawPrevTime !== time && this._first) {
+						internalForce = true;
+						if (this._rawPrevTime > _tinyNum) {
+							callback = "onReverseComplete";
+						}
+					}
+				}
+				this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
+				time = totalDur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7.
+
+			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
+				this._totalTime = this._time = 0;
+				if (prevTime !== 0 || (this._duration === 0 && this._rawPrevTime !== _tinyNum && (this._rawPrevTime > 0 || (time < 0 && this._rawPrevTime >= 0)))) {
+					callback = "onReverseComplete";
+					isComplete = this._reversed;
+				}
+				if (time < 0) {
+					this._active = false;
+					if (this._timeline.autoRemoveChildren && this._reversed) { //ensures proper GC if a timeline is resumed after it's finished reversing.
+						internalForce = isComplete = true;
+						callback = "onReverseComplete";
+					} else if (this._rawPrevTime >= 0 && this._first) { //when going back beyond the start, force a render so that zero-duration tweens that sit at the very beginning render their start values properly. Otherwise, if the parent timeline's playhead lands exactly at this timeline's startTime, and then moves backwards, the zero-duration tweens at the beginning would still be at their end state.
+						internalForce = true;
+					}
+					this._rawPrevTime = time;
+				} else {
+					this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
+					if (time === 0 && isComplete) { //if there's a zero-duration tween at the very beginning of a timeline and the playhead lands EXACTLY at time 0, that tween will correctly render its end values, but we need to keep the timeline alive for one more render so that the beginning values render properly as the parent's playhead keeps moving beyond the begining. Imagine obj.x starts at 0 and then we do tl.set(obj, {x:100}).to(obj, 1, {x:200}) and then later we tl.reverse()...the goal is to have obj.x revert to 0. If the playhead happens to land on exactly 0, without this chunk of code, it'd complete the timeline and remove it from the rendering queue (not good).
+						tween = this._first;
+						while (tween && tween._startTime === 0) {
+							if (!tween._duration) {
+								isComplete = false;
+							}
+							tween = tween._next;
+						}
+					}
+					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
+					if (!this._initted) {
+						internalForce = true;
+					}
+				}
+
+			} else {
+
+				if (this._hasPause && !this._forcingPlayhead && !suppressEvents) {
+					if (time >= prevTime) {
+						tween = this._first;
+						while (tween && tween._startTime <= time && !pauseTween) {
+							if (!tween._duration) if (tween.data === "isPause" && !tween.ratio && !(tween._startTime === 0 && this._rawPrevTime === 0)) {
+								pauseTween = tween;
+							}
+							tween = tween._next;
+						}
+					} else {
+						tween = this._last;
+						while (tween && tween._startTime >= time && !pauseTween) {
+							if (!tween._duration) if (tween.data === "isPause" && tween._rawPrevTime > 0) {
+								pauseTween = tween;
+							}
+							tween = tween._prev;
+						}
+					}
+					if (pauseTween) {
+						this._time = time = pauseTween._startTime;
+						this._totalTime = time + (this._cycle * (this._totalDuration + this._repeatDelay));
+					}
+				}
+
+				this._totalTime = this._time = this._rawPrevTime = time;
+			}
+			if ((this._time === prevTime || !this._first) && !force && !internalForce && !pauseTween) {
+				return;
+			} else if (!this._initted) {
+				this._initted = true;
+			}
+
+			if (!this._active) if (!this._paused && this._time !== prevTime && time > 0) {
+				this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
+			}
+
+			if (prevTime === 0) if (this.vars.onStart) if (this._time !== 0 || !this._duration) if (!suppressEvents) {
+				this._callback("onStart");
+			}
+
+			curTime = this._time;
+			if (curTime >= prevTime) {
+				tween = this._first;
+				while (tween) {
+					next = tween._next; //record it here because the value could change after rendering...
+					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
+						break;
+					} else if (tween._active || (tween._startTime <= curTime && !tween._paused && !tween._gc)) {
+						if (pauseTween === tween) {
+							this.pause();
+						}
+						if (!tween._reversed) {
+							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
+						} else {
+							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
+						}
+					}
+					tween = next;
+				}
+			} else {
+				tween = this._last;
+				while (tween) {
+					next = tween._prev; //record it here because the value could change after rendering...
+					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
+						break;
+					} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
+						if (pauseTween === tween) {
+							pauseTween = tween._prev; //the linked list is organized by _startTime, thus it's possible that a tween could start BEFORE the pause and end after it, in which case it would be positioned before the pause tween in the linked list, but we should render it before we pause() the timeline and cease rendering. This is only a concern when going in reverse.
+							while (pauseTween && pauseTween.endTime() > this._time) {
+								pauseTween.render( (pauseTween._reversed ? pauseTween.totalDuration() - ((time - pauseTween._startTime) * pauseTween._timeScale) : (time - pauseTween._startTime) * pauseTween._timeScale), suppressEvents, force);
+								pauseTween = pauseTween._prev;
+							}
+							pauseTween = null;
+							this.pause();
+						}
+						if (!tween._reversed) {
+							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
+						} else {
+							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
+						}
+					}
+					tween = next;
+				}
+			}
+
+			if (this._onUpdate) if (!suppressEvents) {
+				if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
+					_lazyRender();
+				}
+				this._callback("onUpdate");
+			}
+
+			if (callback) if (!this._gc) if (prevStart === this._startTime || prevTimeScale !== this._timeScale) if (this._time === 0 || totalDur >= this.totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
+				if (isComplete) {
+					if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onComplete on a timeline that reports/checks tweened values.
+						_lazyRender();
+					}
+					if (this._timeline.autoRemoveChildren) {
+						this._enabled(false, false);
+					}
+					this._active = false;
+				}
+				if (!suppressEvents && this.vars[callback]) {
+					this._callback(callback);
+				}
+			}
+		};
+
+		p._hasPausedChild = function() {
+			var tween = this._first;
+			while (tween) {
+				if (tween._paused || ((tween instanceof TimelineLite) && tween._hasPausedChild())) {
+					return true;
+				}
+				tween = tween._next;
+			}
+			return false;
+		};
+
+		p.getChildren = function(nested, tweens, timelines, ignoreBeforeTime) {
+			ignoreBeforeTime = ignoreBeforeTime || -9999999999;
+			var a = [],
+				tween = this._first,
+				cnt = 0;
+			while (tween) {
+				if (tween._startTime < ignoreBeforeTime) {
+					//do nothing
+				} else if (tween instanceof TweenLite) {
+					if (tweens !== false) {
+						a[cnt++] = tween;
+					}
+				} else {
+					if (timelines !== false) {
+						a[cnt++] = tween;
+					}
+					if (nested !== false) {
+						a = a.concat(tween.getChildren(true, tweens, timelines));
+						cnt = a.length;
+					}
+				}
+				tween = tween._next;
+			}
+			return a;
+		};
+
+		p.getTweensOf = function(target, nested) {
+			var disabled = this._gc,
+				a = [],
+				cnt = 0,
+				tweens, i;
+			if (disabled) {
+				this._enabled(true, true); //getTweensOf() filters out disabled tweens, and we have to mark them as _gc = true when the timeline completes in order to allow clean garbage collection, so temporarily re-enable the timeline here.
+			}
+			tweens = TweenLite.getTweensOf(target);
+			i = tweens.length;
+			while (--i > -1) {
+				if (tweens[i].timeline === this || (nested && this._contains(tweens[i]))) {
+					a[cnt++] = tweens[i];
+				}
+			}
+			if (disabled) {
+				this._enabled(false, true);
+			}
+			return a;
+		};
+
+		p.recent = function() {
+			return this._recent;
+		};
+
+		p._contains = function(tween) {
+			var tl = tween.timeline;
+			while (tl) {
+				if (tl === this) {
+					return true;
+				}
+				tl = tl.timeline;
+			}
+			return false;
+		};
+
+		p.shiftChildren = function(amount, adjustLabels, ignoreBeforeTime) {
+			ignoreBeforeTime = ignoreBeforeTime || 0;
+			var tween = this._first,
+				labels = this._labels,
+				p;
+			while (tween) {
+				if (tween._startTime >= ignoreBeforeTime) {
+					tween._startTime += amount;
+				}
+				tween = tween._next;
+			}
+			if (adjustLabels) {
+				for (p in labels) {
+					if (labels[p] >= ignoreBeforeTime) {
+						labels[p] += amount;
+					}
+				}
+			}
+			return this._uncache(true);
+		};
+
+		p._kill = function(vars, target) {
+			if (!vars && !target) {
+				return this._enabled(false, false);
+			}
+			var tweens = (!target) ? this.getChildren(true, true, false) : this.getTweensOf(target),
+				i = tweens.length,
+				changed = false;
+			while (--i > -1) {
+				if (tweens[i]._kill(vars, target)) {
+					changed = true;
+				}
+			}
+			return changed;
+		};
+
+		p.clear = function(labels) {
+			var tweens = this.getChildren(false, true, true),
+				i = tweens.length;
+			this._time = this._totalTime = 0;
+			while (--i > -1) {
+				tweens[i]._enabled(false, false);
+			}
+			if (labels !== false) {
+				this._labels = {};
+			}
+			return this._uncache(true);
+		};
+
+		p.invalidate = function() {
+			var tween = this._first;
+			while (tween) {
+				tween.invalidate();
+				tween = tween._next;
+			}
+			return Animation.prototype.invalidate.call(this);;
+		};
+
+		p._enabled = function(enabled, ignoreTimeline) {
+			if (enabled === this._gc) {
+				var tween = this._first;
+				while (tween) {
+					tween._enabled(enabled, true);
+					tween = tween._next;
+				}
+			}
+			return SimpleTimeline.prototype._enabled.call(this, enabled, ignoreTimeline);
+		};
+
+		p.totalTime = function(time, suppressEvents, uncapped) {
+			this._forcingPlayhead = true;
+			var val = Animation.prototype.totalTime.apply(this, arguments);
+			this._forcingPlayhead = false;
+			return val;
+		};
+
+		p.duration = function(value) {
+			if (!arguments.length) {
+				if (this._dirty) {
+					this.totalDuration(); //just triggers recalculation
+				}
+				return this._duration;
+			}
+			if (this.duration() !== 0 && value !== 0) {
+				this.timeScale(this._duration / value);
+			}
+			return this;
+		};
+
+		p.totalDuration = function(value) {
+			if (!arguments.length) {
+				if (this._dirty) {
+					var max = 0,
+						tween = this._last,
+						prevStart = 999999999999,
+						prev, end;
+					while (tween) {
+						prev = tween._prev; //record it here in case the tween changes position in the sequence...
+						if (tween._dirty) {
+							tween.totalDuration(); //could change the tween._startTime, so make sure the tween's cache is clean before analyzing it.
+						}
+						if (tween._startTime > prevStart && this._sortChildren && !tween._paused && !this._calculatingDuration) { //in case one of the tweens shifted out of order, it needs to be re-inserted into the correct position in the sequence
+							this._calculatingDuration = 1; //prevent endless recursive calls - there are methods that get triggered that check duration/totalDuration when we add(), like _parseTimeOrLabel().
+							this.add(tween, tween._startTime - tween._delay);
+							this._calculatingDuration = 0;
+						} else {
+							prevStart = tween._startTime;
+						}
+						if (tween._startTime < 0 && !tween._paused) { //children aren't allowed to have negative startTimes unless smoothChildTiming is true, so adjust here if one is found.
+							max -= tween._startTime;
+							if (this._timeline.smoothChildTiming) {
+								this._startTime += tween._startTime / this._timeScale;
+								this._time -= tween._startTime;
+								this._totalTime -= tween._startTime;
+								this._rawPrevTime -= tween._startTime;
+							}
+							this.shiftChildren(-tween._startTime, false, -9999999999);
+							prevStart = 0;
+						}
+						end = tween._startTime + (tween._totalDuration / tween._timeScale);
+						if (end > max) {
+							max = end;
+						}
+						tween = prev;
+					}
+					this._duration = this._totalDuration = max;
+					this._dirty = false;
+				}
+				return this._totalDuration;
+			}
+			return (value && this.totalDuration()) ? this.timeScale(this._totalDuration / value) : this;
+		};
+
+		p.paused = function(value) {
+			if (!value) { //if there's a pause directly at the spot from where we're unpausing, skip it.
+				var tween = this._first,
+					time = this._time;
+				while (tween) {
+					if (tween._startTime === time && tween.data === "isPause") {
+						tween._rawPrevTime = 0; //remember, _rawPrevTime is how zero-duration tweens/callbacks sense directionality and determine whether or not to fire. If _rawPrevTime is the same as _startTime on the next render, it won't fire.
+					}
+					tween = tween._next;
+				}
+			}
+			return Animation.prototype.paused.apply(this, arguments);
+		};
+
+		p.usesFrames = function() {
+			var tl = this._timeline;
+			while (tl._timeline) {
+				tl = tl._timeline;
+			}
+			return (tl === Animation._rootFramesTimeline);
+		};
+
+		p.rawTime = function(wrapRepeats) {
+			return (wrapRepeats && (this._paused || (this._repeat && this.time() > 0 && this.totalProgress() < 1))) ? this._totalTime % (this._duration + this._repeatDelay) : this._paused ? this._totalTime : (this._timeline.rawTime(wrapRepeats) - this._startTime) * this._timeScale;
+		};
+
+		return TimelineLite;
+
+	}, true);
+
+}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
+
+//export to AMD/RequireJS and CommonJS/Node (precursor to full modular build system coming at a later date)
+(function(name) {
+	"use strict";
+	var getGlobal = function() {
+		return (_gsScope.GreenSockGlobals || _gsScope)[name];
+	};
+	if (typeof(module) !== "undefined" && module.exports) { //node
+		__webpack_require__(139); //dependency
+		module.exports = getGlobal();
+	} else if (true) { //AMD
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(139)], __WEBPACK_AMD_DEFINE_FACTORY__ = (getGlobal),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	}
+}("TimelineMax"));
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
+
+/***/ }),
+/* 175 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
+ * ScrollMagic v2.0.5 (2015-04-29)
+ * The javascript library for magical scroll interactions.
+ * (c) 2015 Jan Paepke (@janpaepke)
+ * Project Website: http://scrollmagic.io
+ * 
+ * @version 2.0.5
+ * @license Dual licensed under MIT license and GPL.
+ * @author Jan Paepke - e-mail@janpaepke.de
+ *
+ * @file Debug Extension for ScrollMagic.
+ */
+/**
+ * This plugin was formerly known as the ScrollMagic debug extension.
+ *
+ * It enables you to add visual indicators to your page, to be able to see exactly when a scene is triggered.
+ *
+ * To have access to this extension, please include `plugins/debug.addIndicators.js`.
+ * @mixin debug.addIndicators
+ */
+(function (root, factory) {
+	if (true) {
+		// AMD. Register as an anonymous module.
+		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(7)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
+				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
+				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
+	} else if (typeof exports === 'object') {
+		// CommonJS
+		factory(require('scrollmagic'));
+	} else {
+		// no browser global export needed, just execute
+		factory(root.ScrollMagic || (root.jQuery && root.jQuery.ScrollMagic));
+	}
+}(this, function (ScrollMagic) {
+	"use strict";
+	var NAMESPACE = "debug.addIndicators";
+
+	var
+	console = window.console || {},
+		err = Function.prototype.bind.call(console.error || console.log ||
+		function () {}, console);
+	if (!ScrollMagic) {
+		err("(" + NAMESPACE + ") -> ERROR: The ScrollMagic main module could not be found. Please make sure it's loaded before this plugin or use an asynchronous loader like requirejs.");
+	}
+
+	// plugin settings
+	var
+	FONT_SIZE = "0.85em",
+		ZINDEX = "9999",
+		EDGE_OFFSET = 15; // minimum edge distance, added to indentation
+
+	// overall vars
+	var
+	_util = ScrollMagic._util,
+		_autoindex = 0;
+
+
+
+	ScrollMagic.Scene.extend(function () {
+		var
+		Scene = this,
+			_indicator;
+
+		var log = function () {
+			if (Scene._log) { // not available, when main source minified
+				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
+				Scene._log.apply(this, arguments);
+			}
+		};
+
+		/**
+		 * Add visual indicators for a ScrollMagic.Scene.  
+		 * @memberof! debug.addIndicators#
+		 *
+		 * @example
+		 * // add basic indicators
+		 * scene.addIndicators()
+		 *
+		 * // passing options
+		 * scene.addIndicators({name: "pin scene", colorEnd: "#FFFFFF"});
+		 *
+		 * @param {object} [options] - An object containing one or more options for the indicators.
+		 * @param {(string|object)} [options.parent=undefined] - A selector, DOM Object or a jQuery object that the indicators should be added to.  
+		 If undefined, the controller's container will be used.
+		 * @param {number} [options.name=""] - This string will be displayed at the start and end indicators of the scene for identification purposes. If no name is supplied an automatic index will be used.
+		 * @param {number} [options.indent=0] - Additional position offset for the indicators (useful, when having multiple scenes starting at the same position).
+		 * @param {string} [options.colorStart=green] - CSS color definition for the start indicator.
+		 * @param {string} [options.colorEnd=red] - CSS color definition for the end indicator.
+		 * @param {string} [options.colorTrigger=blue] - CSS color definition for the trigger indicator.
+		 */
+		Scene.addIndicators = function (options) {
+			if (!_indicator) {
+				var
+				DEFAULT_OPTIONS = {
+					name: "",
+					indent: 0,
+					parent: undefined,
+					colorStart: "green",
+					colorEnd: "red",
+					colorTrigger: "blue",
+				};
+
+				options = _util.extend({}, DEFAULT_OPTIONS, options);
+
+				_autoindex++;
+				_indicator = new Indicator(Scene, options);
+
+				Scene.on("add.plugin_addIndicators", _indicator.add);
+				Scene.on("remove.plugin_addIndicators", _indicator.remove);
+				Scene.on("destroy.plugin_addIndicators", Scene.removeIndicators);
+
+				// it the scene already has a controller we can start right away.
+				if (Scene.controller()) {
+					_indicator.add();
+				}
+			}
+			return Scene;
+		};
+
+		/**
+		 * Removes visual indicators from a ScrollMagic.Scene.
+		 * @memberof! debug.addIndicators#
+		 *
+		 * @example
+		 * // remove previously added indicators
+		 * scene.removeIndicators()
+		 *
+		 */
+		Scene.removeIndicators = function () {
+			if (_indicator) {
+				_indicator.remove();
+				this.off("*.plugin_addIndicators");
+				_indicator = undefined;
+			}
+			return Scene;
+		};
+
+	});
+
+
+/*
+	 * ----------------------------------------------------------------
+	 * Extension for controller to store and update related indicators
+	 * ----------------------------------------------------------------
+	 */
+	// add option to globally auto-add indicators to scenes
+	/**
+	 * Every ScrollMagic.Controller instance now accepts an additional option.  
+	 * See {@link ScrollMagic.Controller} for a complete list of the standard options.
+	 * @memberof! debug.addIndicators#
+	 * @method new ScrollMagic.Controller(options)
+	 * @example
+	 * // make a controller and add indicators to all scenes attached
+	 * var controller = new ScrollMagic.Controller({addIndicators: true});
+	 * // this scene will automatically have indicators added to it
+	 * new ScrollMagic.Scene()
+	 *                .addTo(controller);
+	 *
+	 * @param {object} [options] - Options for the Controller.
+	 * @param {boolean} [options.addIndicators=false] - If set to `true` every scene that is added to the controller will automatically get indicators added to it.
+	 */
+	ScrollMagic.Controller.addOption("addIndicators", false);
+	// extend Controller
+	ScrollMagic.Controller.extend(function () {
+		var
+		Controller = this,
+			_info = Controller.info(),
+			_container = _info.container,
+			_isDocument = _info.isDocument,
+			_vertical = _info.vertical,
+			_indicators = { // container for all indicators and methods
+				groups: []
+			};
+
+		var log = function () {
+			if (Controller._log) { // not available, when main source minified
+				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
+				Controller._log.apply(this, arguments);
+			}
+		};
+		if (Controller._indicators) {
+			log(2, "WARNING: Scene already has a property '_indicators', which will be overwritten by plugin.");
+		}
+
+		// add indicators container
+		this._indicators = _indicators;
+/*
+			needed updates:
+			+++++++++++++++
+			start/end position on scene shift (handled in Indicator class)
+			trigger parameters on triggerHook value change (handled in Indicator class)
+			bounds position on container scroll or resize (to keep alignment to bottom/right)
+			trigger position on container resize, window resize (if container isn't document) and window scroll (if container isn't document)
+		*/
+
+		// event handler for when associated bounds markers need to be repositioned
+		var handleBoundsPositionChange = function () {
+			_indicators.updateBoundsPositions();
+		};
+
+		// event handler for when associated trigger groups need to be repositioned
+		var handleTriggerPositionChange = function () {
+			_indicators.updateTriggerGroupPositions();
+		};
+
+		_container.addEventListener("resize", handleTriggerPositionChange);
+		if (!_isDocument) {
+			window.addEventListener("resize", handleTriggerPositionChange);
+			window.addEventListener("scroll", handleTriggerPositionChange);
+		}
+		// update all related bounds containers
+		_container.addEventListener("resize", handleBoundsPositionChange);
+		_container.addEventListener("scroll", handleBoundsPositionChange);
+
+
+		// updates the position of the bounds container to aligned to the right for vertical containers and to the bottom for horizontal
+		this._indicators.updateBoundsPositions = function (specificIndicator) {
+			var // constant for all bounds
+			groups = specificIndicator ? [_util.extend({}, specificIndicator.triggerGroup, {
+				members: [specificIndicator]
+			})] : // create a group with only one element
+			_indicators.groups,
+				// use all
+				g = groups.length,
+				css = {},
+				paramPos = _vertical ? "left" : "top",
+				paramDimension = _vertical ? "width" : "height",
+				edge = _vertical ? _util.get.scrollLeft(_container) + _util.get.width(_container) - EDGE_OFFSET : _util.get.scrollTop(_container) + _util.get.height(_container) - EDGE_OFFSET,
+				b, triggerSize, group;
+			while (g--) { // group loop
+				group = groups[g];
+				b = group.members.length;
+				triggerSize = _util.get[paramDimension](group.element.firstChild);
+				while (b--) { // indicators loop
+					css[paramPos] = edge - triggerSize;
+					_util.css(group.members[b].bounds, css);
+				}
+			}
+		};
+
+		// updates the positions of all trigger groups attached to a controller or a specific one, if provided
+		this._indicators.updateTriggerGroupPositions = function (specificGroup) {
+			var // constant vars
+			groups = specificGroup ? [specificGroup] : _indicators.groups,
+				i = groups.length,
+				container = _isDocument ? document.body : _container,
+				containerOffset = _isDocument ? {
+					top: 0,
+					left: 0
+				} : _util.get.offset(container, true),
+				edge = _vertical ? _util.get.width(_container) - EDGE_OFFSET : _util.get.height(_container) - EDGE_OFFSET,
+				paramDimension = _vertical ? "width" : "height",
+				paramTransform = _vertical ? "Y" : "X";
+			var // changing vars
+			group, elem, pos, elemSize, transform;
+			while (i--) {
+				group = groups[i];
+				elem = group.element;
+				pos = group.triggerHook * Controller.info("size");
+				elemSize = _util.get[paramDimension](elem.firstChild.firstChild);
+				transform = pos > elemSize ? "translate" + paramTransform + "(-100%)" : "";
+
+				_util.css(elem, {
+					top: containerOffset.top + (_vertical ? pos : edge - group.members[0].options.indent),
+					left: containerOffset.left + (_vertical ? edge - group.members[0].options.indent : pos)
+				});
+				_util.css(elem.firstChild.firstChild, {
+					"-ms-transform": transform,
+					"-webkit-transform": transform,
+					"transform": transform
+				});
+			}
+		};
+
+		// updates the label for the group to contain the name, if it only has one member
+		this._indicators.updateTriggerGroupLabel = function (group) {
+			var
+			text = "trigger" + (group.members.length > 1 ? "" : " " + group.members[0].options.name),
+				elem = group.element.firstChild.firstChild,
+				doUpdate = elem.textContent !== text;
+			if (doUpdate) {
+				elem.textContent = text;
+				if (_vertical) { // bounds position is dependent on text length, so update
+					_indicators.updateBoundsPositions();
+				}
+			}
+		};
+
+		// add indicators if global option is set
+		this.addScene = function (newScene) {
+
+			if (this._options.addIndicators && newScene instanceof ScrollMagic.Scene && newScene.controller() === Controller) {
+				newScene.addIndicators();
+			}
+			// call original destroy method
+			this.$super.addScene.apply(this, arguments);
+		};
+
+		// remove all previously set listeners on destroy
+		this.destroy = function () {
+			_container.removeEventListener("resize", handleTriggerPositionChange);
+			if (!_isDocument) {
+				window.removeEventListener("resize", handleTriggerPositionChange);
+				window.removeEventListener("scroll", handleTriggerPositionChange);
+			}
+			_container.removeEventListener("resize", handleBoundsPositionChange);
+			_container.removeEventListener("scroll", handleBoundsPositionChange);
+			// call original destroy method
+			this.$super.destroy.apply(this, arguments);
+		};
+		return Controller;
+
+	});
+
+/*
+	 * ----------------------------------------------------------------
+	 * Internal class for the construction of Indicators
+	 * ----------------------------------------------------------------
+	 */
+	var Indicator = function (Scene, options) {
+		var
+		Indicator = this,
+			_elemBounds = TPL.bounds(),
+			_elemStart = TPL.start(options.colorStart),
+			_elemEnd = TPL.end(options.colorEnd),
+			_boundsContainer = options.parent && _util.get.elements(options.parent)[0],
+			_vertical, _ctrl;
+
+		var log = function () {
+			if (Scene._log) { // not available, when main source minified
+				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
+				Scene._log.apply(this, arguments);
+			}
+		};
+
+		options.name = options.name || _autoindex;
+
+		// prepare bounds elements
+		_elemStart.firstChild.textContent += " " + options.name;
+		_elemEnd.textContent += " " + options.name;
+		_elemBounds.appendChild(_elemStart);
+		_elemBounds.appendChild(_elemEnd);
+
+		// set public variables
+		Indicator.options = options;
+		Indicator.bounds = _elemBounds;
+		// will be set later
+		Indicator.triggerGroup = undefined;
+
+		// add indicators to DOM
+		this.add = function () {
+			_ctrl = Scene.controller();
+			_vertical = _ctrl.info("vertical");
+
+			var isDocument = _ctrl.info("isDocument");
+
+			if (!_boundsContainer) {
+				// no parent supplied or doesnt exist
+				_boundsContainer = isDocument ? document.body : _ctrl.info("container"); // check if window/document (then use body)
+			}
+			if (!isDocument && _util.css(_boundsContainer, "position") === 'static') {
+				// position mode needed for correct positioning of indicators
+				_util.css(_boundsContainer, {
+					position: "relative"
+				});
+			}
+
+			// add listeners for updates
+			Scene.on("change.plugin_addIndicators", handleTriggerParamsChange);
+			Scene.on("shift.plugin_addIndicators", handleBoundsParamsChange);
+
+			// updates trigger & bounds (will add elements if needed)
+			updateTriggerGroup();
+			updateBounds();
+
+			setTimeout(function () { // do after all execution is finished otherwise sometimes size calculations are off
+				_ctrl._indicators.updateBoundsPositions(Indicator);
+			}, 0);
+
+			log(3, "added indicators");
+		};
+
+		// remove indicators from DOM
+		this.remove = function () {
+			if (Indicator.triggerGroup) { // if not set there's nothing to remove
+				Scene.off("change.plugin_addIndicators", handleTriggerParamsChange);
+				Scene.off("shift.plugin_addIndicators", handleBoundsParamsChange);
+
+				if (Indicator.triggerGroup.members.length > 1) {
+					// just remove from memberlist of old group
+					var group = Indicator.triggerGroup;
+					group.members.splice(group.members.indexOf(Indicator), 1);
+					_ctrl._indicators.updateTriggerGroupLabel(group);
+					_ctrl._indicators.updateTriggerGroupPositions(group);
+					Indicator.triggerGroup = undefined;
+				} else {
+					// remove complete group
+					removeTriggerGroup();
+				}
+				removeBounds();
+
+				log(3, "removed indicators");
+			}
+		};
+
+/*
+		 * ----------------------------------------------------------------
+		 * internal Event Handlers
+		 * ----------------------------------------------------------------
+		 */
+
+		// event handler for when bounds params change
+		var handleBoundsParamsChange = function () {
+			updateBounds();
+		};
+
+		// event handler for when trigger params change
+		var handleTriggerParamsChange = function (e) {
+			if (e.what === "triggerHook") {
+				updateTriggerGroup();
+			}
+		};
+
+/*
+		 * ----------------------------------------------------------------
+		 * Bounds (start / stop) management
+		 * ----------------------------------------------------------------
+		 */
+
+		// adds an new bounds elements to the array and to the DOM
+		var addBounds = function () {
+			var v = _ctrl.info("vertical");
+			// apply stuff we didn't know before...
+			_util.css(_elemStart.firstChild, {
+				"border-bottom-width": v ? 1 : 0,
+				"border-right-width": v ? 0 : 1,
+				"bottom": v ? -1 : options.indent,
+				"right": v ? options.indent : -1,
+				"padding": v ? "0 8px" : "2px 4px",
+			});
+			_util.css(_elemEnd, {
+				"border-top-width": v ? 1 : 0,
+				"border-left-width": v ? 0 : 1,
+				"top": v ? "100%" : "",
+				"right": v ? options.indent : "",
+				"bottom": v ? "" : options.indent,
+				"left": v ? "" : "100%",
+				"padding": v ? "0 8px" : "2px 4px"
+			});
+			// append
+			_boundsContainer.appendChild(_elemBounds);
+		};
+
+		// remove bounds from list and DOM
+		var removeBounds = function () {
+			_elemBounds.parentNode.removeChild(_elemBounds);
+		};
+
+		// update the start and end positions of the scene
+		var updateBounds = function () {
+			if (_elemBounds.parentNode !== _boundsContainer) {
+				addBounds(); // Add Bounds elements (start/end)
+			}
+			var css = {};
+			css[_vertical ? "top" : "left"] = Scene.triggerPosition();
+			css[_vertical ? "height" : "width"] = Scene.duration();
+			_util.css(_elemBounds, css);
+			_util.css(_elemEnd, {
+				display: Scene.duration() > 0 ? "" : "none"
+			});
+		};
+
+/*
+		 * ----------------------------------------------------------------
+		 * trigger and trigger group management
+		 * ----------------------------------------------------------------
+		 */
+
+		// adds an new trigger group to the array and to the DOM
+		var addTriggerGroup = function () {
+			var triggerElem = TPL.trigger(options.colorTrigger); // new trigger element
+			var css = {};
+			css[_vertical ? "right" : "bottom"] = 0;
+			css[_vertical ? "border-top-width" : "border-left-width"] = 1;
+			_util.css(triggerElem.firstChild, css);
+			_util.css(triggerElem.firstChild.firstChild, {
+				padding: _vertical ? "0 8px 3px 8px" : "3px 4px"
+			});
+			document.body.appendChild(triggerElem); // directly add to body
+			var newGroup = {
+				triggerHook: Scene.triggerHook(),
+				element: triggerElem,
+				members: [Indicator]
+			};
+			_ctrl._indicators.groups.push(newGroup);
+			Indicator.triggerGroup = newGroup;
+			// update right away
+			_ctrl._indicators.updateTriggerGroupLabel(newGroup);
+			_ctrl._indicators.updateTriggerGroupPositions(newGroup);
+		};
+
+		var removeTriggerGroup = function () {
+			_ctrl._indicators.groups.splice(_ctrl._indicators.groups.indexOf(Indicator.triggerGroup), 1);
+			Indicator.triggerGroup.element.parentNode.removeChild(Indicator.triggerGroup.element);
+			Indicator.triggerGroup = undefined;
+		};
+
+		// updates the trigger group -> either join existing or add new one
+/*	
+		 * Logic:
+		 * 1 if a trigger group exist, check if it's in sync with Scene settings – if so, nothing else needs to happen
+		 * 2 try to find an existing one that matches Scene parameters
+		 * 	 2.1 If a match is found check if already assigned to an existing group
+		 *			 If so:
+		 *       A: it was the last member of existing group -> kill whole group
+		 *       B: the existing group has other members -> just remove from member list
+		 *	 2.2 Assign to matching group
+		 * 3 if no new match could be found, check if assigned to existing group
+		 *   A: yes, and it's the only member -> just update parameters and positions and keep using this group
+		 *   B: yes but there are other members -> remove from member list and create a new one
+		 *   C: no, so create a new one
+		 */
+		var updateTriggerGroup = function () {
+			var
+			triggerHook = Scene.triggerHook(),
+				closeEnough = 0.0001;
+
+			// Have a group, check if it still matches
+			if (Indicator.triggerGroup) {
+				if (Math.abs(Indicator.triggerGroup.triggerHook - triggerHook) < closeEnough) {
+					// _util.log(0, "trigger", options.name, "->", "no need to change, still in sync");
+					return; // all good
+				}
+			}
+			// Don't have a group, check if a matching one exists
+			// _util.log(0, "trigger", options.name, "->", "out of sync!");
+			var
+			groups = _ctrl._indicators.groups,
+				group, i = groups.length;
+			while (i--) {
+				group = groups[i];
+				if (Math.abs(group.triggerHook - triggerHook) < closeEnough) {
+					// found a match!
+					// _util.log(0, "trigger", options.name, "->", "found match");
+					if (Indicator.triggerGroup) { // do I have an old group that is out of sync?
+						if (Indicator.triggerGroup.members.length === 1) { // is it the only remaining group?
+							// _util.log(0, "trigger", options.name, "->", "kill");
+							// was the last member, remove the whole group
+							removeTriggerGroup();
+						} else {
+							Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
+							_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
+							_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
+							// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
+						}
+					}
+					// join new group
+					group.members.push(Indicator);
+					Indicator.triggerGroup = group;
+					_ctrl._indicators.updateTriggerGroupLabel(group);
+					return;
+				}
+			}
+
+			// at this point I am obviously out of sync and don't match any other group
+			if (Indicator.triggerGroup) {
+				if (Indicator.triggerGroup.members.length === 1) {
+					// _util.log(0, "trigger", options.name, "->", "updating existing");
+					// out of sync but i'm the only member => just change and update
+					Indicator.triggerGroup.triggerHook = triggerHook;
+					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
+					return;
+				} else {
+					// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
+					Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
+					_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
+					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
+					Indicator.triggerGroup = undefined; // need a brand new group...
+				}
+			}
+			// _util.log(0, "trigger", options.name, "->", "add a new one");
+			// did not find any match, make new trigger group
+			addTriggerGroup();
+		};
+	};
+
+/*
+	 * ----------------------------------------------------------------
+	 * Templates for the indicators
+	 * ----------------------------------------------------------------
+	 */
+	var TPL = {
+		start: function (color) {
+			// inner element (for bottom offset -1, while keeping top position 0)
+			var inner = document.createElement("div");
+			inner.textContent = "start";
+			_util.css(inner, {
+				position: "absolute",
+				overflow: "visible",
+				"border-width": 0,
+				"border-style": "solid",
+				color: color,
+				"border-color": color
+			});
+			var e = document.createElement('div');
+			// wrapper
+			_util.css(e, {
+				position: "absolute",
+				overflow: "visible",
+				width: 0,
+				height: 0
+			});
+			e.appendChild(inner);
+			return e;
+		},
+		end: function (color) {
+			var e = document.createElement('div');
+			e.textContent = "end";
+			_util.css(e, {
+				position: "absolute",
+				overflow: "visible",
+				"border-width": 0,
+				"border-style": "solid",
+				color: color,
+				"border-color": color
+			});
+			return e;
+		},
+		bounds: function () {
+			var e = document.createElement('div');
+			_util.css(e, {
+				position: "absolute",
+				overflow: "visible",
+				"white-space": "nowrap",
+				"pointer-events": "none",
+				"font-size": FONT_SIZE
+			});
+			e.style.zIndex = ZINDEX;
+			return e;
+		},
+		trigger: function (color) {
+			// inner to be above or below line but keep position
+			var inner = document.createElement('div');
+			inner.textContent = "trigger";
+			_util.css(inner, {
+				position: "relative",
+			});
+			// inner wrapper for right: 0 and main element has no size
+			var w = document.createElement('div');
+			_util.css(w, {
+				position: "absolute",
+				overflow: "visible",
+				"border-width": 0,
+				"border-style": "solid",
+				color: color,
+				"border-color": color
+			});
+			w.appendChild(inner);
+			// wrapper
+			var e = document.createElement('div');
+			_util.css(e, {
+				position: "fixed",
+				overflow: "visible",
+				"white-space": "nowrap",
+				"pointer-events": "none",
+				"font-size": FONT_SIZE
+			});
+			e.style.zIndex = ZINDEX;
+			e.appendChild(w);
+			return e;
+		},
+	};
+
+}));
+
+/***/ }),
+/* 176 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -88075,8025 +92301,7 @@ if (inBrowser && window.Vue) {
 
 
 /***/ }),
-/* 172 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Index_vue__ = __webpack_require__(173);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Index_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_Index_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue__ = __webpack_require__(183);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue__ = __webpack_require__(140);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_E404_vue__ = __webpack_require__(192);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_E404_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__components_E404_vue__);
-
-
-
-
-
-var routes = [{ path: '/', component: __WEBPACK_IMPORTED_MODULE_0__components_Index_vue___default.a, name: 'Index' }, { path: '/login', component: __WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue___default.a, name: 'Login' }, { path: '/dashboard', component: __WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue___default.a, name: 'Dashboard' }, { path: '*', component: __WEBPACK_IMPORTED_MODULE_3__components_E404_vue___default.a }];
-
-/* harmony default export */ __webpack_exports__["a"] = (routes);
-
-/***/ }),
-/* 173 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(174)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(177)
-/* template */
-var __vue_template__ = __webpack_require__(182)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-384052eb"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\Index.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-384052eb", Component.options)
-  } else {
-    hotAPI.reload("data-v-384052eb", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 174 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(175);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("9e1cdd34", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-384052eb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Index.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-384052eb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Index.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 175 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n.box-register[data-v-384052eb] {\n  margin-bottom: 60px;\n  background: #343233;\n  position: relative;\n  border: 1.5px solid #222122;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\n.box-register header[data-v-384052eb] {\n    width: 100%;\n    left: 0;\n    position: relative;\n    height: 35px;\n    line-height: 35px;\n    top: 0;\n    font-weight: 300;\n    font-size: 1.5rem;\n    padding: 0 1em;\n    color: #fff;\n    background: #222122;\n    text-align: center;\n}\n.content-register[data-v-384052eb] {\n  padding: 0 1em;\n  text-align: center;\n}\n.button-register[data-v-384052eb] {\n  display: inline-block;\n  padding: .5em 1em;\n  line-height: inherit;\n  font-size: inherit;\n  font-weight: 600;\n  text-decoration: none;\n  border-radius: 5px;\n  color: #c5d6da;\n  background-color: #1b1b1b;\n  border: 0;\n  cursor: pointer;\n  width: 100%;\n  font-size: .9rem;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  text-transform: uppercase;\n}\n.button-register[data-v-384052eb]:active {\n    color: #343233;\n    background-color: #527881;\n    -webkit-transform: translateY(2px);\n            transform: translateY(2px);\n}\n.button-register[data-v-384052eb]:hover {\n    color: #343233;\n    background-color: #a6c0c6;\n}\n.button-register[data-v-384052eb]:focus {\n    background-color: #87aab2;\n}\n.icon-caracter[data-v-384052eb] {\n  margin: auto;\n  width: 40px;\n  height: 40px;\n  padding: 7px;\n  border: 1px solid;\n  border-radius: 50%;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n  background: #222122;\n}\n.description-text[data-v-384052eb] {\n  margin: 0 0 1em 0;\n  text-align: left;\n  font-size: 1.2rem;\n  color: #fff;\n}\n.fill-caracter-icon[data-v-384052eb] {\n  fill: #c5d6da;\n}\n.container-content-info[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: justify;\n  color: #fff;\n  border-radius: 0 0 5px 5px;\n}\n.container-content-info .content-info[data-v-384052eb] {\n    display: block;\n}\n.title-section[data-v-384052eb] {\n  font-size: 2rem;\n  color: #ffffff;\n  padding: 40px 0px 15px 0px;\n  border-radius: 5px 5px 0 0;\n  font-weight: bold;\n  text-transform: uppercase;\n  border-bottom: 5px solid;\n}\n.subtitle-section[data-v-384052eb] {\n  font-size: 1.2rem;\n  color: #ffffff;\n  border-radius: 5px;\n  font-weight: bold;\n  text-transform: uppercase;\n  margin: 30px 0 0px 0;\n}\n.animation-digital-transform[data-v-384052eb] {\n  margin: auto;\n}\n.st0[data-v-384052eb] {\n  fill: #38454F;\n}\n.st1[data-v-384052eb] {\n  fill: #E8EDEE;\n}\n.st2[data-v-384052eb] {\n  fill: #B0B6BB;\n}\n.st3[data-v-384052eb] {\n  fill: #a5c4a6;\n}\n.st4[data-v-384052eb] {\n  fill: #f8a72f;\n}\n.st5[data-v-384052eb] {\n  fill: #FFEB3B;\n}\n.st6[data-v-384052eb] {\n  fill: #EDEADA;\n}\n.st7[data-v-384052eb] {\n  fill: #F7E6A1;\n}\n.st8[data-v-384052eb] {\n  fill: none;\n  stroke: #424A60;\n  stroke-miterlimit: 10;\n}\n.st9[data-v-384052eb] {\n  fill: #424A60;\n}\n.st10[data-v-384052eb] {\n  fill: #EBBA16;\n}\n.st11[data-v-384052eb] {\n  fill: #ED7161;\n}\n.computer-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.5) translateX(589px) translateY(-22px);\n          transform: scale(0.5) translateX(589px) translateY(-22px);\n}\n.memo-dt[data-v-384052eb] {\n  -webkit-transform: scale(0.6) translateY(-28px) translateX(-75px);\n          transform: scale(0.6) translateY(-28px) translateX(-75px);\n  -webkit-animation: moveMemo 5s linear infinite;\n          animation: moveMemo 5s linear infinite;\n}\n.pencil-dt[data-v-384052eb] {\n  -webkit-animation: drawWithPencil 5s linear infinite;\n          animation: drawWithPencil 5s linear infinite;\n}\n.graphic-part[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 1s linear infinite;\n          animation: animBarsVertical 1s linear infinite;\n}\n.bars-vertical[data-v-384052eb] {\n  -webkit-animation: animBarsVertical 2s linear infinite;\n          animation: animBarsVertical 2s linear infinite;\n}\n.bars-horizontal[data-v-384052eb] {\n  -webkit-animation: animBarsHorizontal 1s linear infinite;\n          animation: animBarsHorizontal 1s linear infinite;\n}\n.title-time[data-v-384052eb] {\n  font-size: 1.3rem;\n  text-align: center;\n  margin: 0;\n  text-transform: uppercase;\n}\n.title-time .sub[data-v-384052eb] {\n    background: #FFEB3B;\n    color: #071a31;\n    padding: 0 8px;\n    font-weight: bold;\n}\n.transform-arrow[data-v-384052eb] {\n  -webkit-transform: translateX(105px) translateY(-65px) scale(3.5);\n          transform: translateX(105px) translateY(-65px) scale(3.5);\n}\n.transform-arrow .icon_arrow-line path[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line_a 1.5s ease-in 0.45s forwards infinite;\n}\n.transform-arrow .icon_arrow-line .arrow-line-b[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_b;\n          animation-name: draw_arrow_line_b;\n}\n.transform-arrow .icon_arrow-line .arrow-line-c[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_c;\n          animation-name: draw_arrow_line_c;\n}\n.transform-arrow .icon_arrow-line .arrow-line-d[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_d;\n          animation-name: draw_arrow_line_d;\n}\n.transform-arrow .icon_arrow-line .arrow-line-e[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_e;\n          animation-name: draw_arrow_line_e;\n}\n.transform-arrow .icon_arrow-line .arrow-line-f[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_f;\n          animation-name: draw_arrow_line_f;\n}\n.transform-arrow .icon_arrow-line .arrow-line-g[data-v-384052eb] {\n  -webkit-animation-name: draw_arrow_line_g;\n          animation-name: draw_arrow_line_g;\n}\n.transform-arrow .arrow-end[data-v-384052eb] {\n  -webkit-animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n          animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;\n}\n.content-solution-image[data-v-384052eb] {\n  width: 200px;\n  margin: auto;\n  margin-bottom: 20px;\n}\n.hand-puzzle[data-v-384052eb] {\n  -webkit-animation: moveHandle 5s ease infinite;\n          animation: moveHandle 5s ease infinite;\n}\n.puzzle-blue[data-v-384052eb] {\n  -webkit-transform: translateX(159px) translateY(-2px);\n          transform: translateX(159px) translateY(-2px);\n}\n.card-participate[data-v-384052eb] {\n  text-align: center;\n  margin: auto;\n  background: #ffffff;\n}\n.card-participate img[data-v-384052eb] {\n    display: block;\n    margin: auto;\n    width: 100px;\n    padding: 1em;\n    -webkit-box-sizing: content-box;\n            box-sizing: content-box;\n}\n.card-title-participate[data-v-384052eb] {\n  text-align: center;\n  height: 40px;\n  line-height: 40px;\n  background: #FFF59D;\n  color: #071a31;\n  padding: 0 5px;\n}\n.card-title-participate .title[data-v-384052eb] {\n    font-size: 1.3rem;\n    font-weight: bold;\n    text-transform: uppercase;\n}\n.card-info-participate[data-v-384052eb] {\n  padding: .5em;\n  color: #ffffff;\n  font-size: 1.2rem;\n}\n.container-participate[data-v-384052eb] {\n  position: relative;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 176 */
-/***/ (function(module, exports) {
-
-/**
- * Translates the list format produced by css-loader into something
- * easier to manipulate.
- */
-module.exports = function listToStyles (parentId, list) {
-  var styles = []
-  var newStyles = {}
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i]
-    var id = item[0]
-    var css = item[1]
-    var media = item[2]
-    var sourceMap = item[3]
-    var part = {
-      id: parentId + ':' + i,
-      css: css,
-      media: media,
-      sourceMap: sourceMap
-    }
-    if (!newStyles[id]) {
-      styles.push(newStyles[id] = { id: id, parts: [part] })
-    } else {
-      newStyles[id].parts.push(part)
-    }
-  }
-  return styles
-}
-
-
-/***/ }),
 /* 177 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {};
-  },
-
-  methods: {},
-  mounted: function mounted() {
-    __webpack_require__(181);
-  }
-});
-
-/***/ }),
-/* 178 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * ScrollMagic v2.0.5 (2015-04-29)
- * The javascript library for magical scroll interactions.
- * (c) 2015 Jan Paepke (@janpaepke)
- * Project Website: http://scrollmagic.io
- * 
- * @version 2.0.5
- * @license Dual licensed under MIT license and GPL.
- * @author Jan Paepke - e-mail@janpaepke.de
- *
- * @file ScrollMagic GSAP Animation Plugin.
- *
- * requires: GSAP ~1.14
- * Powered by the Greensock Animation Platform (GSAP): http://www.greensock.com/js
- * Greensock License info at http://www.greensock.com/licensing/
- */
-/**
- * This plugin is meant to be used in conjunction with the Greensock Animation Plattform.  
- * It offers an easy API to trigger Tweens or synchronize them to the scrollbar movement.
- *
- * Both the `lite` and the `max` versions of the GSAP library are supported.  
- * The most basic requirement is `TweenLite`.
- * 
- * To have access to this extension, please include `plugins/animation.gsap.js`.
- * @requires {@link http://greensock.com/gsap|GSAP ~1.14.x}
- * @mixin animation.GSAP
- */
-(function (root, factory) {
-	if (true) {
-		// AMD. Register as an anonymous module.
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(7), __webpack_require__(138), __webpack_require__(179)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	} else if (typeof exports === 'object') {
-		// CommonJS
-		// Loads whole gsap package onto global scope.
-		require('gsap');
-		factory(require('scrollmagic'), TweenMax, TimelineMax);
-	} else {
-		// Browser globals
-		factory(root.ScrollMagic || (root.jQuery && root.jQuery.ScrollMagic), root.TweenMax || root.TweenLite, root.TimelineMax || root.TimelineLite);
-	}
-}(this, function (ScrollMagic, Tween, Timeline) {
-	"use strict";
-	var NAMESPACE = "animation.gsap";
-
-	var
-	console = window.console || {},
-		err = Function.prototype.bind.call(console.error || console.log ||
-		function () {}, console);
-	if (!ScrollMagic) {
-		err("(" + NAMESPACE + ") -> ERROR: The ScrollMagic main module could not be found. Please make sure it's loaded before this plugin or use an asynchronous loader like requirejs.");
-	}
-	if (!Tween) {
-		err("(" + NAMESPACE + ") -> ERROR: TweenLite or TweenMax could not be found. Please make sure GSAP is loaded before ScrollMagic or use an asynchronous loader like requirejs.");
-	}
-
-/*
-	 * ----------------------------------------------------------------
-	 * Extensions for Scene
-	 * ----------------------------------------------------------------
-	 */
-	/**
-	 * Every instance of ScrollMagic.Scene now accepts an additional option.  
-	 * See {@link ScrollMagic.Scene} for a complete list of the standard options.
-	 * @memberof! animation.GSAP#
-	 * @method new ScrollMagic.Scene(options)
-	 * @example
-	 * var scene = new ScrollMagic.Scene({tweenChanges: true});
-	 *
-	 * @param {object} [options] - Options for the Scene. The options can be updated at any time.
-	 * @param {boolean} [options.tweenChanges=false] - Tweens Animation to the progress target instead of setting it.  
-	 Does not affect animations where duration is `0`.
-	 */
-	/**
-	 * **Get** or **Set** the tweenChanges option value.  
-	 * This only affects scenes with a duration. If `tweenChanges` is `true`, the progress update when scrolling will not be immediate, but instead the animation will smoothly animate to the target state.  
-	 * For a better understanding, try enabling and disabling this option in the [Scene Manipulation Example](../examples/basic/scene_manipulation.html).
-	 * @memberof! animation.GSAP#
-	 * @method Scene.tweenChanges
-	 * 
-	 * @example
-	 * // get the current tweenChanges option
-	 * var tweenChanges = scene.tweenChanges();
-	 *
-	 * // set new tweenChanges option
-	 * scene.tweenChanges(true);
-	 *
-	 * @fires {@link Scene.change}, when used as setter
-	 * @param {boolean} [newTweenChanges] - The new tweenChanges setting of the scene.
-	 * @returns {boolean} `get` -  Current tweenChanges option value.
-	 * @returns {Scene} `set` -  Parent object for chaining.
-	 */
-	// add option (TODO: DOC (private for dev))
-	ScrollMagic.Scene.addOption("tweenChanges", // name
-	false, // default
-
-
-	function (val) { // validation callback
-		return !!val;
-	});
-	// extend scene
-	ScrollMagic.Scene.extend(function () {
-		var Scene = this,
-			_tween;
-
-		var log = function () {
-			if (Scene._log) { // not available, when main source minified
-				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
-				Scene._log.apply(this, arguments);
-			}
-		};
-
-		// set listeners
-		Scene.on("progress.plugin_gsap", function () {
-			updateTweenProgress();
-		});
-		Scene.on("destroy.plugin_gsap", function (e) {
-			Scene.removeTween(e.reset);
-		});
-
-		/**
-		 * Update the tween progress to current position.
-		 * @private
-		 */
-		var updateTweenProgress = function () {
-			if (_tween) {
-				var
-				progress = Scene.progress(),
-					state = Scene.state();
-				if (_tween.repeat && _tween.repeat() === -1) {
-					// infinite loop, so not in relation to progress
-					if (state === 'DURING' && _tween.paused()) {
-						_tween.play();
-					} else if (state !== 'DURING' && !_tween.paused()) {
-						_tween.pause();
-					}
-				} else if (progress != _tween.progress()) { // do we even need to update the progress?
-					// no infinite loop - so should we just play or go to a specific point in time?
-					if (Scene.duration() === 0) {
-						// play the animation
-						if (progress > 0) { // play from 0 to 1
-							_tween.play();
-						} else { // play from 1 to 0
-							_tween.reverse();
-						}
-					} else {
-						// go to a specific point in time
-						if (Scene.tweenChanges() && _tween.tweenTo) {
-							// go smooth
-							_tween.tweenTo(progress * _tween.duration());
-						} else {
-							// just hard set it
-							_tween.progress(progress).pause();
-						}
-					}
-				}
-			}
-		};
-
-		/**
-		 * Add a tween to the scene.  
-		 * If you want to add multiple tweens, add them into a GSAP Timeline object and supply it instead (see example below).  
-		 * 
-		 * If the scene has a duration, the tween's duration will be projected to the scroll distance of the scene, meaning its progress will be synced to scrollbar movement.  
-		 * For a scene with a duration of `0`, the tween will be triggered when scrolling forward past the scene's trigger position and reversed, when scrolling back.  
-		 * To gain better understanding, check out the [Simple Tweening example](../examples/basic/simple_tweening.html).
-		 *
-		 * Instead of supplying a tween this method can also be used as a shorthand for `TweenMax.to()` (see example below).
-		 * @memberof! animation.GSAP#
-		 *
-		 * @example
-		 * // add a single tween directly
-		 * scene.setTween(TweenMax.to("obj"), 1, {x: 100});
-		 *
-		 * // add a single tween via variable
-		 * var tween = TweenMax.to("obj"), 1, {x: 100};
-		 * scene.setTween(tween);
-		 *
-		 * // add multiple tweens, wrapped in a timeline.
-		 * var timeline = new TimelineMax();
-		 * var tween1 = TweenMax.from("obj1", 1, {x: 100});
-		 * var tween2 = TweenMax.to("obj2", 1, {y: 100});
-		 * timeline
-		 *		.add(tween1)
-		 *		.add(tween2);
-		 * scene.addTween(timeline);
-		 *
-		 * // short hand to add a TweenMax.to() tween
-		 * scene.setTween("obj3", 0.5, {y: 100});
-		 *
-		 * // short hand to add a TweenMax.to() tween for 1 second
-		 * // this is useful, when the scene has a duration and the tween duration isn't important anyway
-		 * scene.setTween("obj3", {y: 100});
-		 *
-		 * @param {(object|string)} TweenObject - A TweenMax, TweenLite, TimelineMax or TimelineLite object that should be animated in the scene. Can also be a Dom Element or Selector, when using direct tween definition (see examples).
-		 * @param {(number|object)} duration - A duration for the tween, or tween parameters. If an object containing parameters are supplied, a default duration of 1 will be used.
-		 * @param {object} params - The parameters for the tween
-		 * @returns {Scene} Parent object for chaining.
-		 */
-		Scene.setTween = function (TweenObject, duration, params) {
-			var newTween;
-			if (arguments.length > 1) {
-				if (arguments.length < 3) {
-					params = duration;
-					duration = 1;
-				}
-				TweenObject = Tween.to(TweenObject, duration, params);
-			}
-			try {
-				// wrap Tween into a Timeline Object if available to include delay and repeats in the duration and standardize methods.
-				if (Timeline) {
-					newTween = new Timeline({
-						smoothChildTiming: true
-					}).add(TweenObject);
-				} else {
-					newTween = TweenObject;
-				}
-				newTween.pause();
-			} catch (e) {
-				log(1, "ERROR calling method 'setTween()': Supplied argument is not a valid TweenObject");
-				return Scene;
-			}
-			if (_tween) { // kill old tween?
-				Scene.removeTween();
-			}
-			_tween = newTween;
-
-			// some properties need to be transferred it to the wrapper, otherwise they would get lost.
-			if (TweenObject.repeat && TweenObject.repeat() === -1) { // TweenMax or TimelineMax Object?
-				_tween.repeat(-1);
-				_tween.yoyo(TweenObject.yoyo());
-			}
-			// Some tween validations and debugging helpers
-			if (Scene.tweenChanges() && !_tween.tweenTo) {
-				log(2, "WARNING: tweenChanges will only work if the TimelineMax object is available for ScrollMagic.");
-			}
-
-			// check if there are position tweens defined for the trigger and warn about it :)
-			if (_tween && Scene.controller() && Scene.triggerElement() && Scene.loglevel() >= 2) { // controller is needed to know scroll direction.
-				var
-				triggerTweens = Tween.getTweensOf(Scene.triggerElement()),
-					vertical = Scene.controller().info("vertical");
-				triggerTweens.forEach(function (value, index) {
-					var
-					tweenvars = value.vars.css || value.vars,
-						condition = vertical ? (tweenvars.top !== undefined || tweenvars.bottom !== undefined) : (tweenvars.left !== undefined || tweenvars.right !== undefined);
-					if (condition) {
-						log(2, "WARNING: Tweening the position of the trigger element affects the scene timing and should be avoided!");
-						return false;
-					}
-				});
-			}
-
-			// warn about tween overwrites, when an element is tweened multiple times
-			if (parseFloat(TweenLite.version) >= 1.14) { // onOverwrite only present since GSAP v1.14.0
-				var
-				list = _tween.getChildren ? _tween.getChildren(true, true, false) : [_tween],
-					// get all nested tween objects
-					newCallback = function () {
-						log(2, "WARNING: tween was overwritten by another. To learn how to avoid this issue see here: https://github.com/janpaepke/ScrollMagic/wiki/WARNING:-tween-was-overwritten-by-another");
-					};
-				for (var i = 0, thisTween, oldCallback; i < list.length; i++) { /*jshint loopfunc: true */
-					thisTween = list[i];
-					if (oldCallback !== newCallback) { // if tweens is added more than once
-						oldCallback = thisTween.vars.onOverwrite;
-						thisTween.vars.onOverwrite = function () {
-							if (oldCallback) {
-								oldCallback.apply(this, arguments);
-							}
-							newCallback.apply(this, arguments);
-						};
-					}
-				}
-			}
-			log(3, "added tween");
-
-			updateTweenProgress();
-			return Scene;
-		};
-
-		/**
-		 * Remove the tween from the scene.  
-		 * This will terminate the control of the Scene over the tween.
-		 *
-		 * Using the reset option you can decide if the tween should remain in the current state or be rewound to set the target elements back to the state they were in before the tween was added to the scene.
-		 * @memberof! animation.GSAP#
-		 *
-		 * @example
-		 * // remove the tween from the scene without resetting it
-		 * scene.removeTween();
-		 *
-		 * // remove the tween from the scene and reset it to initial position
-		 * scene.removeTween(true);
-		 *
-		 * @param {boolean} [reset=false] - If `true` the tween will be reset to its initial values.
-		 * @returns {Scene} Parent object for chaining.
-		 */
-		Scene.removeTween = function (reset) {
-			if (_tween) {
-				if (reset) {
-					_tween.progress(0).pause();
-				}
-				_tween.kill();
-				_tween = undefined;
-				log(3, "removed tween (reset: " + (reset ? "true" : "false") + ")");
-			}
-			return Scene;
-		};
-
-	});
-}));
-
-/***/ }),
-/* 179 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * VERSION: 1.20.4
- * DATE: 2018-02-15
- * UPDATES AND DOCS AT: http://greensock.com
- *
- * @license Copyright (c) 2008-2018, GreenSock. All rights reserved.
- * This work is subject to the terms at http://greensock.com/standard-license or for
- * Club GreenSock members, the software agreement that was issued with your membership.
- * 
- * @author: Jack Doyle, jack@greensock.com
- */
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
-(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
-
-	"use strict";
-
-	_gsScope._gsDefine("TimelineMax", ["TimelineLite","TweenLite","easing.Ease"], function(TimelineLite, TweenLite, Ease) {
-		
-		var TimelineMax = function(vars) {
-				TimelineLite.call(this, vars);
-				this._repeat = this.vars.repeat || 0;
-				this._repeatDelay = this.vars.repeatDelay || 0;
-				this._cycle = 0;
-				this._yoyo = (this.vars.yoyo === true);
-				this._dirty = true;
-			},
-			_tinyNum = 0.0000000001,
-			TweenLiteInternals = TweenLite._internals,
-			_lazyTweens = TweenLiteInternals.lazyTweens,
-			_lazyRender = TweenLiteInternals.lazyRender,
-			_globals = _gsScope._gsDefine.globals,
-			_easeNone = new Ease(null, null, 1, 0),
-			p = TimelineMax.prototype = new TimelineLite();
-			
-		p.constructor = TimelineMax;
-		p.kill()._gc = false;
-		TimelineMax.version = "1.20.4";
-		
-		p.invalidate = function() {
-			this._yoyo = (this.vars.yoyo === true);
-			this._repeat = this.vars.repeat || 0;
-			this._repeatDelay = this.vars.repeatDelay || 0;
-			this._uncache(true);
-			return TimelineLite.prototype.invalidate.call(this);
-		};
-		
-		p.addCallback = function(callback, position, params, scope) {
-			return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
-		};
-		
-		p.removeCallback = function(callback, position) {
-			if (callback) {
-				if (position == null) {
-					this._kill(null, callback);
-				} else {
-					var a = this.getTweensOf(callback, false),
-						i = a.length,
-						time = this._parseTimeOrLabel(position);
-					while (--i > -1) {
-						if (a[i]._startTime === time) {
-							a[i]._enabled(false, false);
-						}
-					}
-				}
-			}
-			return this;
-		};
-
-		p.removePause = function(position) {
-			return this.removeCallback(TimelineLite._internals.pauseCallback, position);
-		};
-
-		p.tweenTo = function(position, vars) {
-			vars = vars || {};
-			var copy = {ease:_easeNone, useFrames:this.usesFrames(), immediateRender:false, lazy:false},
-				Engine = (vars.repeat && _globals.TweenMax) || TweenLite,
-				duration, p, t;
-			for (p in vars) {
-				copy[p] = vars[p];
-			}
-			copy.time = this._parseTimeOrLabel(position);
-			duration = (Math.abs(Number(copy.time) - this._time) / this._timeScale) || 0.001;
-			t = new Engine(this, duration, copy);
-			copy.onStart = function() {
-				t.target.paused(true);
-				if (t.vars.time !== t.target.time() && duration === t.duration() && !t.isFromTo) { //don't make the duration zero - if it's supposed to be zero, don't worry because it's already initting the tween and will complete immediately, effectively making the duration zero anyway. If we make duration zero, the tween won't run at all.
-					t.duration( Math.abs( t.vars.time - t.target.time()) / t.target._timeScale ).render(t.time(), true, true); //render() right away to ensure that things look right, especially in the case of .tweenTo(0).
-				}
-				if (vars.onStart) { //in case the user had an onStart in the vars - we don't want to overwrite it.
-					vars.onStart.apply(vars.onStartScope || vars.callbackScope || t, vars.onStartParams || []); //don't use t._callback("onStart") or it'll point to the copy.onStart and we'll get a recursion error.
-				}
-			};
-			return t;
-		};
-
-		p.tweenFromTo = function(fromPosition, toPosition, vars) {
-			vars = vars || {};
-			fromPosition = this._parseTimeOrLabel(fromPosition);
-			vars.startAt = {onComplete:this.seek, onCompleteParams:[fromPosition], callbackScope:this};
-			vars.immediateRender = (vars.immediateRender !== false);
-			var t = this.tweenTo(toPosition, vars);
-			t.isFromTo = 1; //to ensure we don't mess with the duration in the onStart (we've got the start and end values here, so lock it in)
-			return t.duration((Math.abs( t.vars.time - fromPosition) / this._timeScale) || 0.001);
-		};
-		
-		p.render = function(time, suppressEvents, force) {
-			if (this._gc) {
-				this._enabled(true, false);
-			}
-			var prevTime = this._time,
-				totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(),
-				dur = this._duration,
-				prevTotalTime = this._totalTime,
-				prevStart = this._startTime, 
-				prevTimeScale = this._timeScale, 
-				prevRawPrevTime = this._rawPrevTime,
-				prevPaused = this._paused, 
-				prevCycle = this._cycle, 
-				tween, isComplete, next, callback, internalForce, cycleDuration, pauseTween, curTime;
-			if (prevTime !== this._time) { //if totalDuration() finds a child with a negative startTime and smoothChildTiming is true, things get shifted around internally so we need to adjust the time accordingly. For example, if a tween starts at -30 we must shift EVERYTHING forward 30 seconds and move this timeline's startTime backward by 30 seconds so that things align with the playhead (no jump).
-				time += this._time - prevTime;
-			}
-			if (time >= totalDur - 0.0000001 && time >= 0) { //to work around occasional floating point math artifacts.
-				if (!this._locked) {
-					this._totalTime = totalDur;
-					this._cycle = this._repeat;
-				}
-				if (!this._reversed) if (!this._hasPausedChild()) {
-					isComplete = true;
-					callback = "onComplete";
-					internalForce = !!this._timeline.autoRemoveChildren; //otherwise, if the animation is unpaused/activated after it's already finished, it doesn't get removed from the parent timeline.
-					if (this._duration === 0) if ((time <= 0 && time >= -0.0000001) || prevRawPrevTime < 0 || prevRawPrevTime === _tinyNum) if (prevRawPrevTime !== time && this._first) {
-						internalForce = true;
-						if (prevRawPrevTime > _tinyNum) {
-							callback = "onReverseComplete";
-						}
-					}
-				}
-				this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-				if (this._yoyo && (this._cycle & 1) !== 0) {
-					this._time = time = 0;
-				} else {
-					this._time = dur;
-					time = dur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7. We cannot do less then 0.0001 because the same issue can occur when the duration is extremely large like 999999999999 in which case adding 0.00000001, for example, causes it to act like nothing was added.
-				}
-				
-			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
-				if (!this._locked) {
-					this._totalTime = this._cycle = 0;
-				}
-				this._time = 0;
-				if (prevTime !== 0 || (dur === 0 && prevRawPrevTime !== _tinyNum && (prevRawPrevTime > 0 || (time < 0 && prevRawPrevTime >= 0)) && !this._locked)) { //edge case for checking time < 0 && prevRawPrevTime >= 0: a zero-duration fromTo() tween inside a zero-duration timeline (yeah, very rare)
-					callback = "onReverseComplete";
-					isComplete = this._reversed;
-				}
-				if (time < 0) {
-					this._active = false;
-					if (this._timeline.autoRemoveChildren && this._reversed) {
-						internalForce = isComplete = true;
-						callback = "onReverseComplete";
-					} else if (prevRawPrevTime >= 0 && this._first) { //when going back beyond the start, force a render so that zero-duration tweens that sit at the very beginning render their start values properly. Otherwise, if the parent timeline's playhead lands exactly at this timeline's startTime, and then moves backwards, the zero-duration tweens at the beginning would still be at their end state.
-						internalForce = true;
-					}
-					this._rawPrevTime = time;
-				} else {
-					this._rawPrevTime = (dur || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-					if (time === 0 && isComplete) { //if there's a zero-duration tween at the very beginning of a timeline and the playhead lands EXACTLY at time 0, that tween will correctly render its end values, but we need to keep the timeline alive for one more render so that the beginning values render properly as the parent's playhead keeps moving beyond the begining. Imagine obj.x starts at 0 and then we do tl.set(obj, {x:100}).to(obj, 1, {x:200}) and then later we tl.reverse()...the goal is to have obj.x revert to 0. If the playhead happens to land on exactly 0, without this chunk of code, it'd complete the timeline and remove it from the rendering queue (not good).
-						tween = this._first;
-						while (tween && tween._startTime === 0) {
-							if (!tween._duration) {
-								isComplete = false;
-							}
-							tween = tween._next;
-						}
-					}
-					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
-					if (!this._initted) {
-						internalForce = true;
-					}
-				}
-				
-			} else {
-				if (dur === 0 && prevRawPrevTime < 0) { //without this, zero-duration repeating timelines (like with a simple callback nested at the very beginning and a repeatDelay) wouldn't render the first time through.
-					internalForce = true;
-				}
-				this._time = this._rawPrevTime = time;
-				if (!this._locked) {
-					this._totalTime = time;
-					if (this._repeat !== 0) {
-						cycleDuration = dur + this._repeatDelay;
-						this._cycle = (this._totalTime / cycleDuration) >> 0; //originally _totalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but it gets reported as 0.79999999!)
-						if (this._cycle !== 0) if (this._cycle === this._totalTime / cycleDuration && prevTotalTime <= time) {
-							this._cycle--; //otherwise when rendered exactly at the end time, it will act as though it is repeating (at the beginning)
-						}
-						this._time = this._totalTime - (this._cycle * cycleDuration);
-						if (this._yoyo) if ((this._cycle & 1) !== 0) {
-							this._time = dur - this._time;
-						}
-						if (this._time > dur) {
-							this._time = dur;
-							time = dur + 0.0001; //to avoid occasional floating point rounding error
-						} else if (this._time < 0) {
-							this._time = time = 0;
-						} else {
-							time = this._time;
-						}
-					}
-				}
-
-				if (this._hasPause && !this._forcingPlayhead && !suppressEvents) {
-					time = this._time;
-					if (time >= prevTime || (this._repeat && prevCycle !== this._cycle)) {
-						tween = this._first;
-						while (tween && tween._startTime <= time && !pauseTween) {
-							if (!tween._duration) if (tween.data === "isPause" && !tween.ratio && !(tween._startTime === 0 && this._rawPrevTime === 0)) {
-								pauseTween = tween;
-							}
-							tween = tween._next;
-						}
-					} else {
-						tween = this._last;
-						while (tween && tween._startTime >= time && !pauseTween) {
-							if (!tween._duration) if (tween.data === "isPause" && tween._rawPrevTime > 0) {
-								pauseTween = tween;
-							}
-							tween = tween._prev;
-						}
-					}
-					if (pauseTween && pauseTween._startTime < dur) {
-						this._time = time = pauseTween._startTime;
-						this._totalTime = time + (this._cycle * (this._totalDuration + this._repeatDelay));
-					}
-				}
-
-			}
-			
-			if (this._cycle !== prevCycle) if (!this._locked) {
-				/*
-				make sure children at the end/beginning of the timeline are rendered properly. If, for example, 
-				a 3-second long timeline rendered at 2.9 seconds previously, and now renders at 3.2 seconds (which
-				would get transated to 2.8 seconds if the timeline yoyos or 0.2 seconds if it just repeats), there
-				could be a callback or a short tween that's at 2.95 or 3 seconds in which wouldn't render. So 
-				we need to push the timeline to the end (and/or beginning depending on its yoyo value). Also we must
-				ensure that zero-duration tweens at the very beginning or end of the TimelineMax work. 
-				*/
-				var backwards = (this._yoyo && (prevCycle & 1) !== 0),
-					wrap = (backwards === (this._yoyo && (this._cycle & 1) !== 0)),
-					recTotalTime = this._totalTime,
-					recCycle = this._cycle,
-					recRawPrevTime = this._rawPrevTime,
-					recTime = this._time;
-				
-				this._totalTime = prevCycle * dur;
-				if (this._cycle < prevCycle) {
-					backwards = !backwards;
-				} else {
-					this._totalTime += dur;
-				}
-				this._time = prevTime; //temporarily revert _time so that render() renders the children in the correct order. Without this, tweens won't rewind correctly. We could arhictect things in a "cleaner" way by splitting out the rendering queue into a separate method but for performance reasons, we kept it all inside this method.
-				
-				this._rawPrevTime = (dur === 0) ? prevRawPrevTime - 0.0001 : prevRawPrevTime;
-				this._cycle = prevCycle;
-				this._locked = true; //prevents changes to totalTime and skips repeat/yoyo behavior when we recursively call render()
-				prevTime = (backwards) ? 0 : dur;
-				this.render(prevTime, suppressEvents, (dur === 0));
-				if (!suppressEvents) if (!this._gc) {
-					if (this.vars.onRepeat) {
-						this._cycle = recCycle; //in case the onRepeat alters the playhead or invalidates(), we shouldn't stay locked or use the previous cycle.
-						this._locked = false;
-						this._callback("onRepeat");
-					}
-				}
-				if (prevTime !== this._time) { //in case there's a callback like onComplete in a nested tween/timeline that changes the playhead position, like via seek(), we should just abort.
-					return;
-				}
-				if (wrap) {
-					this._cycle = prevCycle; //if there's an onRepeat, we reverted this above, so make sure it's set properly again. We also unlocked in that scenario, so reset that too.
-					this._locked = true;
-					prevTime = (backwards) ? dur + 0.0001 : -0.0001;
-					this.render(prevTime, true, false);
-				}
-				this._locked = false;
-				if (this._paused && !prevPaused) { //if the render() triggered callback that paused this timeline, we should abort (very rare, but possible)
-					return;
-				}
-				this._time = recTime;
-				this._totalTime = recTotalTime;
-				this._cycle = recCycle;
-				this._rawPrevTime = recRawPrevTime;
-			}
-
-			if ((this._time === prevTime || !this._first) && !force && !internalForce && !pauseTween) {
-				if (prevTotalTime !== this._totalTime) if (this._onUpdate) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
-					this._callback("onUpdate");
-				}
-				return;
-			} else if (!this._initted) {
-				this._initted = true;
-			}
-
-			if (!this._active) if (!this._paused && this._totalTime !== prevTotalTime && time > 0) {
-				this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
-			}
-			
-			if (prevTotalTime === 0) if (this.vars.onStart) if (this._totalTime !== 0 || !this._totalDuration) if (!suppressEvents) {
-				this._callback("onStart");
-			}
-
-			curTime = this._time;
-			if (curTime >= prevTime) {
-				tween = this._first;
-				while (tween) {
-					next = tween._next; //record it here because the value could change after rendering...
-					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
-						break;
-					} else if (tween._active || (tween._startTime <= this._time && !tween._paused && !tween._gc)) {
-						if (pauseTween === tween) {
-							this.pause();
-						}
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-					}
-					tween = next;
-				}
-			} else {
-				tween = this._last;
-				while (tween) {
-					next = tween._prev; //record it here because the value could change after rendering...
-					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
-						break;
-					} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
-						if (pauseTween === tween) {
-							pauseTween = tween._prev; //the linked list is organized by _startTime, thus it's possible that a tween could start BEFORE the pause and end after it, in which case it would be positioned before the pause tween in the linked list, but we should render it before we pause() the timeline and cease rendering. This is only a concern when going in reverse.
-							while (pauseTween && pauseTween.endTime() > this._time) {
-								pauseTween.render( (pauseTween._reversed ? pauseTween.totalDuration() - ((time - pauseTween._startTime) * pauseTween._timeScale) : (time - pauseTween._startTime) * pauseTween._timeScale), suppressEvents, force);
-								pauseTween = pauseTween._prev;
-							}
-							pauseTween = null;
-							this.pause();
-						}
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-					}
-					tween = next;
-				}
-			}
-			
-			if (this._onUpdate) if (!suppressEvents) {
-				if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
-					_lazyRender();
-				}
-				this._callback("onUpdate");
-			}
-			if (callback) if (!this._locked) if (!this._gc) if (prevStart === this._startTime || prevTimeScale !== this._timeScale) if (this._time === 0 || totalDur >= this.totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
-				if (isComplete) {
-					if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onComplete on a timeline that reports/checks tweened values.
-						_lazyRender();
-					}
-					if (this._timeline.autoRemoveChildren) {
-						this._enabled(false, false);
-					}
-					this._active = false;
-				}
-				if (!suppressEvents && this.vars[callback]) {
-					this._callback(callback);
-				}
-			}
-		};
-		
-		p.getActive = function(nested, tweens, timelines) {
-			if (nested == null) {
-				nested = true;
-			}
-			if (tweens == null) {
-				tweens = true;
-			}
-			if (timelines == null) {
-				timelines = false;
-			}
-			var a = [], 
-				all = this.getChildren(nested, tweens, timelines), 
-				cnt = 0, 
-				l = all.length,
-				i, tween;
-			for (i = 0; i < l; i++) {
-				tween = all[i];
-				if (tween.isActive()) {
-					a[cnt++] = tween;
-				}
-			}
-			return a;
-		};
-		
-		
-		p.getLabelAfter = function(time) {
-			if (!time) if (time !== 0) { //faster than isNan()
-				time = this._time;
-			}
-			var labels = this.getLabelsArray(),
-				l = labels.length,
-				i;
-			for (i = 0; i < l; i++) {
-				if (labels[i].time > time) {
-					return labels[i].name;
-				}
-			}
-			return null;
-		};
-		
-		p.getLabelBefore = function(time) {
-			if (time == null) {
-				time = this._time;
-			}
-			var labels = this.getLabelsArray(),
-				i = labels.length;
-			while (--i > -1) {
-				if (labels[i].time < time) {
-					return labels[i].name;
-				}
-			}
-			return null;
-		};
-		
-		p.getLabelsArray = function() {
-			var a = [],
-				cnt = 0,
-				p;
-			for (p in this._labels) {
-				a[cnt++] = {time:this._labels[p], name:p};
-			}
-			a.sort(function(a,b) {
-				return a.time - b.time;
-			});
-			return a;
-		};
-
-		p.invalidate = function() {
-			this._locked = false; //unlock and set cycle in case invalidate() is called from inside an onRepeat
-			return TimelineLite.prototype.invalidate.call(this);
-		};
-
-		
-//---- GETTERS / SETTERS -------------------------------------------------------------------------------------------------------
-		
-		p.progress = function(value, suppressEvents) {
-			return (!arguments.length) ? (this._time / this.duration()) || 0 : this.totalTime( this.duration() * ((this._yoyo && (this._cycle & 1) !== 0) ? 1 - value : value) + (this._cycle * (this._duration + this._repeatDelay)), suppressEvents);
-		};
-		
-		p.totalProgress = function(value, suppressEvents) {
-			return (!arguments.length) ? (this._totalTime / this.totalDuration()) || 0 : this.totalTime( this.totalDuration() * value, suppressEvents);
-		};
-
-		p.totalDuration = function(value) {
-			if (!arguments.length) {
-				if (this._dirty) {
-					TimelineLite.prototype.totalDuration.call(this); //just forces refresh
-					//Instead of Infinity, we use 999999999999 so that we can accommodate reverses.
-					this._totalDuration = (this._repeat === -1) ? 999999999999 : this._duration * (this._repeat + 1) + (this._repeatDelay * this._repeat);
-				}
-				return this._totalDuration;
-			}
-			return (this._repeat === -1 || !value) ? this : this.timeScale( this.totalDuration() / value );
-		};
-		
-		p.time = function(value, suppressEvents) {
-			if (!arguments.length) {
-				return this._time;
-			}
-			if (this._dirty) {
-				this.totalDuration();
-			}
-			if (value > this._duration) {
-				value = this._duration;
-			}
-			if (this._yoyo && (this._cycle & 1) !== 0) {
-				value = (this._duration - value) + (this._cycle * (this._duration + this._repeatDelay));
-			} else if (this._repeat !== 0) {
-				value += this._cycle * (this._duration + this._repeatDelay);
-			}
-			return this.totalTime(value, suppressEvents);
-		};
-		
-		p.repeat = function(value) {
-			if (!arguments.length) {
-				return this._repeat;
-			}
-			this._repeat = value;
-			return this._uncache(true);
-		};
-		
-		p.repeatDelay = function(value) {
-			if (!arguments.length) {
-				return this._repeatDelay;
-			}
-			this._repeatDelay = value;
-			return this._uncache(true);
-		};
-		
-		p.yoyo = function(value) {
-			if (!arguments.length) {
-				return this._yoyo;
-			}
-			this._yoyo = value;
-			return this;
-		};
-		
-		p.currentLabel = function(value) {
-			if (!arguments.length) {
-				return this.getLabelBefore(this._time + 0.00000001);
-			}
-			return this.seek(value, true);
-		};
-		
-		return TimelineMax;
-		
-	}, true);
-
-
-
-
-
-
-
-/*
- * ----------------------------------------------------------------
- * TimelineLite
- * ----------------------------------------------------------------
- */
-
-	_gsScope._gsDefine("TimelineLite", ["core.Animation","core.SimpleTimeline","TweenLite"], function(Animation, SimpleTimeline, TweenLite) {
-
-		var TimelineLite = function(vars) {
-				SimpleTimeline.call(this, vars);
-				this._labels = {};
-				this.autoRemoveChildren = (this.vars.autoRemoveChildren === true);
-				this.smoothChildTiming = (this.vars.smoothChildTiming === true);
-				this._sortChildren = true;
-				this._onUpdate = this.vars.onUpdate;
-				var v = this.vars,
-					val, p;
-				for (p in v) {
-					val = v[p];
-					if (_isArray(val)) if (val.join("").indexOf("{self}") !== -1) {
-						v[p] = this._swapSelfInParams(val);
-					}
-				}
-				if (_isArray(v.tweens)) {
-					this.add(v.tweens, 0, v.align, v.stagger);
-				}
-			},
-			_tinyNum = 0.0000000001,
-			TweenLiteInternals = TweenLite._internals,
-			_internals = TimelineLite._internals = {},
-			_isSelector = TweenLiteInternals.isSelector,
-			_isArray = TweenLiteInternals.isArray,
-			_lazyTweens = TweenLiteInternals.lazyTweens,
-			_lazyRender = TweenLiteInternals.lazyRender,
-			_globals = _gsScope._gsDefine.globals,
-			_copy = function(vars) {
-				var copy = {}, p;
-				for (p in vars) {
-					copy[p] = vars[p];
-				}
-				return copy;
-			},
-			_applyCycle = function(vars, targets, i) {
-				var alt = vars.cycle,
-					p, val;
-				for (p in alt) {
-					val = alt[p];
-					vars[p] = (typeof(val) === "function") ? val(i, targets[i]) : val[i % val.length];
-				}
-				delete vars.cycle;
-			},
-			_pauseCallback = _internals.pauseCallback = function() {},
-			_slice = function(a) { //don't use [].slice because that doesn't work in IE8 with a NodeList that's returned by querySelectorAll()
-				var b = [],
-					l = a.length,
-					i;
-				for (i = 0; i !== l; b.push(a[i++]));
-				return b;
-			},
-			p = TimelineLite.prototype = new SimpleTimeline();
-
-		TimelineLite.version = "1.20.4";
-		p.constructor = TimelineLite;
-		p.kill()._gc = p._forcingPlayhead = p._hasPause = false;
-
-		/* might use later...
-		//translates a local time inside an animation to the corresponding time on the root/global timeline, factoring in all nesting and timeScales.
-		function localToGlobal(time, animation) {
-			while (animation) {
-				time = (time / animation._timeScale) + animation._startTime;
-				animation = animation.timeline;
-			}
-			return time;
-		}
-
-		//translates the supplied time on the root/global timeline into the corresponding local time inside a particular animation, factoring in all nesting and timeScales
-		function globalToLocal(time, animation) {
-			var scale = 1;
-			time -= localToGlobal(0, animation);
-			while (animation) {
-				scale *= animation._timeScale;
-				animation = animation.timeline;
-			}
-			return time * scale;
-		}
-		*/
-
-		p.to = function(target, duration, vars, position) {
-			var Engine = (vars.repeat && _globals.TweenMax) || TweenLite;
-			return duration ? this.add( new Engine(target, duration, vars), position) : this.set(target, vars, position);
-		};
-
-		p.from = function(target, duration, vars, position) {
-			return this.add( ((vars.repeat && _globals.TweenMax) || TweenLite).from(target, duration, vars), position);
-		};
-
-		p.fromTo = function(target, duration, fromVars, toVars, position) {
-			var Engine = (toVars.repeat && _globals.TweenMax) || TweenLite;
-			return duration ? this.add( Engine.fromTo(target, duration, fromVars, toVars), position) : this.set(target, toVars, position);
-		};
-
-		p.staggerTo = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
-			var tl = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams, callbackScope:onCompleteAllScope, smoothChildTiming:this.smoothChildTiming}),
-				cycle = vars.cycle,
-				copy, i;
-			if (typeof(targets) === "string") {
-				targets = TweenLite.selector(targets) || targets;
-			}
-			targets = targets || [];
-			if (_isSelector(targets)) { //senses if the targets object is a selector. If it is, we should translate it into an array.
-				targets = _slice(targets);
-			}
-			stagger = stagger || 0;
-			if (stagger < 0) {
-				targets = _slice(targets);
-				targets.reverse();
-				stagger *= -1;
-			}
-			for (i = 0; i < targets.length; i++) {
-				copy = _copy(vars);
-				if (copy.startAt) {
-					copy.startAt = _copy(copy.startAt);
-					if (copy.startAt.cycle) {
-						_applyCycle(copy.startAt, targets, i);
-					}
-				}
-				if (cycle) {
-					_applyCycle(copy, targets, i);
-					if (copy.duration != null) {
-						duration = copy.duration;
-						delete copy.duration;
-					}
-				}
-				tl.to(targets[i], duration, copy, i * stagger);
-			}
-			return this.add(tl, position);
-		};
-
-		p.staggerFrom = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
-			vars.immediateRender = (vars.immediateRender != false);
-			vars.runBackwards = true;
-			return this.staggerTo(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
-		};
-
-		p.staggerFromTo = function(targets, duration, fromVars, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
-			toVars.startAt = fromVars;
-			toVars.immediateRender = (toVars.immediateRender != false && fromVars.immediateRender != false);
-			return this.staggerTo(targets, duration, toVars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
-		};
-
-		p.call = function(callback, params, scope, position) {
-			return this.add( TweenLite.delayedCall(0, callback, params, scope), position);
-		};
-
-		p.set = function(target, vars, position) {
-			position = this._parseTimeOrLabel(position, 0, true);
-			if (vars.immediateRender == null) {
-				vars.immediateRender = (position === this._time && !this._paused);
-			}
-			return this.add( new TweenLite(target, 0, vars), position);
-		};
-
-		TimelineLite.exportRoot = function(vars, ignoreDelayedCalls) {
-			vars = vars || {};
-			if (vars.smoothChildTiming == null) {
-				vars.smoothChildTiming = true;
-			}
-			var tl = new TimelineLite(vars),
-				root = tl._timeline,
-				hasNegativeStart, time,	tween, next;
-			if (ignoreDelayedCalls == null) {
-				ignoreDelayedCalls = true;
-			}
-			root._remove(tl, true);
-			tl._startTime = 0;
-			tl._rawPrevTime = tl._time = tl._totalTime = root._time;
-			tween = root._first;
-			while (tween) {
-				next = tween._next;
-				if (!ignoreDelayedCalls || !(tween instanceof TweenLite && tween.target === tween.vars.onComplete)) {
-					time = tween._startTime - tween._delay;
-					if (time < 0) {
-						hasNegativeStart = 1;
-					}
-					tl.add(tween, time);
-				}
-				tween = next;
-			}
-			root.add(tl, 0);
-			if (hasNegativeStart) { //calling totalDuration() will force the adjustment necessary to shift the children forward so none of them start before zero, and moves the timeline backwards the same amount, so the playhead is still aligned where it should be globally, but the timeline doesn't have illegal children that start before zero.
-				tl.totalDuration();
-			}
-			return tl;
-		};
-
-		p.add = function(value, position, align, stagger) {
-			var curTime, l, i, child, tl, beforeRawTime;
-			if (typeof(position) !== "number") {
-				position = this._parseTimeOrLabel(position, 0, true, value);
-			}
-			if (!(value instanceof Animation)) {
-				if ((value instanceof Array) || (value && value.push && _isArray(value))) {
-					align = align || "normal";
-					stagger = stagger || 0;
-					curTime = position;
-					l = value.length;
-					for (i = 0; i < l; i++) {
-						if (_isArray(child = value[i])) {
-							child = new TimelineLite({tweens:child});
-						}
-						this.add(child, curTime);
-						if (typeof(child) !== "string" && typeof(child) !== "function") {
-							if (align === "sequence") {
-								curTime = child._startTime + (child.totalDuration() / child._timeScale);
-							} else if (align === "start") {
-								child._startTime -= child.delay();
-							}
-						}
-						curTime += stagger;
-					}
-					return this._uncache(true);
-				} else if (typeof(value) === "string") {
-					return this.addLabel(value, position);
-				} else if (typeof(value) === "function") {
-					value = TweenLite.delayedCall(0, value);
-				} else {
-					throw("Cannot add " + value + " into the timeline; it is not a tween, timeline, function, or string.");
-				}
-			}
-
-			SimpleTimeline.prototype.add.call(this, value, position);
-
-			if (value._time) { //in case, for example, the _startTime is moved on a tween that has already rendered. Imagine it's at its end state, then the startTime is moved WAY later (after the end of this timeline), it should render at its beginning.
-				value.render((this.rawTime() - value._startTime) * value._timeScale, false, false);
-			}
-
-			//if the timeline has already ended but the inserted tween/timeline extends the duration, we should enable this timeline again so that it renders properly. We should also align the playhead with the parent timeline's when appropriate.
-			if (this._gc || this._time === this._duration) if (!this._paused) if (this._duration < this.duration()) {
-				//in case any of the ancestors had completed but should now be enabled...
-				tl = this;
-				beforeRawTime = (tl.rawTime() > value._startTime); //if the tween is placed on the timeline so that it starts BEFORE the current rawTime, we should align the playhead (move the timeline). This is because sometimes users will create a timeline, let it finish, and much later append a tween and expect it to run instead of jumping to its end state. While technically one could argue that it should jump to its end state, that's not what users intuitively expect.
-				while (tl._timeline) {
-					if (beforeRawTime && tl._timeline.smoothChildTiming) {
-						tl.totalTime(tl._totalTime, true); //moves the timeline (shifts its startTime) if necessary, and also enables it.
-					} else if (tl._gc) {
-						tl._enabled(true, false);
-					}
-					tl = tl._timeline;
-				}
-			}
-
-			return this;
-		};
-
-		p.remove = function(value) {
-			if (value instanceof Animation) {
-				this._remove(value, false);
-				var tl = value._timeline = value.vars.useFrames ? Animation._rootFramesTimeline : Animation._rootTimeline; //now that it's removed, default it to the root timeline so that if it gets played again, it doesn't jump back into this timeline.
-				value._startTime = (value._paused ? value._pauseTime : tl._time) - ((!value._reversed ? value._totalTime : value.totalDuration() - value._totalTime) / value._timeScale); //ensure that if it gets played again, the timing is correct.
-				return this;
-			} else if (value instanceof Array || (value && value.push && _isArray(value))) {
-				var i = value.length;
-				while (--i > -1) {
-					this.remove(value[i]);
-				}
-				return this;
-			} else if (typeof(value) === "string") {
-				return this.removeLabel(value);
-			}
-			return this.kill(null, value);
-		};
-
-		p._remove = function(tween, skipDisable) {
-			SimpleTimeline.prototype._remove.call(this, tween, skipDisable);
-			var last = this._last;
-			if (!last) {
-				this._time = this._totalTime = this._duration = this._totalDuration = 0;
-			} else if (this._time > this.duration()) {
-				this._time = this._duration;
-				this._totalTime = this._totalDuration;
-			}
-			return this;
-		};
-
-		p.append = function(value, offsetOrLabel) {
-			return this.add(value, this._parseTimeOrLabel(null, offsetOrLabel, true, value));
-		};
-
-		p.insert = p.insertMultiple = function(value, position, align, stagger) {
-			return this.add(value, position || 0, align, stagger);
-		};
-
-		p.appendMultiple = function(tweens, offsetOrLabel, align, stagger) {
-			return this.add(tweens, this._parseTimeOrLabel(null, offsetOrLabel, true, tweens), align, stagger);
-		};
-
-		p.addLabel = function(label, position) {
-			this._labels[label] = this._parseTimeOrLabel(position);
-			return this;
-		};
-
-		p.addPause = function(position, callback, params, scope) {
-			var t = TweenLite.delayedCall(0, _pauseCallback, params, scope || this);
-			t.vars.onComplete = t.vars.onReverseComplete = callback;
-			t.data = "isPause";
-			this._hasPause = true;
-			return this.add(t, position);
-		};
-
-		p.removeLabel = function(label) {
-			delete this._labels[label];
-			return this;
-		};
-
-		p.getLabelTime = function(label) {
-			return (this._labels[label] != null) ? this._labels[label] : -1;
-		};
-
-		p._parseTimeOrLabel = function(timeOrLabel, offsetOrLabel, appendIfAbsent, ignore) {
-			var clippedDuration, i;
-			//if we're about to add a tween/timeline (or an array of them) that's already a child of this timeline, we should remove it first so that it doesn't contaminate the duration().
-			if (ignore instanceof Animation && ignore.timeline === this) {
-				this.remove(ignore);
-			} else if (ignore && ((ignore instanceof Array) || (ignore.push && _isArray(ignore)))) {
-				i = ignore.length;
-				while (--i > -1) {
-					if (ignore[i] instanceof Animation && ignore[i].timeline === this) {
-						this.remove(ignore[i]);
-					}
-				}
-			}
-			clippedDuration = (typeof(timeOrLabel) === "number" && !offsetOrLabel) ? 0 : (this.duration() > 99999999999) ? this.recent().endTime(false) : this._duration; //in case there's a child that infinitely repeats, users almost never intend for the insertion point of a new child to be based on a SUPER long value like that so we clip it and assume the most recently-added child's endTime should be used instead.
-			if (typeof(offsetOrLabel) === "string") {
-				return this._parseTimeOrLabel(offsetOrLabel, (appendIfAbsent && typeof(timeOrLabel) === "number" && this._labels[offsetOrLabel] == null) ? timeOrLabel - clippedDuration : 0, appendIfAbsent);
-			}
-			offsetOrLabel = offsetOrLabel || 0;
-			if (typeof(timeOrLabel) === "string" && (isNaN(timeOrLabel) || this._labels[timeOrLabel] != null)) { //if the string is a number like "1", check to see if there's a label with that name, otherwise interpret it as a number (absolute value).
-				i = timeOrLabel.indexOf("=");
-				if (i === -1) {
-					if (this._labels[timeOrLabel] == null) {
-						return appendIfAbsent ? (this._labels[timeOrLabel] = clippedDuration + offsetOrLabel) : offsetOrLabel;
-					}
-					return this._labels[timeOrLabel] + offsetOrLabel;
-				}
-				offsetOrLabel = parseInt(timeOrLabel.charAt(i-1) + "1", 10) * Number(timeOrLabel.substr(i+1));
-				timeOrLabel = (i > 1) ? this._parseTimeOrLabel(timeOrLabel.substr(0, i-1), 0, appendIfAbsent) : clippedDuration;
-			} else if (timeOrLabel == null) {
-				timeOrLabel = clippedDuration;
-			}
-			return Number(timeOrLabel) + offsetOrLabel;
-		};
-
-		p.seek = function(position, suppressEvents) {
-			return this.totalTime((typeof(position) === "number") ? position : this._parseTimeOrLabel(position), (suppressEvents !== false));
-		};
-
-		p.stop = function() {
-			return this.paused(true);
-		};
-
-		p.gotoAndPlay = function(position, suppressEvents) {
-			return this.play(position, suppressEvents);
-		};
-
-		p.gotoAndStop = function(position, suppressEvents) {
-			return this.pause(position, suppressEvents);
-		};
-
-		p.render = function(time, suppressEvents, force) {
-			if (this._gc) {
-				this._enabled(true, false);
-			}
-			var totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(),
-				prevTime = this._time,
-				prevStart = this._startTime,
-				prevTimeScale = this._timeScale,
-				prevPaused = this._paused,
-				tween, isComplete, next, callback, internalForce, pauseTween, curTime;
-			if (time >= totalDur - 0.0000001 && time >= 0) { //to work around occasional floating point math artifacts.
-				this._totalTime = this._time = totalDur;
-				if (!this._reversed) if (!this._hasPausedChild()) {
-					isComplete = true;
-					callback = "onComplete";
-					internalForce = !!this._timeline.autoRemoveChildren; //otherwise, if the animation is unpaused/activated after it's already finished, it doesn't get removed from the parent timeline.
-					if (this._duration === 0) if ((time <= 0 && time >= -0.0000001) || this._rawPrevTime < 0 || this._rawPrevTime === _tinyNum) if (this._rawPrevTime !== time && this._first) {
-						internalForce = true;
-						if (this._rawPrevTime > _tinyNum) {
-							callback = "onReverseComplete";
-						}
-					}
-				}
-				this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-				time = totalDur + 0.0001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off). Try (999999999999.7 - 999999999999) * 1 = 0.699951171875 instead of 0.7.
-
-			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
-				this._totalTime = this._time = 0;
-				if (prevTime !== 0 || (this._duration === 0 && this._rawPrevTime !== _tinyNum && (this._rawPrevTime > 0 || (time < 0 && this._rawPrevTime >= 0)))) {
-					callback = "onReverseComplete";
-					isComplete = this._reversed;
-				}
-				if (time < 0) {
-					this._active = false;
-					if (this._timeline.autoRemoveChildren && this._reversed) { //ensures proper GC if a timeline is resumed after it's finished reversing.
-						internalForce = isComplete = true;
-						callback = "onReverseComplete";
-					} else if (this._rawPrevTime >= 0 && this._first) { //when going back beyond the start, force a render so that zero-duration tweens that sit at the very beginning render their start values properly. Otherwise, if the parent timeline's playhead lands exactly at this timeline's startTime, and then moves backwards, the zero-duration tweens at the beginning would still be at their end state.
-						internalForce = true;
-					}
-					this._rawPrevTime = time;
-				} else {
-					this._rawPrevTime = (this._duration || !suppressEvents || time || this._rawPrevTime === time) ? time : _tinyNum; //when the playhead arrives at EXACTLY time 0 (right on top) of a zero-duration timeline or tween, we need to discern if events are suppressed so that when the playhead moves again (next time), it'll trigger the callback. If events are NOT suppressed, obviously the callback would be triggered in this render. Basically, the callback should fire either when the playhead ARRIVES or LEAVES this exact spot, not both. Imagine doing a timeline.seek(0) and there's a callback that sits at 0. Since events are suppressed on that seek() by default, nothing will fire, but when the playhead moves off of that position, the callback should fire. This behavior is what people intuitively expect. We set the _rawPrevTime to be a precise tiny number to indicate this scenario rather than using another property/variable which would increase memory usage. This technique is less readable, but more efficient.
-					if (time === 0 && isComplete) { //if there's a zero-duration tween at the very beginning of a timeline and the playhead lands EXACTLY at time 0, that tween will correctly render its end values, but we need to keep the timeline alive for one more render so that the beginning values render properly as the parent's playhead keeps moving beyond the begining. Imagine obj.x starts at 0 and then we do tl.set(obj, {x:100}).to(obj, 1, {x:200}) and then later we tl.reverse()...the goal is to have obj.x revert to 0. If the playhead happens to land on exactly 0, without this chunk of code, it'd complete the timeline and remove it from the rendering queue (not good).
-						tween = this._first;
-						while (tween && tween._startTime === 0) {
-							if (!tween._duration) {
-								isComplete = false;
-							}
-							tween = tween._next;
-						}
-					}
-					time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
-					if (!this._initted) {
-						internalForce = true;
-					}
-				}
-
-			} else {
-
-				if (this._hasPause && !this._forcingPlayhead && !suppressEvents) {
-					if (time >= prevTime) {
-						tween = this._first;
-						while (tween && tween._startTime <= time && !pauseTween) {
-							if (!tween._duration) if (tween.data === "isPause" && !tween.ratio && !(tween._startTime === 0 && this._rawPrevTime === 0)) {
-								pauseTween = tween;
-							}
-							tween = tween._next;
-						}
-					} else {
-						tween = this._last;
-						while (tween && tween._startTime >= time && !pauseTween) {
-							if (!tween._duration) if (tween.data === "isPause" && tween._rawPrevTime > 0) {
-								pauseTween = tween;
-							}
-							tween = tween._prev;
-						}
-					}
-					if (pauseTween) {
-						this._time = time = pauseTween._startTime;
-						this._totalTime = time + (this._cycle * (this._totalDuration + this._repeatDelay));
-					}
-				}
-
-				this._totalTime = this._time = this._rawPrevTime = time;
-			}
-			if ((this._time === prevTime || !this._first) && !force && !internalForce && !pauseTween) {
-				return;
-			} else if (!this._initted) {
-				this._initted = true;
-			}
-
-			if (!this._active) if (!this._paused && this._time !== prevTime && time > 0) {
-				this._active = true;  //so that if the user renders the timeline (as opposed to the parent timeline rendering it), it is forced to re-render and align it with the proper time/frame on the next rendering cycle. Maybe the timeline already finished but the user manually re-renders it as halfway done, for example.
-			}
-
-			if (prevTime === 0) if (this.vars.onStart) if (this._time !== 0 || !this._duration) if (!suppressEvents) {
-				this._callback("onStart");
-			}
-
-			curTime = this._time;
-			if (curTime >= prevTime) {
-				tween = this._first;
-				while (tween) {
-					next = tween._next; //record it here because the value could change after rendering...
-					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
-						break;
-					} else if (tween._active || (tween._startTime <= curTime && !tween._paused && !tween._gc)) {
-						if (pauseTween === tween) {
-							this.pause();
-						}
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-					}
-					tween = next;
-				}
-			} else {
-				tween = this._last;
-				while (tween) {
-					next = tween._prev; //record it here because the value could change after rendering...
-					if (curTime !== this._time || (this._paused && !prevPaused)) { //in case a tween pauses or seeks the timeline when rendering, like inside of an onUpdate/onComplete
-						break;
-					} else if (tween._active || (tween._startTime <= prevTime && !tween._paused && !tween._gc)) {
-						if (pauseTween === tween) {
-							pauseTween = tween._prev; //the linked list is organized by _startTime, thus it's possible that a tween could start BEFORE the pause and end after it, in which case it would be positioned before the pause tween in the linked list, but we should render it before we pause() the timeline and cease rendering. This is only a concern when going in reverse.
-							while (pauseTween && pauseTween.endTime() > this._time) {
-								pauseTween.render( (pauseTween._reversed ? pauseTween.totalDuration() - ((time - pauseTween._startTime) * pauseTween._timeScale) : (time - pauseTween._startTime) * pauseTween._timeScale), suppressEvents, force);
-								pauseTween = pauseTween._prev;
-							}
-							pauseTween = null;
-							this.pause();
-						}
-						if (!tween._reversed) {
-							tween.render((time - tween._startTime) * tween._timeScale, suppressEvents, force);
-						} else {
-							tween.render(((!tween._dirty) ? tween._totalDuration : tween.totalDuration()) - ((time - tween._startTime) * tween._timeScale), suppressEvents, force);
-						}
-					}
-					tween = next;
-				}
-			}
-
-			if (this._onUpdate) if (!suppressEvents) {
-				if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onUpdate on a timeline that reports/checks tweened values.
-					_lazyRender();
-				}
-				this._callback("onUpdate");
-			}
-
-			if (callback) if (!this._gc) if (prevStart === this._startTime || prevTimeScale !== this._timeScale) if (this._time === 0 || totalDur >= this.totalDuration()) { //if one of the tweens that was rendered altered this timeline's startTime (like if an onComplete reversed the timeline), it probably isn't complete. If it is, don't worry, because whatever call altered the startTime would complete if it was necessary at the new time. The only exception is the timeScale property. Also check _gc because there's a chance that kill() could be called in an onUpdate
-				if (isComplete) {
-					if (_lazyTweens.length) { //in case rendering caused any tweens to lazy-init, we should render them because typically when a timeline finishes, users expect things to have rendered fully. Imagine an onComplete on a timeline that reports/checks tweened values.
-						_lazyRender();
-					}
-					if (this._timeline.autoRemoveChildren) {
-						this._enabled(false, false);
-					}
-					this._active = false;
-				}
-				if (!suppressEvents && this.vars[callback]) {
-					this._callback(callback);
-				}
-			}
-		};
-
-		p._hasPausedChild = function() {
-			var tween = this._first;
-			while (tween) {
-				if (tween._paused || ((tween instanceof TimelineLite) && tween._hasPausedChild())) {
-					return true;
-				}
-				tween = tween._next;
-			}
-			return false;
-		};
-
-		p.getChildren = function(nested, tweens, timelines, ignoreBeforeTime) {
-			ignoreBeforeTime = ignoreBeforeTime || -9999999999;
-			var a = [],
-				tween = this._first,
-				cnt = 0;
-			while (tween) {
-				if (tween._startTime < ignoreBeforeTime) {
-					//do nothing
-				} else if (tween instanceof TweenLite) {
-					if (tweens !== false) {
-						a[cnt++] = tween;
-					}
-				} else {
-					if (timelines !== false) {
-						a[cnt++] = tween;
-					}
-					if (nested !== false) {
-						a = a.concat(tween.getChildren(true, tweens, timelines));
-						cnt = a.length;
-					}
-				}
-				tween = tween._next;
-			}
-			return a;
-		};
-
-		p.getTweensOf = function(target, nested) {
-			var disabled = this._gc,
-				a = [],
-				cnt = 0,
-				tweens, i;
-			if (disabled) {
-				this._enabled(true, true); //getTweensOf() filters out disabled tweens, and we have to mark them as _gc = true when the timeline completes in order to allow clean garbage collection, so temporarily re-enable the timeline here.
-			}
-			tweens = TweenLite.getTweensOf(target);
-			i = tweens.length;
-			while (--i > -1) {
-				if (tweens[i].timeline === this || (nested && this._contains(tweens[i]))) {
-					a[cnt++] = tweens[i];
-				}
-			}
-			if (disabled) {
-				this._enabled(false, true);
-			}
-			return a;
-		};
-
-		p.recent = function() {
-			return this._recent;
-		};
-
-		p._contains = function(tween) {
-			var tl = tween.timeline;
-			while (tl) {
-				if (tl === this) {
-					return true;
-				}
-				tl = tl.timeline;
-			}
-			return false;
-		};
-
-		p.shiftChildren = function(amount, adjustLabels, ignoreBeforeTime) {
-			ignoreBeforeTime = ignoreBeforeTime || 0;
-			var tween = this._first,
-				labels = this._labels,
-				p;
-			while (tween) {
-				if (tween._startTime >= ignoreBeforeTime) {
-					tween._startTime += amount;
-				}
-				tween = tween._next;
-			}
-			if (adjustLabels) {
-				for (p in labels) {
-					if (labels[p] >= ignoreBeforeTime) {
-						labels[p] += amount;
-					}
-				}
-			}
-			return this._uncache(true);
-		};
-
-		p._kill = function(vars, target) {
-			if (!vars && !target) {
-				return this._enabled(false, false);
-			}
-			var tweens = (!target) ? this.getChildren(true, true, false) : this.getTweensOf(target),
-				i = tweens.length,
-				changed = false;
-			while (--i > -1) {
-				if (tweens[i]._kill(vars, target)) {
-					changed = true;
-				}
-			}
-			return changed;
-		};
-
-		p.clear = function(labels) {
-			var tweens = this.getChildren(false, true, true),
-				i = tweens.length;
-			this._time = this._totalTime = 0;
-			while (--i > -1) {
-				tweens[i]._enabled(false, false);
-			}
-			if (labels !== false) {
-				this._labels = {};
-			}
-			return this._uncache(true);
-		};
-
-		p.invalidate = function() {
-			var tween = this._first;
-			while (tween) {
-				tween.invalidate();
-				tween = tween._next;
-			}
-			return Animation.prototype.invalidate.call(this);;
-		};
-
-		p._enabled = function(enabled, ignoreTimeline) {
-			if (enabled === this._gc) {
-				var tween = this._first;
-				while (tween) {
-					tween._enabled(enabled, true);
-					tween = tween._next;
-				}
-			}
-			return SimpleTimeline.prototype._enabled.call(this, enabled, ignoreTimeline);
-		};
-
-		p.totalTime = function(time, suppressEvents, uncapped) {
-			this._forcingPlayhead = true;
-			var val = Animation.prototype.totalTime.apply(this, arguments);
-			this._forcingPlayhead = false;
-			return val;
-		};
-
-		p.duration = function(value) {
-			if (!arguments.length) {
-				if (this._dirty) {
-					this.totalDuration(); //just triggers recalculation
-				}
-				return this._duration;
-			}
-			if (this.duration() !== 0 && value !== 0) {
-				this.timeScale(this._duration / value);
-			}
-			return this;
-		};
-
-		p.totalDuration = function(value) {
-			if (!arguments.length) {
-				if (this._dirty) {
-					var max = 0,
-						tween = this._last,
-						prevStart = 999999999999,
-						prev, end;
-					while (tween) {
-						prev = tween._prev; //record it here in case the tween changes position in the sequence...
-						if (tween._dirty) {
-							tween.totalDuration(); //could change the tween._startTime, so make sure the tween's cache is clean before analyzing it.
-						}
-						if (tween._startTime > prevStart && this._sortChildren && !tween._paused && !this._calculatingDuration) { //in case one of the tweens shifted out of order, it needs to be re-inserted into the correct position in the sequence
-							this._calculatingDuration = 1; //prevent endless recursive calls - there are methods that get triggered that check duration/totalDuration when we add(), like _parseTimeOrLabel().
-							this.add(tween, tween._startTime - tween._delay);
-							this._calculatingDuration = 0;
-						} else {
-							prevStart = tween._startTime;
-						}
-						if (tween._startTime < 0 && !tween._paused) { //children aren't allowed to have negative startTimes unless smoothChildTiming is true, so adjust here if one is found.
-							max -= tween._startTime;
-							if (this._timeline.smoothChildTiming) {
-								this._startTime += tween._startTime / this._timeScale;
-								this._time -= tween._startTime;
-								this._totalTime -= tween._startTime;
-								this._rawPrevTime -= tween._startTime;
-							}
-							this.shiftChildren(-tween._startTime, false, -9999999999);
-							prevStart = 0;
-						}
-						end = tween._startTime + (tween._totalDuration / tween._timeScale);
-						if (end > max) {
-							max = end;
-						}
-						tween = prev;
-					}
-					this._duration = this._totalDuration = max;
-					this._dirty = false;
-				}
-				return this._totalDuration;
-			}
-			return (value && this.totalDuration()) ? this.timeScale(this._totalDuration / value) : this;
-		};
-
-		p.paused = function(value) {
-			if (!value) { //if there's a pause directly at the spot from where we're unpausing, skip it.
-				var tween = this._first,
-					time = this._time;
-				while (tween) {
-					if (tween._startTime === time && tween.data === "isPause") {
-						tween._rawPrevTime = 0; //remember, _rawPrevTime is how zero-duration tweens/callbacks sense directionality and determine whether or not to fire. If _rawPrevTime is the same as _startTime on the next render, it won't fire.
-					}
-					tween = tween._next;
-				}
-			}
-			return Animation.prototype.paused.apply(this, arguments);
-		};
-
-		p.usesFrames = function() {
-			var tl = this._timeline;
-			while (tl._timeline) {
-				tl = tl._timeline;
-			}
-			return (tl === Animation._rootFramesTimeline);
-		};
-
-		p.rawTime = function(wrapRepeats) {
-			return (wrapRepeats && (this._paused || (this._repeat && this.time() > 0 && this.totalProgress() < 1))) ? this._totalTime % (this._duration + this._repeatDelay) : this._paused ? this._totalTime : (this._timeline.rawTime(wrapRepeats) - this._startTime) * this._timeScale;
-		};
-
-		return TimelineLite;
-
-	}, true);
-
-}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
-
-//export to AMD/RequireJS and CommonJS/Node (precursor to full modular build system coming at a later date)
-(function(name) {
-	"use strict";
-	var getGlobal = function() {
-		return (_gsScope.GreenSockGlobals || _gsScope)[name];
-	};
-	if (typeof(module) !== "undefined" && module.exports) { //node
-		__webpack_require__(139); //dependency
-		module.exports = getGlobal();
-	} else if (true) { //AMD
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(139)], __WEBPACK_AMD_DEFINE_FACTORY__ = (getGlobal),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	}
-}("TimelineMax"));
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
-
-/***/ }),
-/* 180 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
- * ScrollMagic v2.0.5 (2015-04-29)
- * The javascript library for magical scroll interactions.
- * (c) 2015 Jan Paepke (@janpaepke)
- * Project Website: http://scrollmagic.io
- * 
- * @version 2.0.5
- * @license Dual licensed under MIT license and GPL.
- * @author Jan Paepke - e-mail@janpaepke.de
- *
- * @file Debug Extension for ScrollMagic.
- */
-/**
- * This plugin was formerly known as the ScrollMagic debug extension.
- *
- * It enables you to add visual indicators to your page, to be able to see exactly when a scene is triggered.
- *
- * To have access to this extension, please include `plugins/debug.addIndicators.js`.
- * @mixin debug.addIndicators
- */
-(function (root, factory) {
-	if (true) {
-		// AMD. Register as an anonymous module.
-		!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(7)], __WEBPACK_AMD_DEFINE_FACTORY__ = (factory),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
-	} else if (typeof exports === 'object') {
-		// CommonJS
-		factory(require('scrollmagic'));
-	} else {
-		// no browser global export needed, just execute
-		factory(root.ScrollMagic || (root.jQuery && root.jQuery.ScrollMagic));
-	}
-}(this, function (ScrollMagic) {
-	"use strict";
-	var NAMESPACE = "debug.addIndicators";
-
-	var
-	console = window.console || {},
-		err = Function.prototype.bind.call(console.error || console.log ||
-		function () {}, console);
-	if (!ScrollMagic) {
-		err("(" + NAMESPACE + ") -> ERROR: The ScrollMagic main module could not be found. Please make sure it's loaded before this plugin or use an asynchronous loader like requirejs.");
-	}
-
-	// plugin settings
-	var
-	FONT_SIZE = "0.85em",
-		ZINDEX = "9999",
-		EDGE_OFFSET = 15; // minimum edge distance, added to indentation
-
-	// overall vars
-	var
-	_util = ScrollMagic._util,
-		_autoindex = 0;
-
-
-
-	ScrollMagic.Scene.extend(function () {
-		var
-		Scene = this,
-			_indicator;
-
-		var log = function () {
-			if (Scene._log) { // not available, when main source minified
-				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
-				Scene._log.apply(this, arguments);
-			}
-		};
-
-		/**
-		 * Add visual indicators for a ScrollMagic.Scene.  
-		 * @memberof! debug.addIndicators#
-		 *
-		 * @example
-		 * // add basic indicators
-		 * scene.addIndicators()
-		 *
-		 * // passing options
-		 * scene.addIndicators({name: "pin scene", colorEnd: "#FFFFFF"});
-		 *
-		 * @param {object} [options] - An object containing one or more options for the indicators.
-		 * @param {(string|object)} [options.parent=undefined] - A selector, DOM Object or a jQuery object that the indicators should be added to.  
-		 If undefined, the controller's container will be used.
-		 * @param {number} [options.name=""] - This string will be displayed at the start and end indicators of the scene for identification purposes. If no name is supplied an automatic index will be used.
-		 * @param {number} [options.indent=0] - Additional position offset for the indicators (useful, when having multiple scenes starting at the same position).
-		 * @param {string} [options.colorStart=green] - CSS color definition for the start indicator.
-		 * @param {string} [options.colorEnd=red] - CSS color definition for the end indicator.
-		 * @param {string} [options.colorTrigger=blue] - CSS color definition for the trigger indicator.
-		 */
-		Scene.addIndicators = function (options) {
-			if (!_indicator) {
-				var
-				DEFAULT_OPTIONS = {
-					name: "",
-					indent: 0,
-					parent: undefined,
-					colorStart: "green",
-					colorEnd: "red",
-					colorTrigger: "blue",
-				};
-
-				options = _util.extend({}, DEFAULT_OPTIONS, options);
-
-				_autoindex++;
-				_indicator = new Indicator(Scene, options);
-
-				Scene.on("add.plugin_addIndicators", _indicator.add);
-				Scene.on("remove.plugin_addIndicators", _indicator.remove);
-				Scene.on("destroy.plugin_addIndicators", Scene.removeIndicators);
-
-				// it the scene already has a controller we can start right away.
-				if (Scene.controller()) {
-					_indicator.add();
-				}
-			}
-			return Scene;
-		};
-
-		/**
-		 * Removes visual indicators from a ScrollMagic.Scene.
-		 * @memberof! debug.addIndicators#
-		 *
-		 * @example
-		 * // remove previously added indicators
-		 * scene.removeIndicators()
-		 *
-		 */
-		Scene.removeIndicators = function () {
-			if (_indicator) {
-				_indicator.remove();
-				this.off("*.plugin_addIndicators");
-				_indicator = undefined;
-			}
-			return Scene;
-		};
-
-	});
-
-
-/*
-	 * ----------------------------------------------------------------
-	 * Extension for controller to store and update related indicators
-	 * ----------------------------------------------------------------
-	 */
-	// add option to globally auto-add indicators to scenes
-	/**
-	 * Every ScrollMagic.Controller instance now accepts an additional option.  
-	 * See {@link ScrollMagic.Controller} for a complete list of the standard options.
-	 * @memberof! debug.addIndicators#
-	 * @method new ScrollMagic.Controller(options)
-	 * @example
-	 * // make a controller and add indicators to all scenes attached
-	 * var controller = new ScrollMagic.Controller({addIndicators: true});
-	 * // this scene will automatically have indicators added to it
-	 * new ScrollMagic.Scene()
-	 *                .addTo(controller);
-	 *
-	 * @param {object} [options] - Options for the Controller.
-	 * @param {boolean} [options.addIndicators=false] - If set to `true` every scene that is added to the controller will automatically get indicators added to it.
-	 */
-	ScrollMagic.Controller.addOption("addIndicators", false);
-	// extend Controller
-	ScrollMagic.Controller.extend(function () {
-		var
-		Controller = this,
-			_info = Controller.info(),
-			_container = _info.container,
-			_isDocument = _info.isDocument,
-			_vertical = _info.vertical,
-			_indicators = { // container for all indicators and methods
-				groups: []
-			};
-
-		var log = function () {
-			if (Controller._log) { // not available, when main source minified
-				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
-				Controller._log.apply(this, arguments);
-			}
-		};
-		if (Controller._indicators) {
-			log(2, "WARNING: Scene already has a property '_indicators', which will be overwritten by plugin.");
-		}
-
-		// add indicators container
-		this._indicators = _indicators;
-/*
-			needed updates:
-			+++++++++++++++
-			start/end position on scene shift (handled in Indicator class)
-			trigger parameters on triggerHook value change (handled in Indicator class)
-			bounds position on container scroll or resize (to keep alignment to bottom/right)
-			trigger position on container resize, window resize (if container isn't document) and window scroll (if container isn't document)
-		*/
-
-		// event handler for when associated bounds markers need to be repositioned
-		var handleBoundsPositionChange = function () {
-			_indicators.updateBoundsPositions();
-		};
-
-		// event handler for when associated trigger groups need to be repositioned
-		var handleTriggerPositionChange = function () {
-			_indicators.updateTriggerGroupPositions();
-		};
-
-		_container.addEventListener("resize", handleTriggerPositionChange);
-		if (!_isDocument) {
-			window.addEventListener("resize", handleTriggerPositionChange);
-			window.addEventListener("scroll", handleTriggerPositionChange);
-		}
-		// update all related bounds containers
-		_container.addEventListener("resize", handleBoundsPositionChange);
-		_container.addEventListener("scroll", handleBoundsPositionChange);
-
-
-		// updates the position of the bounds container to aligned to the right for vertical containers and to the bottom for horizontal
-		this._indicators.updateBoundsPositions = function (specificIndicator) {
-			var // constant for all bounds
-			groups = specificIndicator ? [_util.extend({}, specificIndicator.triggerGroup, {
-				members: [specificIndicator]
-			})] : // create a group with only one element
-			_indicators.groups,
-				// use all
-				g = groups.length,
-				css = {},
-				paramPos = _vertical ? "left" : "top",
-				paramDimension = _vertical ? "width" : "height",
-				edge = _vertical ? _util.get.scrollLeft(_container) + _util.get.width(_container) - EDGE_OFFSET : _util.get.scrollTop(_container) + _util.get.height(_container) - EDGE_OFFSET,
-				b, triggerSize, group;
-			while (g--) { // group loop
-				group = groups[g];
-				b = group.members.length;
-				triggerSize = _util.get[paramDimension](group.element.firstChild);
-				while (b--) { // indicators loop
-					css[paramPos] = edge - triggerSize;
-					_util.css(group.members[b].bounds, css);
-				}
-			}
-		};
-
-		// updates the positions of all trigger groups attached to a controller or a specific one, if provided
-		this._indicators.updateTriggerGroupPositions = function (specificGroup) {
-			var // constant vars
-			groups = specificGroup ? [specificGroup] : _indicators.groups,
-				i = groups.length,
-				container = _isDocument ? document.body : _container,
-				containerOffset = _isDocument ? {
-					top: 0,
-					left: 0
-				} : _util.get.offset(container, true),
-				edge = _vertical ? _util.get.width(_container) - EDGE_OFFSET : _util.get.height(_container) - EDGE_OFFSET,
-				paramDimension = _vertical ? "width" : "height",
-				paramTransform = _vertical ? "Y" : "X";
-			var // changing vars
-			group, elem, pos, elemSize, transform;
-			while (i--) {
-				group = groups[i];
-				elem = group.element;
-				pos = group.triggerHook * Controller.info("size");
-				elemSize = _util.get[paramDimension](elem.firstChild.firstChild);
-				transform = pos > elemSize ? "translate" + paramTransform + "(-100%)" : "";
-
-				_util.css(elem, {
-					top: containerOffset.top + (_vertical ? pos : edge - group.members[0].options.indent),
-					left: containerOffset.left + (_vertical ? edge - group.members[0].options.indent : pos)
-				});
-				_util.css(elem.firstChild.firstChild, {
-					"-ms-transform": transform,
-					"-webkit-transform": transform,
-					"transform": transform
-				});
-			}
-		};
-
-		// updates the label for the group to contain the name, if it only has one member
-		this._indicators.updateTriggerGroupLabel = function (group) {
-			var
-			text = "trigger" + (group.members.length > 1 ? "" : " " + group.members[0].options.name),
-				elem = group.element.firstChild.firstChild,
-				doUpdate = elem.textContent !== text;
-			if (doUpdate) {
-				elem.textContent = text;
-				if (_vertical) { // bounds position is dependent on text length, so update
-					_indicators.updateBoundsPositions();
-				}
-			}
-		};
-
-		// add indicators if global option is set
-		this.addScene = function (newScene) {
-
-			if (this._options.addIndicators && newScene instanceof ScrollMagic.Scene && newScene.controller() === Controller) {
-				newScene.addIndicators();
-			}
-			// call original destroy method
-			this.$super.addScene.apply(this, arguments);
-		};
-
-		// remove all previously set listeners on destroy
-		this.destroy = function () {
-			_container.removeEventListener("resize", handleTriggerPositionChange);
-			if (!_isDocument) {
-				window.removeEventListener("resize", handleTriggerPositionChange);
-				window.removeEventListener("scroll", handleTriggerPositionChange);
-			}
-			_container.removeEventListener("resize", handleBoundsPositionChange);
-			_container.removeEventListener("scroll", handleBoundsPositionChange);
-			// call original destroy method
-			this.$super.destroy.apply(this, arguments);
-		};
-		return Controller;
-
-	});
-
-/*
-	 * ----------------------------------------------------------------
-	 * Internal class for the construction of Indicators
-	 * ----------------------------------------------------------------
-	 */
-	var Indicator = function (Scene, options) {
-		var
-		Indicator = this,
-			_elemBounds = TPL.bounds(),
-			_elemStart = TPL.start(options.colorStart),
-			_elemEnd = TPL.end(options.colorEnd),
-			_boundsContainer = options.parent && _util.get.elements(options.parent)[0],
-			_vertical, _ctrl;
-
-		var log = function () {
-			if (Scene._log) { // not available, when main source minified
-				Array.prototype.splice.call(arguments, 1, 0, "(" + NAMESPACE + ")", "->");
-				Scene._log.apply(this, arguments);
-			}
-		};
-
-		options.name = options.name || _autoindex;
-
-		// prepare bounds elements
-		_elemStart.firstChild.textContent += " " + options.name;
-		_elemEnd.textContent += " " + options.name;
-		_elemBounds.appendChild(_elemStart);
-		_elemBounds.appendChild(_elemEnd);
-
-		// set public variables
-		Indicator.options = options;
-		Indicator.bounds = _elemBounds;
-		// will be set later
-		Indicator.triggerGroup = undefined;
-
-		// add indicators to DOM
-		this.add = function () {
-			_ctrl = Scene.controller();
-			_vertical = _ctrl.info("vertical");
-
-			var isDocument = _ctrl.info("isDocument");
-
-			if (!_boundsContainer) {
-				// no parent supplied or doesnt exist
-				_boundsContainer = isDocument ? document.body : _ctrl.info("container"); // check if window/document (then use body)
-			}
-			if (!isDocument && _util.css(_boundsContainer, "position") === 'static') {
-				// position mode needed for correct positioning of indicators
-				_util.css(_boundsContainer, {
-					position: "relative"
-				});
-			}
-
-			// add listeners for updates
-			Scene.on("change.plugin_addIndicators", handleTriggerParamsChange);
-			Scene.on("shift.plugin_addIndicators", handleBoundsParamsChange);
-
-			// updates trigger & bounds (will add elements if needed)
-			updateTriggerGroup();
-			updateBounds();
-
-			setTimeout(function () { // do after all execution is finished otherwise sometimes size calculations are off
-				_ctrl._indicators.updateBoundsPositions(Indicator);
-			}, 0);
-
-			log(3, "added indicators");
-		};
-
-		// remove indicators from DOM
-		this.remove = function () {
-			if (Indicator.triggerGroup) { // if not set there's nothing to remove
-				Scene.off("change.plugin_addIndicators", handleTriggerParamsChange);
-				Scene.off("shift.plugin_addIndicators", handleBoundsParamsChange);
-
-				if (Indicator.triggerGroup.members.length > 1) {
-					// just remove from memberlist of old group
-					var group = Indicator.triggerGroup;
-					group.members.splice(group.members.indexOf(Indicator), 1);
-					_ctrl._indicators.updateTriggerGroupLabel(group);
-					_ctrl._indicators.updateTriggerGroupPositions(group);
-					Indicator.triggerGroup = undefined;
-				} else {
-					// remove complete group
-					removeTriggerGroup();
-				}
-				removeBounds();
-
-				log(3, "removed indicators");
-			}
-		};
-
-/*
-		 * ----------------------------------------------------------------
-		 * internal Event Handlers
-		 * ----------------------------------------------------------------
-		 */
-
-		// event handler for when bounds params change
-		var handleBoundsParamsChange = function () {
-			updateBounds();
-		};
-
-		// event handler for when trigger params change
-		var handleTriggerParamsChange = function (e) {
-			if (e.what === "triggerHook") {
-				updateTriggerGroup();
-			}
-		};
-
-/*
-		 * ----------------------------------------------------------------
-		 * Bounds (start / stop) management
-		 * ----------------------------------------------------------------
-		 */
-
-		// adds an new bounds elements to the array and to the DOM
-		var addBounds = function () {
-			var v = _ctrl.info("vertical");
-			// apply stuff we didn't know before...
-			_util.css(_elemStart.firstChild, {
-				"border-bottom-width": v ? 1 : 0,
-				"border-right-width": v ? 0 : 1,
-				"bottom": v ? -1 : options.indent,
-				"right": v ? options.indent : -1,
-				"padding": v ? "0 8px" : "2px 4px",
-			});
-			_util.css(_elemEnd, {
-				"border-top-width": v ? 1 : 0,
-				"border-left-width": v ? 0 : 1,
-				"top": v ? "100%" : "",
-				"right": v ? options.indent : "",
-				"bottom": v ? "" : options.indent,
-				"left": v ? "" : "100%",
-				"padding": v ? "0 8px" : "2px 4px"
-			});
-			// append
-			_boundsContainer.appendChild(_elemBounds);
-		};
-
-		// remove bounds from list and DOM
-		var removeBounds = function () {
-			_elemBounds.parentNode.removeChild(_elemBounds);
-		};
-
-		// update the start and end positions of the scene
-		var updateBounds = function () {
-			if (_elemBounds.parentNode !== _boundsContainer) {
-				addBounds(); // Add Bounds elements (start/end)
-			}
-			var css = {};
-			css[_vertical ? "top" : "left"] = Scene.triggerPosition();
-			css[_vertical ? "height" : "width"] = Scene.duration();
-			_util.css(_elemBounds, css);
-			_util.css(_elemEnd, {
-				display: Scene.duration() > 0 ? "" : "none"
-			});
-		};
-
-/*
-		 * ----------------------------------------------------------------
-		 * trigger and trigger group management
-		 * ----------------------------------------------------------------
-		 */
-
-		// adds an new trigger group to the array and to the DOM
-		var addTriggerGroup = function () {
-			var triggerElem = TPL.trigger(options.colorTrigger); // new trigger element
-			var css = {};
-			css[_vertical ? "right" : "bottom"] = 0;
-			css[_vertical ? "border-top-width" : "border-left-width"] = 1;
-			_util.css(triggerElem.firstChild, css);
-			_util.css(triggerElem.firstChild.firstChild, {
-				padding: _vertical ? "0 8px 3px 8px" : "3px 4px"
-			});
-			document.body.appendChild(triggerElem); // directly add to body
-			var newGroup = {
-				triggerHook: Scene.triggerHook(),
-				element: triggerElem,
-				members: [Indicator]
-			};
-			_ctrl._indicators.groups.push(newGroup);
-			Indicator.triggerGroup = newGroup;
-			// update right away
-			_ctrl._indicators.updateTriggerGroupLabel(newGroup);
-			_ctrl._indicators.updateTriggerGroupPositions(newGroup);
-		};
-
-		var removeTriggerGroup = function () {
-			_ctrl._indicators.groups.splice(_ctrl._indicators.groups.indexOf(Indicator.triggerGroup), 1);
-			Indicator.triggerGroup.element.parentNode.removeChild(Indicator.triggerGroup.element);
-			Indicator.triggerGroup = undefined;
-		};
-
-		// updates the trigger group -> either join existing or add new one
-/*	
-		 * Logic:
-		 * 1 if a trigger group exist, check if it's in sync with Scene settings – if so, nothing else needs to happen
-		 * 2 try to find an existing one that matches Scene parameters
-		 * 	 2.1 If a match is found check if already assigned to an existing group
-		 *			 If so:
-		 *       A: it was the last member of existing group -> kill whole group
-		 *       B: the existing group has other members -> just remove from member list
-		 *	 2.2 Assign to matching group
-		 * 3 if no new match could be found, check if assigned to existing group
-		 *   A: yes, and it's the only member -> just update parameters and positions and keep using this group
-		 *   B: yes but there are other members -> remove from member list and create a new one
-		 *   C: no, so create a new one
-		 */
-		var updateTriggerGroup = function () {
-			var
-			triggerHook = Scene.triggerHook(),
-				closeEnough = 0.0001;
-
-			// Have a group, check if it still matches
-			if (Indicator.triggerGroup) {
-				if (Math.abs(Indicator.triggerGroup.triggerHook - triggerHook) < closeEnough) {
-					// _util.log(0, "trigger", options.name, "->", "no need to change, still in sync");
-					return; // all good
-				}
-			}
-			// Don't have a group, check if a matching one exists
-			// _util.log(0, "trigger", options.name, "->", "out of sync!");
-			var
-			groups = _ctrl._indicators.groups,
-				group, i = groups.length;
-			while (i--) {
-				group = groups[i];
-				if (Math.abs(group.triggerHook - triggerHook) < closeEnough) {
-					// found a match!
-					// _util.log(0, "trigger", options.name, "->", "found match");
-					if (Indicator.triggerGroup) { // do I have an old group that is out of sync?
-						if (Indicator.triggerGroup.members.length === 1) { // is it the only remaining group?
-							// _util.log(0, "trigger", options.name, "->", "kill");
-							// was the last member, remove the whole group
-							removeTriggerGroup();
-						} else {
-							Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
-							_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
-							_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
-							// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
-						}
-					}
-					// join new group
-					group.members.push(Indicator);
-					Indicator.triggerGroup = group;
-					_ctrl._indicators.updateTriggerGroupLabel(group);
-					return;
-				}
-			}
-
-			// at this point I am obviously out of sync and don't match any other group
-			if (Indicator.triggerGroup) {
-				if (Indicator.triggerGroup.members.length === 1) {
-					// _util.log(0, "trigger", options.name, "->", "updating existing");
-					// out of sync but i'm the only member => just change and update
-					Indicator.triggerGroup.triggerHook = triggerHook;
-					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
-					return;
-				} else {
-					// _util.log(0, "trigger", options.name, "->", "removing from previous member list");
-					Indicator.triggerGroup.members.splice(Indicator.triggerGroup.members.indexOf(Indicator), 1); // just remove from memberlist of old group
-					_ctrl._indicators.updateTriggerGroupLabel(Indicator.triggerGroup);
-					_ctrl._indicators.updateTriggerGroupPositions(Indicator.triggerGroup);
-					Indicator.triggerGroup = undefined; // need a brand new group...
-				}
-			}
-			// _util.log(0, "trigger", options.name, "->", "add a new one");
-			// did not find any match, make new trigger group
-			addTriggerGroup();
-		};
-	};
-
-/*
-	 * ----------------------------------------------------------------
-	 * Templates for the indicators
-	 * ----------------------------------------------------------------
-	 */
-	var TPL = {
-		start: function (color) {
-			// inner element (for bottom offset -1, while keeping top position 0)
-			var inner = document.createElement("div");
-			inner.textContent = "start";
-			_util.css(inner, {
-				position: "absolute",
-				overflow: "visible",
-				"border-width": 0,
-				"border-style": "solid",
-				color: color,
-				"border-color": color
-			});
-			var e = document.createElement('div');
-			// wrapper
-			_util.css(e, {
-				position: "absolute",
-				overflow: "visible",
-				width: 0,
-				height: 0
-			});
-			e.appendChild(inner);
-			return e;
-		},
-		end: function (color) {
-			var e = document.createElement('div');
-			e.textContent = "end";
-			_util.css(e, {
-				position: "absolute",
-				overflow: "visible",
-				"border-width": 0,
-				"border-style": "solid",
-				color: color,
-				"border-color": color
-			});
-			return e;
-		},
-		bounds: function () {
-			var e = document.createElement('div');
-			_util.css(e, {
-				position: "absolute",
-				overflow: "visible",
-				"white-space": "nowrap",
-				"pointer-events": "none",
-				"font-size": FONT_SIZE
-			});
-			e.style.zIndex = ZINDEX;
-			return e;
-		},
-		trigger: function (color) {
-			// inner to be above or below line but keep position
-			var inner = document.createElement('div');
-			inner.textContent = "trigger";
-			_util.css(inner, {
-				position: "relative",
-			});
-			// inner wrapper for right: 0 and main element has no size
-			var w = document.createElement('div');
-			_util.css(w, {
-				position: "absolute",
-				overflow: "visible",
-				"border-width": 0,
-				"border-style": "solid",
-				color: color,
-				"border-color": color
-			});
-			w.appendChild(inner);
-			// wrapper
-			var e = document.createElement('div');
-			_util.css(e, {
-				position: "fixed",
-				overflow: "visible",
-				"white-space": "nowrap",
-				"pointer-events": "none",
-				"font-size": FONT_SIZE
-			});
-			e.style.zIndex = ZINDEX;
-			e.appendChild(w);
-			return e;
-		},
-	};
-
-}));
-
-/***/ }),
-/* 181 */
-/***/ (function(module, exports, __webpack_require__) {
-
-window.ScrollMagic = __webpack_require__(7);
-__webpack_require__(178);
-window.TweenMax = __webpack_require__(138);
-__webpack_require__(180);
-
-window.controller = new ScrollMagic.Controller();
-
-if (window.innerWidth > 993) {
-    // tweens
-    var tween_1 = new TimelineMax().add([TweenMax.to("#home", 0.5, { backgroundPositionX: 'calc(50% + 1350px)', backgroundPositionY: 'center' }), TweenMax.staggerFromTo(".box-register", 2, { right: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { right: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0), TweenMax.staggerFromTo(".console", 2, { left: 0, boxShadow: '0 3px 8px rgba(0, 0, 0, 0.25)' }, { left: '120%', boxShadow: '0 15px 70px rgba(0, 0, 0, 0.7)', ease: Back.ease }, 0)]);
-    var tween_2 = new TimelineMax().add([TweenMax.to("#info", 0.2, { opacity: 1 }), TweenMax.to("#info", 0.5, { backgroundPositionX: 'calc(50% + 800px)', backgroundPositionY: 'center' })]);
-
-    var tween_3 = new TimelineMax().add([TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }), TweenMax.to(".judge", 0.2, { opacity: 1 }), TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }), TweenMax.staggerFromTo(".judge", 0.5, { top: 200 }, { top: -60, ease: Back.ease }, 0), TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })]);
-
-    var tween_4 = new TimelineMax().add([TweenMax.to("#we-search", 0.2, { opacity: 1 }), TweenMax.to("#we-search", 0.5, { backgroundPositionX: 'calc(50% + 20px)', backgroundPositionY: 'center' })]);
-    var tween_5 = new TimelineMax().add([TweenMax.to("#participate", 0.2, { opacity: 1 }), TweenMax.to("#participate", 0.5, { backgroundPositionX: 'calc(50% - 964px)', backgroundPositionY: 'center' })]);
-    var tween_6 = new TimelineMax().add([TweenMax.staggerFromTo(".enterprise", 2, { right: '120%' }, { right: 0, ease: Back.ease }, 0), TweenMax.staggerFromTo(".developer", 2, { left: '120%' }, { left: 0, ease: Back.ease }, 0)]);
-
-    // scenes
-    var scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight }).setTween(tween_1).addTo(controller).addIndicators();
-
-    var scene_2 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('home').offsetHeight }).setTween(tween_2).addTo(controller).addIndicators();
-
-    var scene_3 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).setTween(tween_3).addTo(controller).addIndicators();
-    var scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).setTween(tween_4).addTo(controller).addIndicators();
-
-    var scene_5 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).setTween(tween_5).addTo(controller).addIndicators();
-
-    var scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight - 300 }).setTween(tween_6).addTo(controller).addIndicators();
-
-    // nav items activate
-    var nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#home-item", 'active');
-
-    var nav_1 = new ScrollMagic.Scene({ triggerElement: "#info", duration: document.getElementById('info').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#info-item", 'active');
-
-    var nav_2 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#search-item", 'active');
-
-    var nav_3 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#participate-item", 'active');
-
-    var nav_4 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#challenge-item", 'active');
-
-    var nav_5 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight }).addTo(controller).addIndicators().setClassToggle("#judge-item", 'active');
-
-    var nav_6 = new ScrollMagic.Scene({ triggerElement: "#awards", duration: document.getElementById('awards').offsetHeight })
-    //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#award-item", 'active');
-
-    var nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight })
-    //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#inscription-item", 'active');
-
-    var nav_8 = new ScrollMagic.Scene({ triggerElement: "#conctact", duration: document.getElementById('conctact').offsetHeight })
-    //.setTween(tween_3)
-    .addTo(controller).addIndicators().setClassToggle("#conctact-item", 'active');
-}
-
-/***/ }),
-/* 182 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
-    _c("div", { staticClass: "navbar-items hide-on-med-and-down" }, [
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "home-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("home")
-            }
-          }
-        },
-        [_vm._v("Inicio")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "info-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("info")
-            }
-          }
-        },
-        [_vm._v("¿Qué es?")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "search-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("we-search")
-            }
-          }
-        },
-        [_vm._v("¿Qué buscamos?")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "participate-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("participate")
-            }
-          }
-        },
-        [_vm._v("¿Quiénes participan?")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "challenge-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("challenges")
-            }
-          }
-        },
-        [_vm._v("Retos")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "judge-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("judges")
-            }
-          }
-        },
-        [_vm._v("Jurados")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "award-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("awards")
-            }
-          }
-        },
-        [_vm._v("Premios")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "inscription-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("inscriptions")
-            }
-          }
-        },
-        [_vm._v("Inscripción")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        {
-          staticClass: "item",
-          attrs: { id: "conctact-item" },
-          on: {
-            click: function($event) {
-              $event.preventDefault()
-              _vm.$root.goToView("conctact")
-            }
-          }
-        },
-        [_vm._v("Contacto")]
-      ),
-      _vm._v(" "),
-      _c(
-        "div",
-        [
-          !_vm.$root.auth
-            ? _c(
-                "router-link",
-                { staticClass: "item right", attrs: { to: "/login" } },
-                [_vm._v("Login")]
-              )
-            : _c(
-                "router-link",
-                { staticClass: "item right", attrs: { to: "/dashboard" } },
-                [_vm._v("Dashboard")]
-              )
-        ],
-        1
-      )
-    ]),
-    _vm._v(" "),
-    _c("section", { attrs: { id: "home" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main normal" }, [
-          _vm._v("Hackathon Montería")
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 m5" }, [
-          _c("div", { staticClass: "box-register" }, [
-            _vm._m(0),
-            _vm._v(" "),
-            _c("div", { staticClass: "content-register" }, [
-              _c("div", { staticClass: "row" }, [
-                _vm._m(1),
-                _vm._v(" "),
-                _c("div", { staticClass: "col s12 m6" }, [
-                  _c("button", { staticClass: "button-register" }, [
-                    _c("div", { staticClass: "icon-caracter" }, [
-                      _c(
-                        "svg",
-                        {
-                          staticStyle: {
-                            "enable-background": "new 0 0 25.916 25.916"
-                          },
-                          attrs: {
-                            version: "1.1",
-                            id: "businessman",
-                            xmlns: "http://www.w3.org/2000/svg",
-                            "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                            x: "0px",
-                            y: "0px",
-                            viewBox: "0 0 25.916 25.916",
-                            "xml:space": "preserve"
-                          }
-                        },
-                        [
-                          _c("g", { staticClass: "fill-caracter-icon" }, [
-                            _c("path", {
-                              attrs: {
-                                d:
-                                  "M7.938,8.13c0.09,0.414,0.228,0.682,0.389,0.849c0.383,2.666,2.776,4.938,4.698,4.843\n\t\t                  \t\t\tc2.445-0.12,4.178-2.755,4.567-4.843c0.161-0.166,0.316-0.521,0.409-0.938c0.104-0.479,0.216-1.201-0.072-1.583\n\t\t                  \t\t\tc-0.017-0.02-0.127-0.121-0.146-0.138c0.275-0.992,0.879-2.762-0.625-4.353c-0.815-0.862-1.947-1.295-2.97-1.637\n\t\t                  \t\t\tc-3.02-1.009-5.152,0.406-6.136,2.759C7.981,3.256,7.522,4.313,8.078,6.32C8.024,6.356,7.975,6.402,7.934,6.458\n\t\t                  \t\t\tC7.645,6.839,7.833,7.651,7.938,8.13z"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              attrs: {
-                                d:
-                                  "M23.557,22.792c-0.084-1.835-0.188-4.743-1.791-7.122c0,0-0.457-0.623-1.541-1.037\n\t\t                  \t\t\tc0,0-2.354-0.717-3.438-1.492l-0.495,0.339l0.055,3.218l-2.972,7.934c-0.065,0.174-0.231,0.289-0.416,0.289\n\t\t                  \t\t\ts-0.351-0.115-0.416-0.289l-2.971-7.934c0,0,0.055-3.208,0.054-3.218c0.007,0.027-0.496-0.339-0.496-0.339\n\t\t                  \t\t\tc-1.082,0.775-3.437,1.492-3.437,1.492c-1.084,0.414-1.541,1.037-1.541,1.037c-1.602,2.379-1.708,5.287-1.792,7.122\n\t\t                  \t\t\tc-0.058,1.268,0.208,1.741,0.542,1.876c4.146,1.664,15.965,1.664,20.112,0C23.35,24.534,23.614,24.06,23.557,22.792z"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              attrs: {
-                                d:
-                                  "M13.065,14.847l-0.134,0.003c-0.432,0-0.868-0.084-1.296-0.232l1.178,1.803l-1.057,1.02\n\t\t                  \t\t\tl1.088,6.607c0.009,0.057,0.058,0.098,0.116,0.098c0.057,0,0.106-0.041,0.116-0.098l1.088-6.607l-1.058-1.02l1.161-1.776\n\t\t                  \t\t\tC13.888,14.756,13.487,14.83,13.065,14.847z"
-                              }
-                            })
-                          ])
-                        ]
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("span", [_vm._v("Empresario")])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "col s12 m6" }, [
-                  _c("button", { staticClass: "button-register" }, [
-                    _c("div", { staticClass: "icon-caracter" }, [
-                      _c(
-                        "svg",
-                        {
-                          staticStyle: {
-                            "enable-background": "new 0 0 512 512"
-                          },
-                          attrs: {
-                            version: "1.1",
-                            id: "developer",
-                            xmlns: "http://www.w3.org/2000/svg",
-                            "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                            x: "0px",
-                            y: "0px",
-                            viewBox: "0 0 512 512",
-                            "xml:space": "preserve"
-                          }
-                        },
-                        [
-                          _c("g", { staticClass: "fill-caracter-icon" }, [
-                            _c("path", {
-                              attrs: {
-                                d:
-                                  "M441.217,235.868l-37.982-8.802l12.093-37.912l-0.879-0.293c-14.881-4.96-31.125-9.049-48.264-12.282\n\t\t                  \t\t\tc-6.656,54.889-53.528,97.558-110.184,97.558c-55.875,0-102.231-41.501-109.884-95.295c-17.267,3.639-33.567,8.144-48.424,13.509\n\t\t                  \t\t\tl11.073,34.715l-38.004,8.807L0,366.342v79.397h84.333V311.805h343.333V445.74H512v-80.103L441.217,235.868z"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              attrs: {
-                                d:
-                                  "M380.972,81.566c-18.27-40.058-54.956-69.109-98.135-77.711c-17.809-3.548-35.865-3.548-53.674,0\n\t\t                  \t\t\tc-43.179,8.602-79.865,37.653-98.135,77.711l-36.553,80.144c44.649-14.98,101.279-23.544,160.609-24.199\n\t\t                  \t\t\tc58.917-0.643,115.535,6.531,160.653,20.281L380.972,81.566z"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              attrs: {
-                                d:
-                                  "M175.696,173.584c5.143,39.744,39.182,70.554,80.304,70.554c41.688,0,76.11-31.66,80.513-72.196\n\t\t                  \t\t\tC284.593,165.404,227.333,165.99,175.696,173.584z"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              attrs: {
-                                d:
-                                  "M114.333,510.805h283.333v-169H114.333V510.805z M256,405.091l21.213,21.213L256,447.518l-21.213-21.213L256,405.091z"
-                              }
-                            })
-                          ])
-                        ]
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("span", [_vm._v("Dev - Maker")])
-                  ])
-                ]),
-                _vm._v(" "),
-                _c("div", { staticClass: "col s12 center" }, [
-                  _c(
-                    "div",
-                    {
-                      staticClass: "more-info",
-                      on: {
-                        click: function($event) {
-                          _vm.$root.goToView("info")
-                        }
-                      }
-                    },
-                    [_c("a", [_vm._v("Mas información")])]
-                  )
-                ])
-              ])
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 m7" }, [_c("word-writing")], 1)
-      ])
-    ]),
-    _vm._v(" "),
-    _c("section", { attrs: { id: "info" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col s12" }, [
-            _c("h2", { staticClass: "title-section" }, [
-              _vm._v("¿Qúe es la transformación digital?")
-            ]),
-            _vm._v(" "),
-            _c(
-              "div",
-              { staticClass: "col s12 container-content-info no-padding" },
-              [
-                _vm._m(2),
-                _vm._v(" "),
-                _c("div", { staticClass: "col s12 m6" }, [
-                  _c("div", { staticClass: "content-info" }, [
-                    _vm._m(3),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "animation-digital-transform" }, [
-                      _c(
-                        "svg",
-                        {
-                          staticStyle: {
-                            "enable-background": "new 0 0 656 573.3"
-                          },
-                          attrs: {
-                            version: "1.1",
-                            id: "Layer_1",
-                            xmlns: "http://www.w3.org/2000/svg",
-                            "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                            x: "0px",
-                            y: "0px",
-                            viewBox: "0 0 656 273",
-                            "xml:space": "preserve"
-                          }
-                        },
-                        [
-                          _c("g", { staticClass: "memo-dt" }, [
-                            _c("rect", {
-                              staticClass: "st6 memo-container",
-                              attrs: {
-                                x: "198.4",
-                                y: "131.9",
-                                width: "254",
-                                height: "254"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("g", { staticClass: "objects-drawed-pencil" }, [
-                              _c("g", [
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M341.2,309.8c-2,0-3.6-1.6-3.6-3.6v-10.9c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v10.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC344.9,308.2,343.2,309.8,341.2,309.8"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M355.8,309.8c-2,0-3.6-1.6-3.6-3.6v-25.5c0-2,1.6-3.6,3.6-3.6c2,0,3.6,1.6,3.6,3.6v25.5\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC359.4,308.2,357.8,309.8,355.8,309.8"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M370.3,309.8c-2,0-3.6-1.6-3.6-3.6V288c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v18.2\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC374,308.2,372.4,309.8,370.3,309.8"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M384.9,309.8c-2,0-3.6-1.6-3.6-3.6v-43.7c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v43.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC388.5,308.2,386.9,309.8,384.9,309.8"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M399.5,309.8c-2,0-3.6-1.6-3.6-3.6V277c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v29.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC403.1,308.2,401.5,309.8,399.5,309.8"
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st8",
-                                attrs: {
-                                  d:
-                                    "M319.4,257c0,21.1-17.1,38.2-38.2,38.2S243,278.1,243,257s17.1-38.2,38.2-38.2S319.4,235.9,319.4,257"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st8",
-                                attrs: {
-                                  d:
-                                    "M279.4,218.9C279.4,218.9,279.4,218.9,279.4,218.9l-0.1,39.9c0,0.1,0.1,0.1,0.1,0.1h39.8c0,0,0,0,0.1-0.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC320.4,236.3,301.9,217.8,279.4,218.9"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("g", [
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M381.3,237h-29.1c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h29.1c2,0,3.6,1.6,3.6,3.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC384.9,235.4,383.3,237,381.3,237"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M399.5,237c-0.9,0-1.9-0.4-2.6-1.1c-0.1-0.2-0.3-0.4-0.4-0.5c-0.1-0.2-0.3-0.4-0.3-0.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc-0.1-0.2-0.2-0.4-0.2-0.7c0-0.3-0.1-0.5-0.1-0.7c0-0.2,0-0.5,0.1-0.7c0-0.2,0.1-0.4,0.2-0.7c0.1-0.2,0.2-0.4,0.3-0.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc0.1-0.2,0.3-0.4,0.4-0.5c1.3-1.3,3.8-1.3,5.2,0c0.7,0.7,1.1,1.6,1.1,2.6c0,1-0.4,1.9-1.1,2.6C401.3,236.6,400.4,237,399.5,237"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M399.5,218.8h-10.9c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h10.9c2,0,3.6,1.6,3.6,3.6S401.5,218.8,399.5,218.8"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M359.4,218.8h-7.3c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h7.3c2,0,3.6,1.6,3.6,3.6S361.4,218.8,359.4,218.8"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "st8",
-                                  attrs: {
-                                    d:
-                                      "M374,218.8c-0.9,0-1.9-0.4-2.6-1.1c-0.7-0.7-1.1-1.6-1.1-2.6c0-0.9,0.4-1.9,1.1-2.6c0.4-0.3,0.7-0.6,1.2-0.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc1.3-0.6,2.9-0.3,4,0.8c0.7,0.7,1.1,1.6,1.1,2.6c0,0.9-0.4,1.9-1.1,2.6C375.9,218.4,374.9,218.8,374,218.8"
-                                  }
-                                })
-                              ])
-                            ]),
-                            _vm._v(" "),
-                            _c("g", { staticClass: "pencil-dt" }, [
-                              _c("path", {
-                                staticClass: "st7",
-                                attrs: {
-                                  d:
-                                    "M358.2,222.4c1.4,1.4,1.4,3.7,0,5.1l-1.3,1.3l20.8-5.7l-20.2-20.2l-5.7,20.8l1.3-1.3\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC354.6,221,356.8,221,358.2,222.4z"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st9",
-                                attrs: {
-                                  d:
-                                    "M357,228.8l1.3-1.3c1.4-1.4,1.4-3.7,0-5.1c-1.4-1.4-3.7-1.4-5.1,0l-1.3,1.3l-1.9,7L357,228.8z"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("polygon", {
-                                staticClass: "st10",
-                                attrs: {
-                                  points:
-                                    "474.6,126.4 454.3,106 357.6,202.7 357.6,202.8 377.8,223.1 377.9,223 "
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st11",
-                                attrs: {
-                                  d:
-                                    "M497.5,93.3l-10.3-10.3c-2.8-2.8-7.3-2.8-10.1,0l-12.8,12.8l20.3,20.3l12.8-12.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC500.3,100.7,500.3,96.1,497.5,93.3z"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("rect", {
-                                staticClass: "st7",
-                                attrs: {
-                                  x: "462.3",
-                                  y: "96.7",
-                                  transform:
-                                    "matrix(0.7071 -0.7071 0.7071 0.7071 58.9513 364.5358)",
-                                  width: "14.4",
-                                  height: "28.8"
-                                }
-                              })
-                            ])
-                          ]),
-                          _vm._v(" "),
-                          _c("g", { staticClass: "computer-dt" }, [
-                            _c("path", {
-                              staticClass: "st0",
-                              attrs: {
-                                d:
-                                  "M584,389.8H72V120.6c0-17.1,13.8-30.9,30.9-30.9h450.2c17.1,0,30.9,13.8,30.9,30.9L584,389.8L584,389.8z"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              staticClass: "st1",
-                              attrs: {
-                                d:
-                                  "M433.9,566.3H222.1c0-19.5,15.8-35.3,35.3-35.3h141.2C418.1,531,433.9,546.8,433.9,566.3"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("polygon", {
-                              staticClass: "st2",
-                              attrs: {
-                                points:
-                                  "389.8,531 266.2,531 283.9,460.4 372.1,460.4 \t"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              staticClass: "st1",
-                              attrs: {
-                                d:
-                                  "M553.1,460.4H102.9c-17.1,0-30.9-13.8-30.9-30.9v-39.7h512v39.7C584,446.6,570.2,460.4,553.1,460.4"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("g", { staticClass: "bars-horizontal" }, [
-                              _c("path", {
-                                staticClass: "st3",
-                                attrs: {
-                                  d:
-                                    "M363.3,363.3c-4.9,0-8.8-4-8.8-8.8V328c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v26.5\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC372.1,359.4,368.2,363.3,363.3,363.3"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st3",
-                                attrs: {
-                                  d:
-                                    "M398.6,363.3c-4.9,0-8.8-4-8.8-8.8v-61.8c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v61.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC407.4,359.4,403.5,363.3,398.6,363.3"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st3",
-                                attrs: {
-                                  d:
-                                    "M433.9,363.3c-4.9,0-8.8-4-8.8-8.8v-44.1c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v44.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC442.8,359.4,438.8,363.3,433.9,363.3"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st3",
-                                attrs: {
-                                  d:
-                                    "M469.2,363.3c-4.9,0-8.8-4-8.8-8.8V248.6c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v105.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC478.1,359.4,474.1,363.3,469.2,363.3"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st3",
-                                attrs: {
-                                  d:
-                                    "M504.6,363.3c-4.9,0-8.8-4-8.8-8.8v-70.6c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v70.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC513.4,359.4,509.4,363.3,504.6,363.3"
-                                }
-                              })
-                            ]),
-                            _vm._v(" "),
-                            _c("path", {
-                              staticClass: "st4",
-                              attrs: {
-                                d:
-                                  "M310.3,235.3c0,51.2-41.5,92.7-92.7,92.7S125,286.5,125,235.3s41.5-92.7,92.7-92.7S310.3,184.1,310.3,235.3"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("path", {
-                              staticClass: "st5 graphic-part",
-                              attrs: {
-                                d:
-                                  "M213.4,142.7c0,0-0.1,0.1-0.1,0.1v96.6c0,0.2,0.1,0.3,0.3,0.3h96.6c0,0,0.1-0.1,0.1-0.1\n\t\t\t\t\t\t\t\t\t\t\t\t\tC312.7,185,267.9,140.3,213.4,142.7"
-                              }
-                            }),
-                            _vm._v(" "),
-                            _c("g", { staticClass: "bars-vertical" }, [
-                              _c("path", {
-                                staticClass: "st4",
-                                attrs: {
-                                  d:
-                                    "M460.4,186.8h-70.6c-4.9,0-8.8-4-8.8-8.8s3.9-8.8,8.8-8.8h70.6c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC469.2,182.8,465.3,186.8,460.4,186.8"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st4",
-                                attrs: {
-                                  d:
-                                    "M504.6,186.8c-2.3,0-4.6-1-6.3-2.6c-0.4-0.4-0.8-0.9-1.1-1.3c-0.4-0.5-0.6-1.1-0.8-1.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tc-0.3-0.5-0.4-1.1-0.5-1.6c-0.1-0.6-0.2-1.2-0.2-1.8s0.1-1.1,0.2-1.8c0.1-0.5,0.3-1.1,0.5-1.6c0.2-0.5,0.4-1.1,0.8-1.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tc0.3-0.4,0.7-0.9,1.1-1.3c3.3-3.3,9.2-3.3,12.5,0c1.6,1.7,2.6,3.9,2.6,6.3c0,2.4-1,4.6-2.6,6.3\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC509.1,185.8,506.8,186.8,504.6,186.8"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st4",
-                                attrs: {
-                                  d:
-                                    "M504.6,142.6h-26.5c-4.9,0-8.8-4-8.8-8.8c0-4.9,3.9-8.8,8.8-8.8h26.5c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC513.4,138.7,509.4,142.6,504.6,142.6"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st4",
-                                attrs: {
-                                  d:
-                                    "M407.4,142.6h-17.7c-4.9,0-8.8-4-8.8-8.8c0-4.9,3.9-8.8,8.8-8.8h17.7c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC416.3,138.7,412.3,142.6,407.4,142.6"
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "st4",
-                                attrs: {
-                                  d:
-                                    "M442.8,142.6c-2.3,0-4.6-1-6.3-2.6c-1.6-1.7-2.6-4-2.6-6.3c0-2.3,1-4.6,2.6-6.3c0.9-0.8,1.8-1.4,2.9-1.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tc3.3-1.4,7.1-0.6,9.6,1.9c1.6,1.7,2.6,4,2.6,6.3c0,2.3-1,4.6-2.6,6.3C447.3,141.6,445.1,142.6,442.8,142.6"
-                                }
-                              })
-                            ])
-                          ]),
-                          _vm._v(" "),
-                          _c(
-                            "g",
-                            {
-                              staticClass: "transform-arrow",
-                              attrs: { fill: "#f28a7c" }
-                            },
-                            [
-                              _c("g", { staticClass: "icon_arrow-line" }, [
-                                _c("path", {
-                                  staticClass: "arrow-line-a",
-                                  attrs: {
-                                    d:
-                                      "m 30.201849,72.467726 2.78648,0.161796 0.287637,-4.674096 -2.804458,-0.161796 z"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "arrow-line-b",
-                                  attrs: {
-                                    d:
-                                      "m 35.073695,61.303828 -2.750526,-0.683137 -1.06066,4.566232 2.660639,0.66516 z"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "arrow-line-c",
-                                  attrs: {
-                                    d:
-                                      "m 33.707421,57.744325 2.444911,1.312342 2.265139,-4.062868 -2.498843,-1.348297 z"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "arrow-line-d",
-                                  attrs: {
-                                    d:
-                                      "m 37.752311,51.578114 2.157275,1.707842 2.912321,-3.613435 -2.193229,-1.743797 z"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "arrow-line-e",
-                                  attrs: {
-                                    d:
-                                      "m 42.749998,46.005153 1.599979,2.301094 3.865118,-2.552776 -1.599979,-2.337047 z"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "arrow-line-f",
-                                  attrs: {
-                                    d:
-                                      "m 49.275755,42.229922 0.916842,2.624685 4.422413,-1.52807 -0.898864,-2.606707 z"
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("path", {
-                                  staticClass: "arrow-line-g",
-                                  attrs: {
-                                    d:
-                                      "m 56.232967,40.036693 0.287636,2.804457 4.602187,-0.431455 -0.233705,-2.732548 z"
-                                  }
-                                })
-                              ]),
-                              _vm._v(" "),
-                              _c("path", {
-                                staticClass: "arrow-end",
-                                attrs: {
-                                  d:
-                                    "m 60.392578,33.474609 -2.042969,2.113282 5.839844,5.648437 -5.583984,5.773438 2.113281,2.042968 7.587891,-7.845703 -0.107422,-0.103515 z"
-                                }
-                              })
-                            ]
-                          )
-                        ]
-                      )
-                    ])
-                  ])
-                ]),
-                _vm._v(" "),
-                _vm._m(4)
-              ]
-            )
-          ])
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _c("section", { attrs: { id: "we-search" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h2", { staticClass: "title-section" }, [_vm._v("¿Qué buscamos?")]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 container-content-info" }, [
-          _vm._m(5),
-          _vm._v(" "),
-          _c("div", { staticClass: "col s12 m6" }, [
-            _c("div", { staticClass: "content-solution-image" }, [
-              _c(
-                "svg",
-                {
-                  staticStyle: { "enable-background": "new 0 0 464 464" },
-                  attrs: {
-                    version: "1.1",
-                    id: "solution-business",
-                    xmlns: "http://www.w3.org/2000/svg",
-                    "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                    x: "0px",
-                    y: "0px",
-                    viewBox: "0 0 464 464",
-                    "xml:space": "preserve"
-                  }
-                },
-                [
-                  _c("path", {
-                    staticStyle: { fill: "#A6001E" },
-                    attrs: {
-                      d:
-                        "M64,328c0,4.418-3.582,8-8,8s-8,3.582-8,8v16c0,13.255,10.745,24,24,24h16c13.255,0,24-10.745,24-24\n\t\t\t\t\t\t\t\t\tv-16c0-4.418-3.582-8-8-8c-4.418,0-8-3.582-8-8c0-8.837,7.163-16,16-16h40v-40c0-8.837-7.163-16-16-16c-4.418,0-8,3.582-8,8\n\t\t\t\t\t\t\t\t\ts-3.582,8-8,8h-16c-13.255,0-24-10.745-24-24v-16c0-13.255,10.745-24,24-24h16c4.418,0,8,3.582,8,8s3.582,8,8,8\n\t\t\t\t\t\t\t\t\tc8.837,0,16-7.163,16-16v-48C68.053,160,0,228.053,0,312h48C56.837,312,64,319.163,64,328z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#F40E34" },
-                    attrs: {
-                      d:
-                        "M72,372c-6.617,0-12-5.383-12-12v-12.398c9.117-1.859,16-9.945,16-19.602c0-15.438-12.563-28-28-28\n\t\t\t\t\t\t\t\t\tH12.508C18.281,232.359,72.359,178.281,140,172.508V208c0,0.898-0.297,1.727-0.797,2.398C136.773,202.086,129.086,196,120,196h-16\n\t\t\t\t\t\t\t\t\tc-19.852,0-36,16.148-36,36v16c0,19.852,16.148,36,36,36h16c9.086,0,16.773-6.086,19.203-14.398c0.5,0.672,0.797,1.5,0.797,2.398v28\n\t\t\t\t\t\t\t\t\th-28c-15.438,0-28,12.563-28,28c0,9.656,6.883,17.742,16,19.602V360c0,6.617-5.383,12-12,12H72z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#E7B900" },
-                    attrs: {
-                      d:
-                        "M176,392c4.418,0,8,3.582,8,8s3.582,8,8,8h8c17.673,0,32-14.327,32-32s-14.327-32-32-32h-8\n\t\t\t\t\t\t\t\t\tc-4.418,0-8,3.582-8,8s-3.582,8-8,8c-13.255,0-24-10.745-24-24v-24h-40c-8.837,0-16,7.163-16,16c0,4.418,3.582,8,8,8\n\t\t\t\t\t\t\t\t\tc4.418,0,8,3.582,8,8v16c0,13.255-10.745,24-24,24H72c-13.255,0-24-10.745-24-24v-16c0-4.418,3.582-8,8-8s8-3.582,8-8\n\t\t\t\t\t\t\t\t\tc0-8.837-7.163-16-16-16H0c0,83.947,68.053,152,152,152v-48C152,402.745,162.745,392,176,392z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#FFD422" },
-                    attrs: {
-                      d:
-                        "M140,451.492C72.359,445.719,18.281,391.641,12.508,324H48c0.898,0,1.727,0.297,2.398,0.797\n\t\t\t\t\t\t\t\t\tC42.086,327.227,36,334.914,36,344v16c0,19.852,16.148,36,36,36h16c19.852,0,36-16.148,36-36v-16\n\t\t\t\t\t\t\t\t\tc0-9.086-6.086-16.773-14.398-19.203c0.672-0.5,1.5-0.797,2.398-0.797h28v12c0,19.852,16.148,36,36,36\n\t\t\t\t\t\t\t\t\tc9.656,0,17.742-6.883,19.602-16H200c11.031,0,20,8.969,20,20s-8.969,20-20,20h-4.398c-1.859-9.117-9.945-16-19.602-16\n\t\t\t\t\t\t\t\t\tc-19.852,0-36,16.148-36,36V451.492z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("g", { staticClass: "puzzle-blue" }, [
-                    _c("path", {
-                      staticStyle: { fill: "#1E81CE" },
-                      attrs: {
-                        d:
-                          "M240,288c0-4.418,3.582-8,8-8s8-3.582,8-8v-8c0-17.673-14.327-32-32-32s-32,14.327-32,32v8\n\t\t\t\t\t\t\t\t\t\tc0,4.418,3.582,8,8,8s8,3.582,8,8c0,13.255-10.745,24-24,24h-32v24c0,13.255,10.745,24,24,24c4.418,0,8-3.582,8-8s3.582-8,8-8h8\n\t\t\t\t\t\t\t\t\t\tc17.673,0,32,14.327,32,32s-14.327,32-32,32h-8c-4.418,0-8-3.582-8-8s-3.582-8-8-8c-13.255,0-24,10.745-24,24v48\n\t\t\t\t\t\t\t\t\t\tc83.947,0,152-68.053,152-152h-40C250.745,312,240,301.255,240,288z"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("path", {
-                      staticStyle: { fill: "#5AAAE7" },
-                      attrs: {
-                        d:
-                          "M164,416c0-5.406,3.594-9.984,8.516-11.484C174.57,413.375,182.523,420,192,420h8\n\t\t\t\t\t\t\t\t\t\tc24.258,0,44-19.742,44-44s-19.742-44-44-44h-8c-9.477,0-17.43,6.625-19.484,15.484c-4.922-1.5-8.516-6.078-8.516-11.484v-12h20\n\t\t\t\t\t\t\t\t\t\tc19.852,0,36-16.148,36-36c0-9.656-6.883-17.742-16-19.602V264c0-11.031,8.969-20,20-20s20,8.969,20,20v4.398\n\t\t\t\t\t\t\t\t\t\tc-9.117,1.859-16,9.945-16,19.602c0,19.852,16.148,36,36,36h27.492C285.719,391.641,231.641,445.719,164,451.492V416z"
-                      }
-                    })
-                  ]),
-                  _vm._v(" "),
-                  _c("g", { staticClass: "hand-puzzle" }, [
-                    _c("path", {
-                      staticStyle: { fill: "#5EAC24" },
-                      attrs: {
-                        d:
-                          "M267.022,97.013c-3.119-3.129-3.112-8.194,0.017-11.314s3.136-8.185,0.017-11.314l-11.297-11.331\n\t\t\t\t\t\t\t\t\t\tc-9.359-9.387-24.554-9.409-33.941-0.051l-11.331,11.297c-9.387,9.359-9.409,24.554-0.051,33.941l11.297,11.331\n\t\t\t\t\t\t\t\t\t\tc3.12,3.129,8.185,3.136,11.314,0.017c3.129-3.12,8.194-3.112,11.314,0.017c6.239,6.258,6.224,16.388-0.034,22.627L216,170.476\n\t\t\t\t\t\t\t\t\t\tl28.242,28.327c6.239,6.258,16.37,6.273,22.627,0.034c3.129-3.12,3.136-8.185,0.017-11.314c-3.119-3.129-3.112-8.194,0.017-11.314\n\t\t\t\t\t\t\t\t\t\tl11.331-11.297c9.387-9.359,24.583-9.336,33.941,0.051l11.297,11.331c9.359,9.387,9.336,24.583-0.051,33.941l-11.331,11.297\n\t\t\t\t\t\t\t\t\t\tc-3.129,3.12-8.194,3.112-11.314-0.017c-3.119-3.129-8.185-3.136-11.314-0.017c-6.258,6.239-6.273,16.37-0.034,22.627l33.89,33.992\n\t\t\t\t\t\t\t\t\t\tc59.449-59.271,59.593-155.512,0.322-214.96l-33.992,33.89C283.392,103.286,273.261,103.271,267.022,97.013z"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("path", {
-                      staticStyle: { fill: "#69C229" },
-                      attrs: {
-                        d:
-                          "M297.93,235.656c-0.758-0.766-1.039-1.617-1.133-2.258c2.93,1.609,6.219,2.469,9.648,2.469\n\t\t\t\t\t\t\t\t\t\tc5.32,0,10.336-2.07,14.109-5.828l11.344-11.305c6.805-6.797,10.563-15.828,10.578-25.445c0.008-9.617-3.719-18.656-10.516-25.469\n\t\t\t\t\t\t\t\t\t\tl-11.289-11.328c-6.805-6.828-15.859-10.586-25.492-10.586c-9.602,0-18.625,3.734-25.422,10.516l-11.328,11.289\n\t\t\t\t\t\t\t\t\t\tc-3.773,3.766-5.867,8.781-5.875,14.125c-0.008,3.422,0.836,6.711,2.438,9.625c-0.648-0.094-1.5-0.375-2.258-1.133L232.969,170.5\n\t\t\t\t\t\t\t\t\t\tl19.828-19.766c10.938-10.906,10.961-28.672,0.055-39.602c-3.766-3.789-8.797-5.883-14.164-5.883c-3.969,0-7.766,1.156-11,3.297\n\t\t\t\t\t\t\t\t\t\tl-8.75-8.781c-4.672-4.68-4.664-12.297,0.023-16.977l11.328-11.281c2.266-2.258,5.273-3.508,8.477-3.508\n\t\t\t\t\t\t\t\t\t\tc3.211,0,6.227,1.258,8.5,3.531l8.75,8.773c-2.156,3.234-3.328,7.047-3.328,11.039c-0.008,5.328,2.063,10.352,5.828,14.133\n\t\t\t\t\t\t\t\t\t\tc5.297,5.32,12.336,8.242,19.836,8.242c7.461,0,14.484-2.906,19.773-8.18l25.133-25.055C344.5,105.711,356.047,137.313,356,170.68\n\t\t\t\t\t\t\t\t\t\ts-11.688,64.938-33.008,90.109L297.93,235.656z"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("path", {
-                      staticStyle: { fill: "#FFB398" },
-                      attrs: {
-                        d:
-                          "M256,40l30.64-30.64c6.006-6,14.151-9.367,22.64-9.36H464v112h-24l-24,32h-88v-16\n\t\t\t\t\t\t\t\t\t\tc0.032-13.606,8.664-25.704,21.52-30.16c3.358-1.225,6.906-1.848,10.48-1.84l0,0c13.255,0,24-10.745,24-24V56\n\t\t\t\t\t\t\t\t\t\tc0-13.255-10.745-24-24-24h-34.72c-8.489-0.007-16.634,3.36-22.64,9.36L280,64L256,40z"
-                      }
-                    })
-                  ])
-                ]
-              )
-            ])
-          ]),
-          _vm._v(" "),
-          _vm._m(6)
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _vm._m(7),
-    _vm._v(" "),
-    _vm._m(8),
-    _vm._v(" "),
-    _vm._m(9),
-    _vm._v(" "),
-    _c("section", { attrs: { id: "awards" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h2", { staticClass: "title-section" }, [_vm._v("Premios")]),
-        _vm._v(" "),
-        _c("div", { staticClass: "container-awards" }, [
-          _c("div", { staticClass: "award-podium-icon" }, [
-            _c(
-              "svg",
-              {
-                staticStyle: { "enable-background": "new 0 0 512 512" },
-                attrs: {
-                  xmlns: "http://www.w3.org/2000/svg",
-                  "xmlns:xlink": "http://www.w3.org/1999/xlink",
-                  version: "1.1",
-                  id: "Capa_1",
-                  x: "0px",
-                  y: "0px",
-                  viewBox: "0 0 512 512",
-                  "xml:space": "preserve"
-                }
-              },
-              [
-                _c("rect", {
-                  staticStyle: { fill: "#F89E62" },
-                  attrs: { y: "345.024", width: "170.672", height: "166.976" }
-                }),
-                _vm._v(" "),
-                _c("rect", {
-                  staticStyle: { fill: "#ED6362" },
-                  attrs: {
-                    x: "170.672",
-                    y: "267.584",
-                    width: "170.672",
-                    height: "244.416"
-                  }
-                }),
-                _vm._v(" "),
-                _c("rect", {
-                  staticStyle: { fill: "#F89E62" },
-                  attrs: {
-                    x: "341.328",
-                    y: "376.352",
-                    width: "170.672",
-                    height: "135.648"
-                  }
-                }),
-                _vm._v(" "),
-                _c("path", {
-                  staticStyle: { fill: "#E95454" },
-                  attrs: {
-                    d:
-                      "M341.328,267.584H246.72c-7.712,0-14.464,5.648-14.88,13.232c-0.416,8.128,6.064,14.88,14.048,14.88  h9.872c8.128,0,14.608,6.752,14.192,14.88c-0.416,7.584-7.296,13.36-14.88,13.36h-15.12c-7.584,0.144-13.632,6.336-13.632,14.048  s6.336,14.048,14.048,14.048h28.624c6.608,0,11.984,5.376,11.856,11.856v1.104c0.416,6.336-4.688,11.84-11.168,11.84h-32.32  c-7.712,0-14.464,5.648-15.024,13.232c-0.272,8.128,6.064,14.88,14.192,14.88h27.776c6.48,0,11.856,5.376,11.856,11.856  l-0.144,0.832v0.144c0.144,6.896-5.504,12.544-12.4,12.544h-26c-7.712,0-14.464,5.648-15.024,13.36  c-0.272,8.128,6.064,14.88,14.192,14.88h29.456c6.896,0,11.856,5.648,11.856,12.544c0,0,0,0,0,0.144s0,0.144,0,0.144  c0,6.752-4.96,12.544-11.856,12.544h-17.456c-7.584,0-14.336,5.648-14.736,13.232c-0.432,8.224,6.048,14.832,14.048,14.832h93.248  V267.584H341.328z"
-                  }
-                }),
-                _vm._v(" "),
-                _c("path", {
-                  staticStyle: { fill: "#FAAB74" },
-                  attrs: {
-                    d:
-                      "M418.576,376.352c-7.616,0-14.288,5.568-14.688,13.056c-0.416,8.032,5.984,14.704,13.872,14.704h9.76  c8.032,0,14.416,6.672,14.016,14.688c-0.416,7.488-7.232,13.2-14.704,13.2h-14.928c-7.488,0.144-13.472,6.256-13.472,13.872  s6.256,13.872,13.872,13.872h28.272c6.528,0,11.84,5.312,11.696,11.696v1.088c0.416,6.256-4.624,11.696-11.024,11.696h-31.904  c-7.616,0-14.288,5.584-14.832,13.056c-0.272,8.048,5.984,14.72,14.016,14.72H512V376.352H418.576z"
-                  }
-                }),
-                _vm._v(" "),
-                _c("path", {
-                  staticStyle: { fill: "#F89959" },
-                  attrs: {
-                    d:
-                      "M55.664,345.024c-9.376,0-17.584,6.864-18.08,16.08c-0.512,9.888,7.36,18.096,17.072,18.096h12  c9.888,0,17.76,8.208,17.248,18.08c-0.496,9.216-8.88,16.24-18.08,16.24H47.44c-9.216,0.176-16.576,7.712-16.576,17.088  s7.696,17.088,17.088,17.088h34.8c8.032,0,14.576,6.528,14.4,14.4v1.344c0.496,7.696-5.696,14.4-13.568,14.4H44.288  c-9.376,0-17.584,6.864-18.256,16.08C25.696,503.792,33.408,512,43.296,512h127.376V345.024H55.664z"
-                  }
-                }),
-                _vm._v(" "),
-                _c("g", [
-                  _c("path", {
-                    staticStyle: { fill: "#FFFFFF" },
-                    attrs: {
-                      d:
-                        "M258.512,352.896c-1.6,4.48-4.56,8.4-8.88,11.76c-2.656,2.064-5.152,3.584-7.568,4.832v12.8   c5.088-2.224,9.792-4.96,13.776-8.688v53.088h14.096V352.88h-11.424V352.896z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#FFFFFF" },
-                    attrs: {
-                      d:
-                        "M110.032,452.336v13.088H60.64c0.528-4.944,2.144-9.632,4.816-14.064   c2.672-4.432,7.952-10.304,15.84-17.616c6.352-5.92,10.24-9.92,11.68-12.032c1.936-2.912,2.912-5.776,2.912-8.624   c0-3.136-0.848-5.552-2.528-7.248c-1.68-1.68-4.016-2.528-6.992-2.528c-2.944,0-5.28,0.88-7.024,2.656s-2.736,4.72-3.008,8.816   l-14.032-1.408c0.832-7.76,3.456-13.312,7.872-16.688c4.416-3.376,9.92-5.056,16.544-5.056c7.248,0,12.944,1.952,17.104,5.872   c4.144,3.904,6.224,8.768,6.224,14.592c0,3.312-0.592,6.464-1.776,9.456s-3.072,6.128-5.648,9.408   c-1.712,2.176-4.784,5.296-9.232,9.376s-7.264,6.784-8.448,8.128s-2.144,2.64-2.88,3.904h27.968V452.336z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#FFFFFF" },
-                    attrs: {
-                      d:
-                        "M402.256,460.944l13.632-1.648c0.432,3.472,1.6,6.128,3.504,7.968s4.208,2.752,6.912,2.752   c2.912,0,5.36-1.104,7.344-3.312s2.976-5.184,2.976-8.928c0-3.536-0.96-6.352-2.864-8.416c-1.904-2.08-4.224-3.104-6.976-3.104   c-1.808,0-3.968,0.352-6.464,1.056l1.552-11.488c3.808,0.096,6.72-0.72,8.72-2.48s3.008-4.08,3.008-6.992   c0-2.48-0.736-4.448-2.208-5.92c-1.472-1.472-3.424-2.208-5.872-2.208c-2.4,0-4.464,0.832-6.16,2.512   c-1.712,1.664-2.736,4.112-3.104,7.312l-12.992-2.208c0.896-4.448,2.272-8,4.08-10.656c1.824-2.656,4.368-4.752,7.616-6.272   c3.264-1.52,6.912-2.288,10.96-2.288c6.912,0,12.464,2.208,16.64,6.624c3.44,3.616,5.168,7.68,5.168,12.24   c0,6.448-3.52,11.6-10.576,15.44c4.208,0.896,7.584,2.928,10.096,6.064s3.792,6.928,3.792,11.376   c0,6.448-2.352,11.952-7.072,16.496s-10.576,6.816-17.6,6.816c-6.656,0-12.16-1.92-16.544-5.744   C405.488,472.144,402.96,467.136,402.256,460.944z"
-                    }
-                  })
-                ]),
-                _vm._v(" "),
-                _c("g", { staticClass: "award-icon" }, [
-                  _c("path", {
-                    staticStyle: { fill: "#2B414D" },
-                    attrs: {
-                      d:
-                        "M308.567,161.452l-152.025,68.923l122.88,270.966l66.166-55.926l85.465-12.603  C431.053,432.812,308.567,161.452,308.567,161.452z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#475F6C" },
-                    attrs: {
-                      d:
-                        "M195.927,164.209l152.025,68.923l-122.88,271.36l-66.166-56.32l-85.858-12.603  C73.047,435.569,195.927,164.209,195.927,164.209z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#EFC75E" },
-                    attrs: {
-                      d:
-                        "M449.17,197.292c0,14.572-20.874,26.782-24.025,40.566c-3.151,14.178,10.634,34.265,4.726,47.262  c-6.302,12.997-30.326,14.572-38.991,25.6s-4.726,35.446-15.754,44.505s-33.083-0.394-45.686,5.908s-19.298,29.932-33.083,33.083  c-13.391,3.151-29.538-14.966-43.717-14.966c-14.178,0-30.326,18.117-43.717,14.966c-13.785-3.151-20.48-26.782-33.083-33.083  c-12.603-6.302-35.052,3.151-45.686-5.908c-11.028-9.058-7.089-33.477-15.754-44.505s-32.689-12.603-38.991-25.6  c-5.908-12.603,7.877-33.083,4.726-47.262c-3.938-13.785-24.812-25.994-24.812-40.566s20.874-26.782,24.025-40.566  c3.151-14.178-10.634-34.265-4.726-47.262c6.302-12.997,30.326-14.572,38.991-25.6s4.726-35.446,15.754-44.505  s33.083,0.394,45.686-5.908c12.603-6.302,19.298-29.932,33.083-33.083c13.391-3.151,29.538,14.966,43.717,14.966  c14.178,0,30.326-18.117,43.717-14.966c13.785,3.151,20.48,26.782,33.083,33.083c12.603,6.302,35.052-3.151,45.686,5.908  c11.028,9.058,7.089,33.477,15.754,44.505s32.689,12.603,38.991,25.6c5.908,12.603-7.877,33.083-4.726,47.262  C428.296,170.511,449.17,182.72,449.17,197.292z"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("path", {
-                    staticStyle: { fill: "#D7B354" },
-                    attrs: {
-                      d:
-                        "M252.247,118.523c-43.717,0-78.769,35.446-78.769,78.769s35.446,78.769,78.769,78.769  c43.717,0,78.769-35.446,78.769-78.769S295.963,118.523,252.247,118.523z M252.247,232.738c-19.692,0-35.446-15.754-35.446-35.446  s15.754-35.446,35.446-35.446s35.446,15.754,35.446,35.446S271.939,232.738,252.247,232.738z M252.247,55.507  c-78.375,0-141.785,63.409-141.785,141.785s63.409,141.785,141.785,141.785s141.784-63.41,141.784-141.785  S330.622,55.507,252.247,55.507z M252.247,315.446c-65.378,0-118.154-52.775-118.154-118.154S186.868,79.138,252.247,79.138  s118.154,52.775,118.154,118.154S317.625,315.446,252.247,315.446z"
-                    }
-                  })
-                ])
-              ]
-            )
-          ]),
-          _vm._v(" "),
-          _c("div", {})
-        ])
-      ])
-    ]),
-    _vm._v(" "),
-    _vm._m(10),
-    _vm._v(" "),
-    _vm._m(11),
-    _vm._v(" "),
-    _vm._m(12)
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("header", [
-      _vm._v("\n\t\t      \t\t¡Haz parte del "),
-      _c("span", { staticClass: "r-text" }, [_vm._v("evento!")])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col s12" }, [
-      _c("img", {
-        staticClass: "responsive-img",
-        attrs: { src: "/images/logo.png", width: "200" }
-      }),
-      _vm._v(" "),
-      _c("p", { staticClass: "description-text" }, [
-        _vm._v("Simplemente selecciona tu rol:")
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col s12 m6" }, [
-      _c("div", { staticClass: "content-info" }, [
-        _c("span", [
-          _vm._v(
-            "La transformación digital es el proceso por el cual las empresas reorganizan sus métodos de trabajo y estrategias, para obtener más beneficios gracias a la implementación de las nuevas tecnologías, reconstruye las dinámicas de las organizaciones para adaptarlas a las necesidades del presente y del futuro."
-          )
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("h3", { staticClass: "title-time" }, [
-      _vm._v("¡Es hora de "),
-      _c("span", { staticClass: "sub" }, [_vm._v("transformar")]),
-      _vm._v(" tu empresa!")
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col s12" }, [
-      _c("h2", { staticClass: "subtitle-section" }, [
-        _vm._v("¿Qué ventajas aporta la Transformación Digital?")
-      ]),
-      _vm._v(" "),
-      _c("span", { staticClass: "text-justify" }, [
-        _vm._v(
-          "La clave para la organización es ver la transformación digital como una oportunidad que permite combinar prácticas y formas de hacer que dan como resultado nuevas técnicas y habilidades como las siguientes:"
-        )
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "container-objects" }, [
-        _c("div", { staticClass: "object" }, [
-          _c("div", { staticClass: "container-img" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/advantage/online-shopping.svg" }
-            })
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "title-object" }, [
-            _vm._v("Generar experiencias nuevas al cliente")
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "object" }, [
-          _c("div", { staticClass: "container-img" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/advantage/businessmen_efi.svg" }
-            })
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "title-object two-lines" }, [
-            _vm._v("Mejorar la eficiencia operativa")
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "object" }, [
-          _c("div", { staticClass: "container-img" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/advantage/businessman_money.svg" }
-            })
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "title-object" }, [
-            _vm._v("Generar nuevas fuentes de ingresos")
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "object" }, [
-          _c("div", { staticClass: "container-img" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/advantage/student.svg" }
-            })
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "title-object" }, [
-            _vm._v("Responder rápido a los cambios en el mercado")
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "object" }, [
-          _c("div", { staticClass: "container-img" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/advantage/profits.svg" }
-            })
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "title-object" }, [
-            _vm._v("Crear una ventaja competitiva para la organización")
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "object" }, [
-          _c("div", { staticClass: "container-img" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/advantage/meeting.svg" }
-            })
-          ]),
-          _vm._v(" "),
-          _c("span", { staticClass: "title-object two-lines" }, [
-            _vm._v("Mejorar la colaboración interna")
-          ])
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "content-info step-row" }, [
-      _c("span", [
-        _vm._v(
-          "Queremos realizar una maratón tecnológica, denominada hackathon. Este evento consiste en la asignación de las necesidades tecnológicas de las empresas del departamento de Córdoba a varios grupos de desarrolladores, para que compitan por un premio a la mejor solución tecnológica (prototipo) de las necesidades presentadas, con el fin de mejorar el proceso de transformación productiva y digital de nuestros empresarios."
-        )
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "col s12 m6 no-padding" }, [
-      _c("div", { staticClass: "content-info" }, [
-        _c("span", [
-          _vm._v(
-            "Para el desarrollo del mencionado evento se requiere convocar a un grupo de empresarios con el objetivo de capacitarlos en la identificación de sus necesidades tecnológicas, tendientes a la automatización y optimización de sus actividades mercantiles; para la solución (prototipo) de dichas necesidades se requiere de la conformación de los team makers (programadores) y de un espacio optimo y adecuado para el desarrollo del evento."
-          )
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "participate" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h2", { staticClass: "title-section" }, [
-          _vm._v("¿Quiénes participan?")
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col s12 m6 container-content-info" }, [
-            _c("div", { staticClass: "container-participate enterprise" }, [
-              _c("div", { staticClass: "card-participate" }, [
-                _c("img", {
-                  staticClass: "responsive-img",
-                  attrs: { src: "/images/participate/teamwork.svg" }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-title-participate" }, [
-                _c("span", { staticClass: "title" }, [_vm._v("Empresas")])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-info-participate" }, [
-                _vm._v(
-                  "Las empresas requieren soluciones tecnológicas para el potenciamiento de su operatividad, ya sea replantear los modelos de negocios u optimizar procesos de la cadena de valor. Las empresas identificarán las necesidades que limitan sus procesos de transformación digital, y serán expuestas ante los makers para el desarrollo de soluciones tecnológicas.\n\t\t  \t\t\t\t"
-                )
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col s12 m6 container-content-info" }, [
-            _c("div", { staticClass: "container-participate developer" }, [
-              _c("div", { staticClass: "card-participate" }, [
-                _c("img", {
-                  staticClass: "responsive-img",
-                  attrs: { src: "/images/participate/hacker.svg" }
-                })
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-title-participate" }, [
-                _c("span", { staticClass: "title" }, [
-                  _vm._v("Desarrolladores - Makers")
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "card-info-participate" }, [
-                _vm._v(
-                  "Los makers son agentes generadores de ideas y conocimientos para la resolución de problemas. Son los desarrolladores de las soluciones a las dificultades presentadas por los empresarios; estos son profesionales o estudiantes, técnicos o tecnólogos que conforman el capital humano. \n\t\t  \t\t\t\t"
-                )
-              ])
-            ])
-          ])
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "challenges" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h2", { staticClass: "title-section" }, [_vm._v("Retos")]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 container-content-info" }, [
-          _c("div", { staticClass: "content-info margin-default-bottom" }, [
-            _c("span", [
-              _vm._v(
-                "Proponemos los siguientes retos a cumplir para que el evento sea todo un exito."
-              )
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 m6 l3" }, [
-          _c("div", { staticClass: "container-challenge" }, [
-            _c("div", { staticClass: "title-number-challenge" }, [
-              _c("div", { staticClass: "bg-number" }, [
-                _c("span", { staticClass: "number-challenge" }, [_vm._v("1")])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "challenge-icon" }, [
-              _c("div", [
-                _c("img", {
-                  staticClass: "responsive-img",
-                  attrs: { src: "/images/challenges/car-repair.svg" }
-                })
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "title-challenge" }, [
-              _vm._v("Diagnóstico")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "info-challenge" }, [
-              _vm._v(
-                "Socialización del proyecto al sector productivo y capacitación en Transformación Productiva y Digital"
-              )
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 m6 l3" }, [
-          _c("div", { staticClass: "container-challenge" }, [
-            _c("div", { staticClass: "title-number-challenge" }, [
-              _c("div", { staticClass: "bg-number" }, [
-                _c("span", { staticClass: "number-challenge" }, [_vm._v("2")])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "challenge-icon" }, [
-              _c("div", [
-                _c("img", {
-                  staticClass: "responsive-img",
-                  attrs: { src: "/images/challenges/user.svg" }
-                })
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "title-challenge" }, [
-              _vm._v("Selección")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "info-challenge" }, [
-              _vm._v(
-                "Reclutamiento y selección de los Makers, socialización del proyecto y capacitación en prototipado."
-              )
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 m6 l3" }, [
-          _c("div", { staticClass: "container-challenge" }, [
-            _c("div", { staticClass: "title-number-challenge" }, [
-              _c("div", { staticClass: "bg-number" }, [
-                _c("span", { staticClass: "number-challenge" }, [_vm._v("3")])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "challenge-icon" }, [
-              _c("div", [
-                _c("img", {
-                  staticClass: "responsive-img",
-                  attrs: { src: "/images/challenges/problem.svg" }
-                })
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "title-challenge" }, [
-              _vm._v("Necesidades")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "info-challenge" }, [
-              _vm._v(
-                "Categorización de necesidades y conformación de Makers Team."
-              )
-            ])
-          ])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col s12 m6 l3" }, [
-          _c("div", { staticClass: "container-challenge" }, [
-            _c("div", { staticClass: "title-number-challenge" }, [
-              _c("div", { staticClass: "bg-number" }, [
-                _c("span", { staticClass: "number-challenge" }, [_vm._v("4")])
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "challenge-icon" }, [
-              _c("div", [
-                _c("img", {
-                  staticClass: "responsive-img mini",
-                  attrs: { src: "/images/challenges/employee_female.svg" }
-                }),
-                _vm._v(" "),
-                _c("img", {
-                  staticClass: "responsive-img mini",
-                  attrs: { src: "/images/challenges/employee_male.svg" }
-                })
-              ])
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "title-challenge" }, [
-              _vm._v("Desarrollo")
-            ]),
-            _vm._v(" "),
-            _c("div", { staticClass: "info-challenge" }, [
-              _vm._v(
-                "Desarrollo tecnológico para solucionar la necesidad planteada por el sector empresarial."
-              )
-            ])
-          ])
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "judges" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c(
-          "h2",
-          { staticClass: "title-section", attrs: { id: "title-section-two" } },
-          [_vm._v("Jurados")]
-        ),
-        _vm._v(" "),
-        _c("div", { staticClass: "container-judges" }, [
-          _c("div", { staticClass: "judge" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/omar.jpg" }
-            }),
-            _vm._v(" "),
-            _c("span", { staticClass: "name" }, [_vm._v("Omar Flórez")]),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("span", [
-                _vm._v(
-                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t    consequat."
-                )
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "judge" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/sergio.jpg" }
-            }),
-            _vm._v(" "),
-            _c("span", { staticClass: "name" }, [_vm._v("Sergio Molina")]),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("span", [
-                _vm._v(
-                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t    consequat."
-                )
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "judge" }, [
-            _c("img", {
-              staticClass: "responsive-img",
-              attrs: { src: "/images/judges/uribe.png" }
-            }),
-            _vm._v(" "),
-            _c("span", { staticClass: "name" }, [_vm._v("Uribe")]),
-            _vm._v(" "),
-            _c("div", { staticClass: "info" }, [
-              _c("span", [
-                _vm._v(
-                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t    consequat."
-                )
-              ])
-            ])
-          ])
-        ])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "inscriptions" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h2", { staticClass: "title-section" }, [_vm._v("Inscripción")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("section", { attrs: { id: "conctact" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h2", { staticClass: "title-section" }, [_vm._v("Contacto")])
-      ])
-    ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("footer", { attrs: { id: "footer" } }, [
-      _c("div", { staticClass: "container" }, [
-        _c("h1", { staticClass: "title-main" }, [_vm._v("PATROCINADORES")])
-      ])
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-384052eb", module.exports)
-  }
-}
-
-/***/ }),
-/* 183 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(184)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(186)
-/* template */
-var __vue_template__ = __webpack_require__(187)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-78b73b2d"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\Dashboard.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-78b73b2d", Component.options)
-  } else {
-    hotAPI.reload("data-v-78b73b2d", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 184 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(185);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("8ba9bafc", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-78b73b2d\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Dashboard.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-78b73b2d\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Dashboard.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 185 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n.btn-floating.tooltipped[data-v-78b73b2d] {\n  font-size: 20px;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 186 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      tokens: [],
-      loading: false
-    };
-  },
-
-  methods: {
-    getTokens: function getTokens() {
-      var vm = this;
-      vm.loading = true;
-      axios.get('/api/user/tokens').then(function (response) {
-        vm.tokens = response.data.data;
-        setTimeout(function () {
-          $('.tooltipped').tooltip();
-        }, 10);
-      }).catch(function (error) {
-        console.log(error);
-        M.toast("Hubo un error al obtener los tokens", 6000);
-      }).then(function () {
-        vm.loading = false;
-      });
-    },
-    deleteToken: function deleteToken(index) {
-      var vm = this;
-      vm.loading = true;
-      axios.delete('/api/user/tokens/' + vm.tokens[index].id).then(function (response) {
-        vm.getTokens();
-      }).catch(function (error) {
-        console.log(error);
-        M.toast("Hubo un error al eliminar el token", 6000);
-      }).then(function () {
-        vm.loading = false;
-      });
-    }
-  },
-  mounted: function mounted() {
-    var vm = this;
-    if (!vm.$root.auth) {
-      vm.$router.push("/");
-    } else {
-      vm.getTokens();
-    }
-  }
-});
-
-/***/ }),
-/* 187 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
-    _c(
-      "div",
-      { staticClass: "navbar-items" },
-      [
-        _c("router-link", { staticClass: "item", attrs: { to: "/" } }, [
-          _vm._v("Inicio")
-        ]),
-        _vm._v(" "),
-        _c(
-          "div",
-          {
-            staticClass: "item right",
-            on: {
-              click: function($event) {
-                $event.preventDefault()
-                return _vm.$root.logout($event)
-              }
-            }
-          },
-          [_vm._v("Logout")]
-        )
-      ],
-      1
-    ),
-    _vm._v(" "),
-    _c("div", { staticClass: "container" }, [
-      _c("div", { staticClass: "row" }, [
-        _c("div", { staticClass: "col s12" }, [
-          _c("div", { staticClass: "card" }, [
-            _c("div", { staticClass: "card-content" }, [
-              _c("table", { staticClass: "striped highlight" }, [
-                _vm._m(0),
-                _vm._v(" "),
-                _c(
-                  "tbody",
-                  _vm._l(_vm.tokens, function(token, i) {
-                    return _c("tr", { key: i }, [
-                      _c("td", [_vm._v(_vm._s(token.id))]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(token.created_at))]),
-                      _vm._v(" "),
-                      _c("td", [_vm._v(_vm._s(token.expires_at))]),
-                      _vm._v(" "),
-                      _c("td", [
-                        _c(
-                          "a",
-                          {
-                            staticClass:
-                              "btn-floating tooltipped mainColor waves-effect waves-light",
-                            class: { disabled: token.revoked },
-                            attrs: {
-                              disabled: token.revoked,
-                              "data-position": "bottom",
-                              "data-tooltip": "Cerrar conexión"
-                            },
-                            on: {
-                              click: function($event) {
-                                _vm.deleteToken(i)
-                              }
-                            }
-                          },
-                          [
-                            _c("font-awesome-icon", {
-                              attrs: { icon: "trash" }
-                            })
-                          ],
-                          1
-                        )
-                      ])
-                    ])
-                  })
-                )
-              ])
-            ])
-          ])
-        ])
-      ])
-    ])
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("thead", [
-      _c("tr", [
-        _c("th", [_vm._v("Token")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Creado")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Expira")])
-      ])
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-78b73b2d", module.exports)
-  }
-}
-
-/***/ }),
-/* 188 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(189);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("4ba3116b", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17ca704c\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../../node_modules/sass-loader/lib/loader.js!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Login.vue", function() {
-     var newContent = require("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17ca704c\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../../node_modules/sass-loader/lib/loader.js!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Login.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 189 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n.copyright[data-v-17ca704c] {\n  font-size: .8rem;\n  position: relative;\n  z-index: 1;\n  margin: 0px;\n  padding: 1.4rem 0px 1.4rem 0px;\n}\n.card-title[data-v-17ca704c] {\n  font-size: 3rem;\n  text-align: center;\n}\n.btn[data-v-17ca704c] {\n  width: 100%;\n}\n.divider[data-v-17ca704c] {\n  width: 100%;\n}\n#login_card[data-v-17ca704c] {\n  background-color: #f5f5f5 !important;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 190 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      email: '',
-      password: '',
-      loading: false
-    };
-  },
-
-  methods: {
-    login: function login() {
-      var vm = this;
-      vm.loading = true;
-      axios.post(vm.$root.apiMap.login, {
-        'grant_type': 'password',
-        'client_id': vm.$root.client_id,
-        'client_secret': vm.$root.client_secret,
-        'username': vm.email,
-        'password': vm.password,
-        'scope': '*'
-      }).then(function (response) {
-        vm.$root.token = response.data.access_token;
-        vm.$root.getUser("/dashboard");
-        vm.$router.push("/dashboard");
-      }).catch(function (error) {
-        if (M.getData(error).message.indexOf("username")) M.toastError(error);
-      }).then(function () {
-        vm.loading = false;
-      });
-      return false;
-    }
-  },
-  mounted: function mounted() {
-    var loginCard = anime({
-      targets: '#login_card',
-      duration: 1250,
-      easing: 'easeInOutQuart',
-      translateY: 0,
-      opacity: 1,
-      scale: 1,
-      delay: 0
-    });
-    var loginCardBg = anime({
-      targets: '#login_card .bg',
-      opacity: 1,
-      borderRadius: '0%',
-      easing: 'easeInSine',
-      duration: 500,
-      scale: 1,
-      delay: 500,
-      complete: function complete() {
-        $('input#email').focus();
-        $('.copyright').removeClass('grey-text');
-        $('.card-title').removeClass('grey-text');
-      }
-    });
-  }
-});
-
-/***/ }),
-/* 191 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", [
-    _c(
-      "div",
-      {
-        staticClass: "valign-wrapper",
-        staticStyle: { width: "100%", height: "100%", position: "absolute" }
-      },
-      [
-        _c("div", { staticClass: "valign", staticStyle: { width: "100%" } }, [
-          _c("div", { staticClass: "container" }, [
-            _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col s12 m6 offset-m3" }, [
-                _c(
-                  "div",
-                  {
-                    staticClass: "card",
-                    staticStyle: { opacity: "0", transform: "scale(0.8)" },
-                    attrs: { id: "login_card" }
-                  },
-                  [
-                    _c("div", {
-                      staticClass: "bg",
-                      staticStyle: {
-                        "z-index": "-1",
-                        "border-radius": "100%",
-                        transform: "scale(0)",
-                        "background-color": "white",
-                        opacity: "0",
-                        height: "100%",
-                        width: "100%",
-                        position: "absolute"
-                      }
-                    }),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "card-content" }, [
-                      _c("span", { staticClass: "card-title grey-text" }, [
-                        _vm._v("Hackathon")
-                      ]),
-                      _vm._v(" "),
-                      _c(
-                        "form",
-                        {
-                          on: {
-                            submit: function($event) {
-                              $event.preventDefault()
-                              return _vm.login($event)
-                            }
-                          }
-                        },
-                        [
-                          _c("div", { staticClass: "row" }, [
-                            _c("div", { staticClass: "input-field col s12" }, [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "validate",
-                                    rawName: "v-validate",
-                                    value: "required|email",
-                                    expression: "'required|email'"
-                                  },
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.email,
-                                    expression: "email"
-                                  }
-                                ],
-                                class: {
-                                  invalid:
-                                    _vm.errors.first("email") != undefined
-                                },
-                                attrs: {
-                                  placeholder: "example@correo.com",
-                                  id: "email",
-                                  name: "email",
-                                  type: "email"
-                                },
-                                domProps: { value: _vm.email },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.email = $event.target.value
-                                  }
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c(
-                                "label",
-                                {
-                                  staticClass: "active",
-                                  attrs: { for: "email" }
-                                },
-                                [_vm._v("Correo")]
-                              ),
-                              _vm._v(" "),
-                              _c("span", {
-                                staticClass: "helper-text",
-                                attrs: {
-                                  "data-error": _vm.errors.first("email")
-                                }
-                              })
-                            ])
-                          ]),
-                          _vm._v(" "),
-                          _c("div", { staticClass: "row" }, [
-                            _c("div", { staticClass: "input-field col s12" }, [
-                              _c("input", {
-                                directives: [
-                                  {
-                                    name: "validate",
-                                    rawName: "v-validate",
-                                    value: "required",
-                                    expression: "'required'"
-                                  },
-                                  {
-                                    name: "model",
-                                    rawName: "v-model",
-                                    value: _vm.password,
-                                    expression: "password"
-                                  }
-                                ],
-                                class: {
-                                  invalid:
-                                    _vm.errors.first("password") != undefined
-                                },
-                                attrs: {
-                                  placeholder: "*********",
-                                  id: "password",
-                                  name: "password",
-                                  type: "password"
-                                },
-                                domProps: { value: _vm.password },
-                                on: {
-                                  input: function($event) {
-                                    if ($event.target.composing) {
-                                      return
-                                    }
-                                    _vm.password = $event.target.value
-                                  }
-                                }
-                              }),
-                              _vm._v(" "),
-                              _c(
-                                "label",
-                                {
-                                  staticClass: "active",
-                                  attrs: { for: "password" }
-                                },
-                                [_vm._v("Contraseña")]
-                              ),
-                              _vm._v(" "),
-                              _c("span", {
-                                staticClass: "helper-text",
-                                attrs: {
-                                  "data-error": _vm.errors.first("password")
-                                }
-                              })
-                            ])
-                          ]),
-                          _vm._v(" "),
-                          _vm._m(0)
-                        ]
-                      )
-                    ]),
-                    _vm._v(" "),
-                    _c("div", { staticClass: "divider" }),
-                    _vm._v(" "),
-                    _c(
-                      "p",
-                      { staticClass: "center-align copyright grey-text" },
-                      [_vm._v("SEGRITH.TECH © 2018")]
-                    )
-                  ]
-                )
-              ])
-            ])
-          ])
-        ])
-      ]
-    )
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "col s12" }, [
-        _c(
-          "button",
-          {
-            staticClass: "btn mainColor waves-effect waves-light",
-            attrs: { type: "submit", id: "btn_login" }
-          },
-          [_vm._v("Iniciar sesión")]
-        )
-      ])
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-17ca704c", module.exports)
-  }
-}
-
-/***/ }),
-/* 192 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(193)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(195)
-/* template */
-var __vue_template__ = __webpack_require__(196)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-2ce9e1ac"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\E404.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-2ce9e1ac", Component.options)
-  } else {
-    hotAPI.reload("data-v-2ce9e1ac", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 193 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(194);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("dfbdba4c", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2ce9e1ac\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./E404.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2ce9e1ac\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./E404.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 194 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(false);
-// imports
-
-
-// module
-exports.push([module.i, "", ""]);
-
-// exports
-
-
-/***/ }),
-/* 195 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {};
-  },
-
-  methods: {},
-  mounted: function mounted() {}
-});
-
-/***/ }),
-/* 196 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [_c("h1", [_vm._v("Nada prro")])])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-2ce9e1ac", module.exports)
-  }
-}
-
-/***/ }),
-/* 197 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(198)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(200)
-/* template */
-var __vue_template__ = __webpack_require__(201)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-117390fa"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\App.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-117390fa", Component.options)
-  } else {
-    hotAPI.reload("data-v-117390fa", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 198 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(199);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("57d36db9", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 199 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n.MainLoader[data-v-117390fa] {\n  position: absolute;\n  right: 50%;\n  top: 50%;\n  -webkit-transform: translate(-50%, -50%);\n          transform: translate(-50%, -50%);\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 200 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {};
-  },
-
-  methods: {},
-  mounted: function mounted() {}
-});
-
-/***/ }),
-/* 201 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c(
-    "div",
-    { staticClass: "row" },
-    [
-      _vm.$root.loaded
-        ? _c("router-view")
-        : _c("div", { staticClass: "MainLoader" }, [
-            _c("div", { staticClass: "preloader-wrapper big active" }, [
-              _c("div", { staticClass: "spinner-layer spinner-blue-only" }, [
-                _c("div", { staticClass: "circle-clipper left" }, [
-                  _c("div", { staticClass: "circle" })
-                ]),
-                _c("div", { staticClass: "gap-patch" }, [
-                  _c("div", { staticClass: "circle" })
-                ]),
-                _c("div", { staticClass: "circle-clipper right" }, [
-                  _c("div", { staticClass: "circle" })
-                ])
-              ])
-            ])
-          ])
-    ],
-    1
-  )
-}
-var staticRenderFns = []
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-117390fa", module.exports)
-  }
-}
-
-/***/ }),
-/* 202 */,
-/* 203 */,
-/* 204 */,
-/* 205 */,
-/* 206 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(global) {/* unused harmony export install */
-/* unused harmony export ResizeObserver */
-function getInternetExplorerVersion() {
-	var ua = window.navigator.userAgent;
-
-	var msie = ua.indexOf('MSIE ');
-	if (msie > 0) {
-		// IE 10 or older => return version number
-		return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-	}
-
-	var trident = ua.indexOf('Trident/');
-	if (trident > 0) {
-		// IE 11 => return version number
-		var rv = ua.indexOf('rv:');
-		return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-	}
-
-	var edge = ua.indexOf('Edge/');
-	if (edge > 0) {
-		// Edge (IE 12+) => return version number
-		return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-	}
-
-	// other browser
-	return -1;
-}
-
-var isIE = void 0;
-
-function initCompat() {
-	if (!initCompat.init) {
-		initCompat.init = true;
-		isIE = getInternetExplorerVersion() !== -1;
-	}
-}
-
-var ResizeObserver = { render: function render() {
-		var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "resize-observer", attrs: { "tabindex": "-1" } });
-	}, staticRenderFns: [], _scopeId: 'data-v-b329ee4c',
-	name: 'resize-observer',
-
-	methods: {
-		notify: function notify() {
-			this.$emit('notify');
-		},
-		addResizeHandlers: function addResizeHandlers() {
-			this._resizeObject.contentDocument.defaultView.addEventListener('resize', this.notify);
-			if (this._w !== this.$el.offsetWidth || this._h !== this.$el.offsetHeight) {
-				this.notify();
-			}
-		},
-		removeResizeHandlers: function removeResizeHandlers() {
-			if (this._resizeObject && this._resizeObject.onload) {
-				if (!isIE && this._resizeObject.contentDocument) {
-					this._resizeObject.contentDocument.defaultView.removeEventListener('resize', this.notify);
-				}
-				delete this._resizeObject.onload;
-			}
-		}
-	},
-
-	mounted: function mounted() {
-		var _this = this;
-
-		initCompat();
-		this.$nextTick(function () {
-			_this._w = _this.$el.offsetWidth;
-			_this._h = _this.$el.offsetHeight;
-		});
-		var object = document.createElement('object');
-		this._resizeObject = object;
-		object.setAttribute('style', 'display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;');
-		object.setAttribute('aria-hidden', 'true');
-		object.setAttribute('tabindex', -1);
-		object.onload = this.addResizeHandlers;
-		object.type = 'text/html';
-		if (isIE) {
-			this.$el.appendChild(object);
-		}
-		object.data = 'about:blank';
-		if (!isIE) {
-			this.$el.appendChild(object);
-		}
-	},
-	beforeDestroy: function beforeDestroy() {
-		this.removeResizeHandlers();
-	}
-};
-
-// Install the components
-function install(Vue) {
-	Vue.component('resize-observer', ResizeObserver);
-	/* -- Add more components here -- */
-}
-
-/* -- Plugin definition & Auto-install -- */
-/* You shouldn't have to modify the code below */
-
-// Plugin
-var plugin = {
-	// eslint-disable-next-line no-undef
-	version: "0.4.4",
-	install: install
-};
-
-// Auto-install
-var GlobalVue = null;
-if (typeof window !== 'undefined') {
-	GlobalVue = window.Vue;
-} else if (typeof global !== 'undefined') {
-	GlobalVue = global.Vue;
-}
-if (GlobalVue) {
-	GlobalVue.use(plugin);
-}
-
-
-/* unused harmony default export */ var _unused_webpack_default_export = (plugin);
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(2)))
-
-/***/ }),
-/* 207 */,
-/* 208 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 209 */,
-/* 210 */,
-/* 211 */,
-/* 212 */,
-/* 213 */,
-/* 214 */,
-/* 215 */,
-/* 216 */,
-/* 217 */,
-/* 218 */,
-/* 219 */,
-/* 220 */,
-/* 221 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var disposed = false
-function injectStyle (ssrContext) {
-  if (disposed) return
-  __webpack_require__(222)
-}
-var normalizeComponent = __webpack_require__(5)
-/* script */
-var __vue_script__ = __webpack_require__(224)
-/* template */
-var __vue_template__ = __webpack_require__(225)
-/* template functional */
-var __vue_template_functional__ = false
-/* styles */
-var __vue_styles__ = injectStyle
-/* scopeId */
-var __vue_scopeId__ = "data-v-8dd9b02a"
-/* moduleIdentifier (server only) */
-var __vue_module_identifier__ = null
-var Component = normalizeComponent(
-  __vue_script__,
-  __vue_template__,
-  __vue_template_functional__,
-  __vue_styles__,
-  __vue_scopeId__,
-  __vue_module_identifier__
-)
-Component.options.__file = "resources\\assets\\js\\components\\wordWriting.vue"
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-8dd9b02a", Component.options)
-  } else {
-    hotAPI.reload("data-v-8dd9b02a", Component.options)
-  }
-  module.hot.dispose(function (data) {
-    disposed = true
-  })
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 222 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// style-loader: Adds some css to the DOM by adding a <style> tag
-
-// load the styles
-var content = __webpack_require__(223);
-if(typeof content === 'string') content = [[module.i, content, '']];
-if(content.locals) module.exports = content.locals;
-// add the styles to the DOM
-var update = __webpack_require__(4)("24dd7849", content, false, {});
-// Hot Module Replacement
-if(false) {
- // When the styles change, update the <style> tags
- if(!content.locals) {
-   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-8dd9b02a\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./wordWriting.vue", function() {
-     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-8dd9b02a\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./wordWriting.vue");
-     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
-     update(newContent);
-   });
- }
- // When the module is disposed, remove the <style> tags
- module.hot.dispose(function() { update(); });
-}
-
-/***/ }),
-/* 223 */
-/***/ (function(module, exports, __webpack_require__) {
-
-exports = module.exports = __webpack_require__(3)(false);
-// imports
-
-
-// module
-exports.push([module.i, "\n.word-text[data-v-8dd9b02a] {\n  position: relative;\n  padding-right: 8px;\n}\n.slash[data-v-8dd9b02a] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.command-input[data-v-8dd9b02a], .help-box[data-v-8dd9b02a] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  border: 0px;\n  position: absolute;\n  width: 100%;\n  height: 30px;\n  line-height: 20px;\n  top: 25px;\n  left: 0px;\n  margin: 0px;\n  padding: 5px 10px;\n  color: #c5d6da;\n  background: inherit;\n  outline: none;\n  font-family: \"Helvetica Neue\", 'Roboto', arial, sans-serif;\n}\n.command-input.move-input-cmd[data-v-8dd9b02a], .help-box.move-input-cmd[data-v-8dd9b02a] {\n    top: 75px;\n}\n.help-box span[data-v-8dd9b02a] {\n  display: block;\n}\n.write-mode[data-v-8dd9b02a] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  margin: auto;\n  display: block;\n  padding: 0 10px;\n}\n.write-mode #word[data-v-8dd9b02a] {\n    margin-right: 6px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-8dd9b02a] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-8dd9b02a] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.container-console[data-v-8dd9b02a] {\n  position: relative;\n}\n.console[data-v-8dd9b02a] {\n  background: #222122;\n  border-radius: 3px;\n  position: relative;\n}\n.console.last[data-v-8dd9b02a] {\n    margin-top: 20px;\n    height: 110.29px;\n}\nheader[data-v-8dd9b02a] {\n  padding: 2px 5px;\n  content: '';\n  position: relative;\n  width: 100%;\n  height: 25px;\n  top: 0;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\nheader[data-v-8dd9b02a]:after {\n    content: attr(data-title-cmd);\n    text-align: center;\n    color: #000;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    font-weight: 400;\n}\nheader .help[data-v-8dd9b02a] {\n    color: #ffff;\n    border-width: 1px;\n    width: 19px;\n    height: 19px;\n    line-height: 19px;\n    text-align: center;\n    font-size: 1rem;\n    border-style: solid;\n    border-radius: 2px;\n    display: inline-block;\n    background: #2295f1;\n    border-color: #2196F3;\n    cursor: pointer;\n    z-index: 50;\n    position: absolute;\n    right: 4px;\n    top: 2.35px;\n}\nheader .help[data-v-8dd9b02a]:hover {\n      background: #0d7bd3;\n      border-color: #0c7cd5;\n}\n.button-navbar-mac[data-v-8dd9b02a] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-8dd9b02a] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-8dd9b02a] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-8dd9b02a] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
-
-// exports
-
-
-/***/ }),
-/* 224 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_resize__ = __webpack_require__(206);
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      word: 'crear',
-      step: 1,
-      command: '$ ',
-      help_show: false
-    };
-  },
-
-  methods: {
-    changeWords: function changeWords() {
-      switch (this.step) {
-        case 1:
-          this.word = 'crear';
-          break;
-        case 2:
-          this.word = 'explorar';
-          break;
-        case 3:
-          this.word = 'imaginar';
-          break;
-        case 4:
-          this.word = 'aprender';
-          break;
-        case 5:
-          this.word = 'descubrir';
-          break;
-        case 6:
-          this.word = 'invertir';
-          break;
-      }
-      if (this.step == 6) {
-        this.step = 0;
-      }
-    },
-    formatCommand: function formatCommand() {
-      var n = this.command;
-      if (n == '' || n == null) this.command = '$ ';
-    },
-    handleResize: function handleResize() {
-      var s = document.getElementById('slash');
-      var w = document.getElementById('width-word');
-      if (s.offsetWidth >= w.offsetWidth) {
-        this.step++;
-        this.changeWords();
-      }
-    },
-    showHelp: function showHelp() {
-      this.help_show = !this.help_show;
-    },
-    executeCommand: function executeCommand() {
-      var vm = this;
-      var c = vm.command;
-      if (c == "$ goto 1" || c == "$goto 1") {
-        if (vm.help_show) vm.help_show = false;
-        vm.messageCommand('Estas en la primera sección', 1500);
-      } else if (c == "$ goto 2" || c == "$goto 2") {
-        vm.$root.goToView('info');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ goto 3" || c == "$goto 3") {
-        vm.$root.goToView('judges');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ goto 4" || c == "$goto 4") {
-        vm.$root.goToView('project-route');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ goto 5" || c == "$goto 5") {
-        vm.$root.goToView('places');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ goto 6" || c == "$goto 6") {
-        vm.$root.goToView('how-to-get');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ goto 7" || c == "$goto 7") {
-        vm.$root.goToView('quotas');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ goto 8" || c == "$goto 8") {
-        vm.$root.goToView('inscriptions');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ goto 9" || c == "$goto 9") {
-        vm.$root.goToView('challenges');
-        vm.command = "$ ";
-        if (vm.help_show) vm.help_show = false;
-      } else if (c == "$ dev" || c == "$dev") {
-        if (vm.help_show) vm.help_show = false;
-        vm.messageCommand('Desarrollado por Segrith Tech', 1500);
-      } else if (c == "$ clear" || c == "$clear") {
-        vm.help_show = false;
-        vm.command = "$ ";
-      } else if (c == "$ help" || c == "$help") {
-        vm.help_show = true;
-        vm.command = "$ ";
-      } else if (c == "$ ls" || c == "$ls") {
-        if (vm.help_show) vm.help_show = false;
-        vm.messageCommand('css favicon.ico fonts images  index.php', 3000);
-      } else {
-        if (vm.help_show) vm.help_show = false;
-        vm.messageCommand('Error de comando', 1500);
-      }
-    },
-    messageCommand: function messageCommand(m, t) {
-      var vm = this;
-      vm.command = m;
-      setTimeout(function () {
-        vm.command = "$ ";
-      }, t);
-    },
-    focusTerminal: function focusTerminal() {
-      document.getElementById('terminal-input').focus();
-    }
-  },
-  computed: {
-    date: function date() {
-      return moment().format('LLLL');
-    }
-  },
-  mounted: function mounted() {
-    var vm = this;
-  }
-});
-
-/***/ }),
-/* 225 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var render = function() {
-  var _vm = this
-  var _h = _vm.$createElement
-  var _c = _vm._self._c || _h
-  return _c("div", { staticClass: "container-console" }, [
-    _c("div", { staticClass: "console" }, [
-      _vm._m(0),
-      _vm._v(" "),
-      _c("span", { staticClass: "write-mode" }, [
-        _vm._v("Ultimo acceso: " + _vm._s(_vm.date))
-      ]),
-      _vm._v(" "),
-      _c("span", { staticClass: "write-mode" }, [
-        _vm._v("El evento donde podrás\n      "),
-        _c(
-          "span",
-          { staticClass: "container-word", attrs: { id: "width-word" } },
-          [
-            _c("div", { attrs: { id: "word" } }, [
-              _c("span", { staticClass: "word-text" }, [
-                _vm._v(_vm._s(_vm.word)),
-                _c("span", { staticClass: "slash" })
-              ])
-            ]),
-            _vm._v(" "),
-            _c(
-              "resize-observer",
-              { attrs: { id: "slash" }, on: { notify: _vm.handleResize } },
-              [_vm._v(" ")]
-            )
-          ],
-          1
-        )
-      ]),
-      _vm._v(" "),
-      _c("div", { staticClass: "container-algorithm-icon" }, [
-        _c(
-          "svg",
-          {
-            attrs: { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 64 64" }
-          },
-          [
-            _c("path", {
-              staticClass: "sun",
-              attrs: {
-                d:
-                  "m17 32c0-1.51 2.19-2.656 2.633-4.019.458-1.412-.624-3.623.231-4.8s3.308-.837 4.5-1.7 1.592-3.292 3-3.75c1.362-.443 3.126 1.269 4.636 1.269s3.274-1.712 4.637-1.269c1.412.458 1.829 2.895 3 3.751s3.631.513 4.5 1.7-.227 3.387.231 4.8c.442 1.362 2.632 2.508 2.632 4.018s-2.19 2.656-2.633 4.019c-.458 1.412.624 3.623-.231 4.8s-3.308.837-4.5 1.7-1.592 3.292-3 3.75c-1.362.443-3.126-1.269-4.636-1.269s-3.274 1.712-4.637 1.269c-1.412-.458-1.829-2.895-3-3.751s-3.631-.513-4.5-1.7.227-3.387-.231-4.8c-.442-1.362-2.632-2.508-2.632-4.018z",
-                fill: "#fcf05a"
-              }
-            }),
-            _vm._v(" "),
-            _c("circle", {
-              attrs: { cx: "32", cy: "32", fill: "#fdbd40", r: "10" }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "st0-solar half-saucer",
-              attrs: {
-                d:
-                  "m32 54a22 22 0 1 1 14.667-5.6l-1.334-1.49a19.948 19.948 0 1 0 -10.475 4.89l.284 1.98a22.186 22.186 0 0 1 -3.142.22z"
-              }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "st0-solar dish-outside",
-              attrs: {
-                d:
-                  "m32 60a28.008 28.008 0 0 1 -24.546-41.482l1.752.964a26 26 0 1 0 48.349 7.7l1.966-.368a28.025 28.025 0 0 1 -27.521 33.186z"
-              }
-            }),
-            _vm._v(" "),
-            _c("path", {
-              staticClass: "st0-solar dish-outside",
-              attrs: {
-                d:
-                  "m51.379 14.667a26.008 26.008 0 0 0 -33-4.815l-1.049-1.7a28.012 28.012 0 0 1 35.54 5.181z"
-              }
-            }),
-            _vm._v(" "),
-            _c("circle", {
-              staticClass: "dish-outside",
-              attrs: { cx: "12", cy: "13", fill: "#84f03c", r: "3" }
-            }),
-            _vm._v(" "),
-            _c("circle", {
-              staticClass: "half-saucer",
-              attrs: { cx: "41", cy: "51", fill: "#7fcac9", r: "2" }
-            }),
-            _vm._v(" "),
-            _c("circle", {
-              staticClass: "dish-outside",
-              attrs: { cx: "57", cy: "20", fill: "#fdbd40", r: "4" }
-            }),
-            _vm._v(" "),
-            _c("g", { attrs: { fill: "#7d8d9c" } }, [
-              _c("path", {
-                staticClass: "rect-anim-one",
-                attrs: { d: "m52 4h2v2h-2z" }
-              }),
-              _vm._v(" "),
-              _c("path", {
-                staticClass: "rect-anim-two",
-                attrs: { d: "m56 6h2v2h-2z" }
-              }),
-              _vm._v(" "),
-              _c("path", {
-                staticClass: "rect-anim-three",
-                attrs: { d: "m2 54h2v2h-2z" }
-              }),
-              _vm._v(" "),
-              _c("path", {
-                staticClass: "rect-anim-two",
-                attrs: { d: "m6 56h2v2h-2z" }
-              }),
-              _vm._v(" "),
-              _c("path", {
-                staticClass: "rect-anim-four",
-                attrs: { d: "m54 54h2v2h-2z" }
-              }),
-              _vm._v(" "),
-              _c("path", {
-                staticClass: "rect-anim-five",
-                attrs: { d: "m58 56h2v2h-2z" }
-              })
-            ])
-          ]
-        )
-      ])
-    ]),
-    _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "console last", on: { click: _vm.focusTerminal } },
-      [
-        _c("header", { attrs: { "data-title-cmd": "Ejecuta comandos" } }, [
-          _c("div", { staticClass: "close button-navbar-mac" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "minify button-navbar-mac" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "maximize button-navbar-mac" }),
-          _vm._v(" "),
-          _c(
-            "div",
-            { staticClass: "right help", on: { click: _vm.showHelp } },
-            [
-              !_vm.help_show
-                ? _c("span", [_vm._v("?")])
-                : _c("span", [_vm._v("X")])
-            ]
-          )
-        ]),
-        _vm._v(" "),
-        _vm.help_show
-          ? _c("div", { staticClass: "help-box" }, [
-              _c("span", [_vm._v("Puede ejecutar los siguientes comandos:")]),
-              _vm._v(" "),
-              _c("span", [
-                _vm._v("clear, dev, help, goto [número de la sección]")
-              ])
-            ])
-          : _vm._e(),
-        _vm._v(" "),
-        _c("input", {
-          directives: [
-            {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.command,
-              expression: "command"
-            }
-          ],
-          staticClass: "command-input browser-default",
-          class: { "move-input-cmd": _vm.help_show },
-          attrs: { type: "text", spellcheck: "false", id: "terminal-input" },
-          domProps: { value: _vm.command },
-          on: {
-            input: [
-              function($event) {
-                if ($event.target.composing) {
-                  return
-                }
-                _vm.command = $event.target.value
-              },
-              _vm.formatCommand
-            ],
-            keyup: function($event) {
-              if (
-                !("button" in $event) &&
-                _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-              ) {
-                return null
-              }
-              return _vm.executeCommand($event)
-            }
-          }
-        })
-      ]
-    )
-  ])
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("header", { attrs: { "data-title-cmd": "Terminal" } }, [
-      _c("div", { staticClass: "close button-navbar-mac" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "minify button-navbar-mac" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "maximize button-navbar-mac" })
-    ])
-  }
-]
-render._withStripped = true
-module.exports = { render: render, staticRenderFns: staticRenderFns }
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-    require("vue-hot-reload-api")      .rerender("data-v-8dd9b02a", module.exports)
-  }
-}
-
-/***/ }),
-/* 226 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "config", function() { return config; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "icon", function() { return icon; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "noAuto", function() { return noAuto; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "layer", function() { return layer; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "text", function() { return text; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "library", function() { return library; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "dom", function() { return dom; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "parse", function() { return parse; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "findIconDefinition", function() { return findIconDefinition; });
-/*!
- * Font Awesome Free 5.0.13 by @fontawesome - https://fontawesome.com
- * License - https://fontawesome.com/license (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
- */
-var noop = function noop() {};
-
-var _WINDOW = {};
-var _DOCUMENT = {};
-var _MUTATION_OBSERVER$1 = null;
-var _PERFORMANCE = { mark: noop, measure: noop };
-
-try {
-  if (typeof window !== 'undefined') _WINDOW = window;
-  if (typeof document !== 'undefined') _DOCUMENT = document;
-  if (typeof MutationObserver !== 'undefined') _MUTATION_OBSERVER$1 = MutationObserver;
-  if (typeof performance !== 'undefined') _PERFORMANCE = performance;
-} catch (e) {}
-
-var _ref = _WINDOW.navigator || {};
-var _ref$userAgent = _ref.userAgent;
-var userAgent = _ref$userAgent === undefined ? '' : _ref$userAgent;
-
-var WINDOW = _WINDOW;
-var DOCUMENT = _DOCUMENT;
-var MUTATION_OBSERVER = _MUTATION_OBSERVER$1;
-var PERFORMANCE = _PERFORMANCE;
-var IS_BROWSER = !!WINDOW.document;
-var IS_DOM = !!DOCUMENT.documentElement && !!DOCUMENT.head && typeof DOCUMENT.addEventListener === 'function' && typeof DOCUMENT.createElement === 'function';
-var IS_IE = ~userAgent.indexOf('MSIE') || ~userAgent.indexOf('Trident/');
-
-var NAMESPACE_IDENTIFIER = '___FONT_AWESOME___';
-var UNITS_IN_GRID = 16;
-var DEFAULT_FAMILY_PREFIX = 'fa';
-var DEFAULT_REPLACEMENT_CLASS = 'svg-inline--fa';
-var DATA_FA_I2SVG = 'data-fa-i2svg';
-var DATA_FA_PSEUDO_ELEMENT = 'data-fa-pseudo-element';
-var HTML_CLASS_I2SVG_BASE_CLASS = 'fontawesome-i2svg';
-
-var PRODUCTION = function () {
-  try {
-    return "development" === 'production';
-  } catch (e) {
-    return false;
-  }
-}();
-
-var oneToTen = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-var oneToTwenty = oneToTen.concat([11, 12, 13, 14, 15, 16, 17, 18, 19, 20]);
-
-var ATTRIBUTES_WATCHED_FOR_MUTATION = ['class', 'data-prefix', 'data-icon', 'data-fa-transform', 'data-fa-mask'];
-
-var RESERVED_CLASSES = ['xs', 'sm', 'lg', 'fw', 'ul', 'li', 'border', 'pull-left', 'pull-right', 'spin', 'pulse', 'rotate-90', 'rotate-180', 'rotate-270', 'flip-horizontal', 'flip-vertical', 'stack', 'stack-1x', 'stack-2x', 'inverse', 'layers', 'layers-text', 'layers-counter'].concat(oneToTen.map(function (n) {
-  return n + 'x';
-})).concat(oneToTwenty.map(function (n) {
-  return 'w-' + n;
-}));
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
-
-
-
-var _extends = Object.assign || function (target) {
-  for (var i = 1; i < arguments.length; i++) {
-    var source = arguments[i];
-
-    for (var key in source) {
-      if (Object.prototype.hasOwnProperty.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-};
-
-
-
-var toConsumableArray = function (arr) {
-  if (Array.isArray(arr)) {
-    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-    return arr2;
-  } else {
-    return Array.from(arr);
-  }
-};
-
-var initial = WINDOW.FontAwesomeConfig || {};
-var initialKeys = Object.keys(initial);
-
-var _default = _extends({
-  familyPrefix: DEFAULT_FAMILY_PREFIX,
-  replacementClass: DEFAULT_REPLACEMENT_CLASS,
-  autoReplaceSvg: true,
-  autoAddCss: true,
-  autoA11y: true,
-  searchPseudoElements: false,
-  observeMutations: true,
-  keepOriginalSource: true,
-  measurePerformance: false,
-  showMissingIcons: true
-}, initial);
-
-if (!_default.autoReplaceSvg) _default.observeMutations = false;
-
-var config$1 = _extends({}, _default);
-
-WINDOW.FontAwesomeConfig = config$1;
-
-function update(newConfig) {
-  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var _params$asNewDefault = params.asNewDefault,
-      asNewDefault = _params$asNewDefault === undefined ? false : _params$asNewDefault;
-
-  var validKeys = Object.keys(config$1);
-  var ok = asNewDefault ? function (k) {
-    return ~validKeys.indexOf(k) && !~initialKeys.indexOf(k);
-  } : function (k) {
-    return ~validKeys.indexOf(k);
-  };
-
-  Object.keys(newConfig).forEach(function (configKey) {
-    if (ok(configKey)) config$1[configKey] = newConfig[configKey];
-  });
-}
-
-function auto(value) {
-  update({
-    autoReplaceSvg: value,
-    observeMutations: value
-  });
-}
-
-var w = WINDOW || {};
-
-if (!w[NAMESPACE_IDENTIFIER]) w[NAMESPACE_IDENTIFIER] = {};
-if (!w[NAMESPACE_IDENTIFIER].styles) w[NAMESPACE_IDENTIFIER].styles = {};
-if (!w[NAMESPACE_IDENTIFIER].hooks) w[NAMESPACE_IDENTIFIER].hooks = {};
-if (!w[NAMESPACE_IDENTIFIER].shims) w[NAMESPACE_IDENTIFIER].shims = [];
-
-var namespace = w[NAMESPACE_IDENTIFIER];
-
-var functions = [];
-var listener = function listener() {
-  DOCUMENT.removeEventListener('DOMContentLoaded', listener);
-  loaded = 1;
-  functions.map(function (fn) {
-    return fn();
-  });
-};
-
-var loaded = false;
-
-if (IS_DOM) {
-  loaded = (DOCUMENT.documentElement.doScroll ? /^loaded|^c/ : /^loaded|^i|^c/).test(DOCUMENT.readyState);
-
-  if (!loaded) DOCUMENT.addEventListener('DOMContentLoaded', listener);
-}
-
-var domready = function (fn) {
-  if (!IS_DOM) return;
-  loaded ? setTimeout(fn, 0) : functions.push(fn);
-};
-
-var d = UNITS_IN_GRID;
-
-var meaninglessTransform = {
-  size: 16,
-  x: 0,
-  y: 0,
-  rotate: 0,
-  flipX: false,
-  flipY: false
-};
-
-function isReserved(name) {
-  return ~RESERVED_CLASSES.indexOf(name);
-}
-
-function bunker(fn) {
-  try {
-    fn();
-  } catch (e) {
-    if (!PRODUCTION) {
-      throw e;
-    }
-  }
-}
-
-function insertCss(css) {
-  if (!css || !IS_DOM) {
-    return;
-  }
-
-  var style = DOCUMENT.createElement('style');
-  style.setAttribute('type', 'text/css');
-  style.innerHTML = css;
-
-  var headChildren = DOCUMENT.head.childNodes;
-  var beforeChild = null;
-
-  for (var i = headChildren.length - 1; i > -1; i--) {
-    var child = headChildren[i];
-    var tagName = (child.tagName || '').toUpperCase();
-    if (['STYLE', 'LINK'].indexOf(tagName) > -1) {
-      beforeChild = child;
-    }
-  }
-
-  DOCUMENT.head.insertBefore(style, beforeChild);
-
-  return css;
-}
-
-var _uniqueId = 0;
-
-function nextUniqueId() {
-  _uniqueId++;
-
-  return _uniqueId;
-}
-
-function toArray(obj) {
-  var array = [];
-
-  for (var i = (obj || []).length >>> 0; i--;) {
-    array[i] = obj[i];
-  }
-
-  return array;
-}
-
-function classArray(node) {
-  if (node.classList) {
-    return toArray(node.classList);
-  } else {
-    return (node.getAttribute('class') || '').split(' ').filter(function (i) {
-      return i;
-    });
-  }
-}
-
-function getIconName(familyPrefix, cls) {
-  var parts = cls.split('-');
-  var prefix = parts[0];
-  var iconName = parts.slice(1).join('-');
-
-  if (prefix === familyPrefix && iconName !== '' && !isReserved(iconName)) {
-    return iconName;
-  } else {
-    return null;
-  }
-}
-
-function htmlEscape(str) {
-  return ('' + str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function joinAttributes(attributes) {
-  return Object.keys(attributes || {}).reduce(function (acc, attributeName) {
-    return acc + (attributeName + '="' + htmlEscape(attributes[attributeName]) + '" ');
-  }, '').trim();
-}
-
-function joinStyles(styles) {
-  return Object.keys(styles || {}).reduce(function (acc, styleName) {
-    return acc + (styleName + ': ' + styles[styleName] + ';');
-  }, '');
-}
-
-function transformIsMeaningful(transform) {
-  return transform.size !== meaninglessTransform.size || transform.x !== meaninglessTransform.x || transform.y !== meaninglessTransform.y || transform.rotate !== meaninglessTransform.rotate || transform.flipX || transform.flipY;
-}
-
-function transformForSvg(_ref) {
-  var transform = _ref.transform,
-      containerWidth = _ref.containerWidth,
-      iconWidth = _ref.iconWidth;
-
-  var outer = {
-    transform: 'translate(' + containerWidth / 2 + ' 256)'
-  };
-  var innerTranslate = 'translate(' + transform.x * 32 + ', ' + transform.y * 32 + ') ';
-  var innerScale = 'scale(' + transform.size / 16 * (transform.flipX ? -1 : 1) + ', ' + transform.size / 16 * (transform.flipY ? -1 : 1) + ') ';
-  var innerRotate = 'rotate(' + transform.rotate + ' 0 0)';
-  var inner = {
-    transform: innerTranslate + ' ' + innerScale + ' ' + innerRotate
-  };
-  var path = {
-    transform: 'translate(' + iconWidth / 2 * -1 + ' -256)'
-  };
-  return {
-    outer: outer,
-    inner: inner,
-    path: path
-  };
-}
-
-function transformForCss(_ref2) {
-  var transform = _ref2.transform,
-      _ref2$width = _ref2.width,
-      width = _ref2$width === undefined ? UNITS_IN_GRID : _ref2$width,
-      _ref2$height = _ref2.height,
-      height = _ref2$height === undefined ? UNITS_IN_GRID : _ref2$height,
-      _ref2$startCentered = _ref2.startCentered,
-      startCentered = _ref2$startCentered === undefined ? false : _ref2$startCentered;
-
-  var val = '';
-
-  if (startCentered && IS_IE) {
-    val += 'translate(' + (transform.x / d - width / 2) + 'em, ' + (transform.y / d - height / 2) + 'em) ';
-  } else if (startCentered) {
-    val += 'translate(calc(-50% + ' + transform.x / d + 'em), calc(-50% + ' + transform.y / d + 'em)) ';
-  } else {
-    val += 'translate(' + transform.x / d + 'em, ' + transform.y / d + 'em) ';
-  }
-
-  val += 'scale(' + transform.size / d * (transform.flipX ? -1 : 1) + ', ' + transform.size / d * (transform.flipY ? -1 : 1) + ') ';
-  val += 'rotate(' + transform.rotate + 'deg) ';
-
-  return val;
-}
-
-var ALL_SPACE = {
-  x: 0,
-  y: 0,
-  width: '100%',
-  height: '100%'
-};
-
-var makeIconMasking = function (_ref) {
-  var children = _ref.children,
-      attributes = _ref.attributes,
-      main = _ref.main,
-      mask = _ref.mask,
-      transform = _ref.transform;
-  var mainWidth = main.width,
-      mainPath = main.icon;
-  var maskWidth = mask.width,
-      maskPath = mask.icon;
-
-
-  var trans = transformForSvg({ transform: transform, containerWidth: maskWidth, iconWidth: mainWidth });
-
-  var maskRect = {
-    tag: 'rect',
-    attributes: _extends({}, ALL_SPACE, {
-      fill: 'white'
-    })
-  };
-  var maskInnerGroup = {
-    tag: 'g',
-    attributes: _extends({}, trans.inner),
-    children: [{ tag: 'path', attributes: _extends({}, mainPath.attributes, trans.path, { fill: 'black' }) }]
-  };
-  var maskOuterGroup = {
-    tag: 'g',
-    attributes: _extends({}, trans.outer),
-    children: [maskInnerGroup]
-  };
-  var maskId = 'mask-' + nextUniqueId();
-  var clipId = 'clip-' + nextUniqueId();
-  var maskTag = {
-    tag: 'mask',
-    attributes: _extends({}, ALL_SPACE, {
-      id: maskId,
-      maskUnits: 'userSpaceOnUse',
-      maskContentUnits: 'userSpaceOnUse'
-    }),
-    children: [maskRect, maskOuterGroup]
-  };
-  var defs = {
-    tag: 'defs',
-    children: [{ tag: 'clipPath', attributes: { id: clipId }, children: [maskPath] }, maskTag]
-  };
-
-  children.push(defs, { tag: 'rect', attributes: _extends({ fill: 'currentColor', 'clip-path': 'url(#' + clipId + ')', mask: 'url(#' + maskId + ')' }, ALL_SPACE) });
-
-  return {
-    children: children,
-    attributes: attributes
-  };
-};
-
-var makeIconStandard = function (_ref) {
-  var children = _ref.children,
-      attributes = _ref.attributes,
-      main = _ref.main,
-      transform = _ref.transform,
-      styles = _ref.styles;
-
-  var styleString = joinStyles(styles);
-
-  if (styleString.length > 0) {
-    attributes['style'] = styleString;
-  }
-
-  if (transformIsMeaningful(transform)) {
-    var trans = transformForSvg({ transform: transform, containerWidth: main.width, iconWidth: main.width });
-    children.push({
-      tag: 'g',
-      attributes: _extends({}, trans.outer),
-      children: [{
-        tag: 'g',
-        attributes: _extends({}, trans.inner),
-        children: [{
-          tag: main.icon.tag,
-          children: main.icon.children,
-          attributes: _extends({}, main.icon.attributes, trans.path)
-        }]
-      }]
-    });
-  } else {
-    children.push(main.icon);
-  }
-
-  return {
-    children: children,
-    attributes: attributes
-  };
-};
-
-var asIcon = function (_ref) {
-  var children = _ref.children,
-      main = _ref.main,
-      mask = _ref.mask,
-      attributes = _ref.attributes,
-      styles = _ref.styles,
-      transform = _ref.transform;
-
-  if (transformIsMeaningful(transform) && main.found && !mask.found) {
-    var width = main.width,
-        height = main.height;
-
-    var offset = {
-      x: width / height / 2,
-      y: 0.5
-    };
-    attributes['style'] = joinStyles(_extends({}, styles, {
-      'transform-origin': offset.x + transform.x / 16 + 'em ' + (offset.y + transform.y / 16) + 'em'
-    }));
-  }
-
-  return [{
-    tag: 'svg',
-    attributes: attributes,
-    children: children
-  }];
-};
-
-var asSymbol = function (_ref) {
-  var prefix = _ref.prefix,
-      iconName = _ref.iconName,
-      children = _ref.children,
-      attributes = _ref.attributes,
-      symbol = _ref.symbol;
-
-  var id = symbol === true ? prefix + '-' + config$1.familyPrefix + '-' + iconName : symbol;
-
-  return [{
-    tag: 'svg',
-    attributes: {
-      style: 'display: none;'
-    },
-    children: [{
-      tag: 'symbol',
-      attributes: _extends({}, attributes, { id: id }),
-      children: children
-    }]
-  }];
-};
-
-function makeInlineSvgAbstract(params) {
-  var _params$icons = params.icons,
-      main = _params$icons.main,
-      mask = _params$icons.mask,
-      prefix = params.prefix,
-      iconName = params.iconName,
-      transform = params.transform,
-      symbol = params.symbol,
-      title = params.title,
-      extra = params.extra,
-      _params$watchable = params.watchable,
-      watchable = _params$watchable === undefined ? false : _params$watchable;
-
-  var _ref = mask.found ? mask : main,
-      width = _ref.width,
-      height = _ref.height;
-
-  var widthClass = 'fa-w-' + Math.ceil(width / height * 16);
-  var attrClass = [config$1.replacementClass, iconName ? config$1.familyPrefix + '-' + iconName : '', widthClass].concat(extra.classes).join(' ');
-
-  var content = {
-    children: [],
-    attributes: _extends({}, extra.attributes, {
-      'data-prefix': prefix,
-      'data-icon': iconName,
-      'class': attrClass,
-      'role': 'img',
-      'xmlns': 'http://www.w3.org/2000/svg',
-      'viewBox': '0 0 ' + width + ' ' + height
-    })
-  };
-
-  if (watchable) {
-    content.attributes[DATA_FA_I2SVG] = '';
-  }
-
-  if (title) content.children.push({ tag: 'title', attributes: { id: content.attributes['aria-labelledby'] || 'title-' + nextUniqueId() }, children: [title] });
-
-  var args = _extends({}, content, {
-    prefix: prefix,
-    iconName: iconName,
-    main: main,
-    mask: mask,
-    transform: transform,
-    symbol: symbol,
-    styles: extra.styles
-  });
-
-  var _ref2 = mask.found && main.found ? makeIconMasking(args) : makeIconStandard(args),
-      children = _ref2.children,
-      attributes = _ref2.attributes;
-
-  args.children = children;
-  args.attributes = attributes;
-
-  if (symbol) {
-    return asSymbol(args);
-  } else {
-    return asIcon(args);
-  }
-}
-
-function makeLayersTextAbstract(params) {
-  var content = params.content,
-      width = params.width,
-      height = params.height,
-      transform = params.transform,
-      title = params.title,
-      extra = params.extra,
-      _params$watchable2 = params.watchable,
-      watchable = _params$watchable2 === undefined ? false : _params$watchable2;
-
-
-  var attributes = _extends({}, extra.attributes, title ? { 'title': title } : {}, {
-    'class': extra.classes.join(' ')
-  });
-
-  if (watchable) {
-    attributes[DATA_FA_I2SVG] = '';
-  }
-
-  var styles = _extends({}, extra.styles);
-
-  if (transformIsMeaningful(transform)) {
-    styles['transform'] = transformForCss({ transform: transform, startCentered: true, width: width, height: height });
-    styles['-webkit-transform'] = styles['transform'];
-  }
-
-  var styleString = joinStyles(styles);
-
-  if (styleString.length > 0) {
-    attributes['style'] = styleString;
-  }
-
-  var val = [];
-
-  val.push({
-    tag: 'span',
-    attributes: attributes,
-    children: [content]
-  });
-
-  if (title) {
-    val.push({ tag: 'span', attributes: { class: 'sr-only' }, children: [title] });
-  }
-
-  return val;
-}
-
-var noop$2 = function noop() {};
-var p = config$1.measurePerformance && PERFORMANCE && PERFORMANCE.mark && PERFORMANCE.measure ? PERFORMANCE : { mark: noop$2, measure: noop$2 };
-var preamble = 'FA "5.0.13"';
-
-var begin = function begin(name) {
-  p.mark(preamble + ' ' + name + ' begins');
-  return function () {
-    return end(name);
-  };
-};
-
-var end = function end(name) {
-  p.mark(preamble + ' ' + name + ' ends');
-  p.measure(preamble + ' ' + name, preamble + ' ' + name + ' begins', preamble + ' ' + name + ' ends');
-};
-
-var perf = { begin: begin, end: end };
-
-'use strict';
-
-/**
- * Internal helper to bind a function known to have 4 arguments
- * to a given context.
- */
-var bindInternal4 = function bindInternal4 (func, thisContext) {
-  return function (a, b, c, d) {
-    return func.call(thisContext, a, b, c, d);
-  };
-};
-
-'use strict';
-
-
-
-/**
- * # Reduce
- *
- * A fast object `.reduce()` implementation.
- *
- * @param  {Object}   subject      The object to reduce over.
- * @param  {Function} fn           The reducer function.
- * @param  {mixed}    initialValue The initial value for the reducer, defaults to subject[0].
- * @param  {Object}   thisContext  The context for the reducer.
- * @return {mixed}                 The final result.
- */
-var reduce = function fastReduceObject (subject, fn, initialValue, thisContext) {
-  var keys = Object.keys(subject),
-      length = keys.length,
-      iterator = thisContext !== undefined ? bindInternal4(fn, thisContext) : fn,
-      i, key, result;
-
-  if (initialValue === undefined) {
-    i = 1;
-    result = subject[keys[0]];
-  }
-  else {
-    i = 0;
-    result = initialValue;
-  }
-
-  for (; i < length; i++) {
-    key = keys[i];
-    result = iterator(result, subject[key], key, subject);
-  }
-
-  return result;
-};
-
-var styles$2 = namespace.styles;
-var shims = namespace.shims;
-
-
-var _byUnicode = {};
-var _byLigature = {};
-var _byOldName = {};
-
-var build = function build() {
-  var lookup = function lookup(reducer) {
-    return reduce(styles$2, function (o, style, prefix) {
-      o[prefix] = reduce(style, reducer, {});
-      return o;
-    }, {});
-  };
-
-  _byUnicode = lookup(function (acc, icon, iconName) {
-    acc[icon[3]] = iconName;
-
-    return acc;
-  });
-
-  _byLigature = lookup(function (acc, icon, iconName) {
-    var ligatures = icon[2];
-
-    acc[iconName] = iconName;
-
-    ligatures.forEach(function (ligature) {
-      acc[ligature] = iconName;
-    });
-
-    return acc;
-  });
-
-  var hasRegular = 'far' in styles$2;
-
-  _byOldName = reduce(shims, function (acc, shim) {
-    var oldName = shim[0];
-    var prefix = shim[1];
-    var iconName = shim[2];
-
-    if (prefix === 'far' && !hasRegular) {
-      prefix = 'fas';
-    }
-
-    acc[oldName] = { prefix: prefix, iconName: iconName };
-
-    return acc;
-  }, {});
-};
-
-build();
-
-function byUnicode(prefix, unicode) {
-  return _byUnicode[prefix][unicode];
-}
-
-function byLigature(prefix, ligature) {
-  return _byLigature[prefix][ligature];
-}
-
-function byOldName(name) {
-  return _byOldName[name] || { prefix: null, iconName: null };
-}
-
-var styles$1 = namespace.styles;
-
-
-var emptyCanonicalIcon = function emptyCanonicalIcon() {
-  return { prefix: null, iconName: null, rest: [] };
-};
-
-function getCanonicalIcon(values) {
-  return values.reduce(function (acc, cls) {
-    var iconName = getIconName(config$1.familyPrefix, cls);
-
-    if (styles$1[cls]) {
-      acc.prefix = cls;
-    } else if (iconName) {
-      var shim = acc.prefix === 'fa' ? byOldName(iconName) : {};
-
-      acc.iconName = shim.iconName || iconName;
-      acc.prefix = shim.prefix || acc.prefix;
-    } else if (cls !== config$1.replacementClass && cls.indexOf('fa-w-') !== 0) {
-      acc.rest.push(cls);
-    }
-
-    return acc;
-  }, emptyCanonicalIcon());
-}
-
-function iconFromMapping(mapping, prefix, iconName) {
-  if (mapping && mapping[prefix] && mapping[prefix][iconName]) {
-    return {
-      prefix: prefix,
-      iconName: iconName,
-      icon: mapping[prefix][iconName]
-    };
-  }
-}
-
-function toHtml(abstractNodes) {
-  var tag = abstractNodes.tag,
-      _abstractNodes$attrib = abstractNodes.attributes,
-      attributes = _abstractNodes$attrib === undefined ? {} : _abstractNodes$attrib,
-      _abstractNodes$childr = abstractNodes.children,
-      children = _abstractNodes$childr === undefined ? [] : _abstractNodes$childr;
-
-
-  if (typeof abstractNodes === 'string') {
-    return htmlEscape(abstractNodes);
-  } else {
-    return '<' + tag + ' ' + joinAttributes(attributes) + '>' + children.map(toHtml).join('') + '</' + tag + '>';
-  }
-}
-
-var noop$1 = function noop() {};
-
-function isWatched(node) {
-  var i2svg = node.getAttribute ? node.getAttribute(DATA_FA_I2SVG) : null;
-
-  return typeof i2svg === 'string';
-}
-
-function getMutator() {
-  if (config$1.autoReplaceSvg === true) {
-    return mutators.replace;
-  }
-
-  var mutator = mutators[config$1.autoReplaceSvg];
-
-  return mutator || mutators.replace;
-}
-
-var mutators = {
-  replace: function replace(mutation) {
-    var node = mutation[0];
-    var abstract = mutation[1];
-    var newOuterHTML = abstract.map(function (a) {
-      return toHtml(a);
-    }).join('\n');
-
-    if (node.parentNode && node.outerHTML) {
-      node.outerHTML = newOuterHTML + (config$1.keepOriginalSource && node.tagName.toLowerCase() !== 'svg' ? '<!-- ' + node.outerHTML + ' -->' : '');
-    } else if (node.parentNode) {
-      var newNode = document.createElement('span');
-      node.parentNode.replaceChild(newNode, node);
-      newNode.outerHTML = newOuterHTML;
-    }
-  },
-  nest: function nest(mutation) {
-    var node = mutation[0];
-    var abstract = mutation[1];
-
-    // If we already have a replaced node we do not want to continue nesting within it.
-    // Short-circuit to the standard replacement
-    if (~classArray(node).indexOf(config$1.replacementClass)) {
-      return mutators.replace(mutation);
-    }
-
-    var forSvg = new RegExp(config$1.familyPrefix + '-.*');
-
-    delete abstract[0].attributes.style;
-
-    var splitClasses = abstract[0].attributes.class.split(' ').reduce(function (acc, cls) {
-      if (cls === config$1.replacementClass || cls.match(forSvg)) {
-        acc.toSvg.push(cls);
-      } else {
-        acc.toNode.push(cls);
-      }
-
-      return acc;
-    }, { toNode: [], toSvg: [] });
-
-    abstract[0].attributes.class = splitClasses.toSvg.join(' ');
-
-    var newInnerHTML = abstract.map(function (a) {
-      return toHtml(a);
-    }).join('\n');
-    node.setAttribute('class', splitClasses.toNode.join(' '));
-    node.setAttribute(DATA_FA_I2SVG, '');
-    node.innerHTML = newInnerHTML;
-  }
-};
-
-function perform(mutations, callback) {
-  var callbackFunction = typeof callback === 'function' ? callback : noop$1;
-
-  if (mutations.length === 0) {
-    callbackFunction();
-  } else {
-    var frame = WINDOW.requestAnimationFrame || function (op) {
-      return op();
-    };
-
-    frame(function () {
-      var mutator = getMutator();
-      var mark = perf.begin('mutate');
-
-      mutations.map(mutator);
-
-      mark();
-
-      callbackFunction();
-    });
-  }
-}
-
-var disabled = false;
-
-function disableObservation(operation) {
-  disabled = true;
-  operation();
-  disabled = false;
-}
-
-var mo = null;
-
-function observe(options) {
-  if (!MUTATION_OBSERVER) return;
-
-  var treeCallback = options.treeCallback,
-      nodeCallback = options.nodeCallback,
-      pseudoElementsCallback = options.pseudoElementsCallback;
-
-
-  mo = new MUTATION_OBSERVER(function (objects) {
-    if (disabled) return;
-
-    toArray(objects).forEach(function (mutationRecord) {
-      if (mutationRecord.type === 'childList' && mutationRecord.addedNodes.length > 0 && !isWatched(mutationRecord.addedNodes[0])) {
-        if (config$1.searchPseudoElements) {
-          pseudoElementsCallback(mutationRecord.target);
-        }
-
-        treeCallback(mutationRecord.target);
-      }
-
-      if (mutationRecord.type === 'attributes' && mutationRecord.target.parentNode && config$1.searchPseudoElements) {
-        pseudoElementsCallback(mutationRecord.target.parentNode);
-      }
-
-      if (mutationRecord.type === 'attributes' && isWatched(mutationRecord.target) && ~ATTRIBUTES_WATCHED_FOR_MUTATION.indexOf(mutationRecord.attributeName)) {
-        if (mutationRecord.attributeName === 'class') {
-          var _getCanonicalIcon = getCanonicalIcon(classArray(mutationRecord.target)),
-              prefix = _getCanonicalIcon.prefix,
-              iconName = _getCanonicalIcon.iconName;
-
-          if (prefix) mutationRecord.target.setAttribute('data-prefix', prefix);
-          if (iconName) mutationRecord.target.setAttribute('data-icon', iconName);
-        } else {
-          nodeCallback(mutationRecord.target);
-        }
-      }
-    });
-  });
-
-  if (!IS_DOM) return;
-
-  mo.observe(DOCUMENT.getElementsByTagName('body')[0], {
-    childList: true, attributes: true, characterData: true, subtree: true
-  });
-}
-
-function disconnect() {
-  if (!mo) return;
-
-  mo.disconnect();
-}
-
-var styleParser = function (node) {
-  var style = node.getAttribute('style');
-
-  var val = [];
-
-  if (style) {
-    val = style.split(';').reduce(function (acc, style) {
-      var styles = style.split(':');
-      var prop = styles[0];
-      var value = styles.slice(1);
-
-      if (prop && value.length > 0) {
-        acc[prop] = value.join(':').trim();
-      }
-
-      return acc;
-    }, {});
-  }
-
-  return val;
-};
-
-function toHex(unicode) {
-  var result = '';
-
-  for (var i = 0; i < unicode.length; i++) {
-    var hex = unicode.charCodeAt(i).toString(16);
-    result += ('000' + hex).slice(-4);
-  }
-
-  return result;
-}
-
-var classParser = function (node) {
-  var existingPrefix = node.getAttribute('data-prefix');
-  var existingIconName = node.getAttribute('data-icon');
-  var innerText = node.innerText !== undefined ? node.innerText.trim() : '';
-
-  var val = getCanonicalIcon(classArray(node));
-
-  if (existingPrefix && existingIconName) {
-    val.prefix = existingPrefix;
-    val.iconName = existingIconName;
-  }
-
-  if (val.prefix && innerText.length > 1) {
-    val.iconName = byLigature(val.prefix, node.innerText);
-  } else if (val.prefix && innerText.length === 1) {
-    val.iconName = byUnicode(val.prefix, toHex(node.innerText));
-  }
-
-  return val;
-};
-
-var parseTransformString = function parseTransformString(transformString) {
-  var transform = {
-    size: 16,
-    x: 0,
-    y: 0,
-    flipX: false,
-    flipY: false,
-    rotate: 0
-  };
-
-  if (!transformString) {
-    return transform;
-  } else {
-    return transformString.toLowerCase().split(' ').reduce(function (acc, n) {
-      var parts = n.toLowerCase().split('-');
-      var first = parts[0];
-      var rest = parts.slice(1).join('-');
-
-      if (first && rest === 'h') {
-        acc.flipX = true;
-        return acc;
-      }
-
-      if (first && rest === 'v') {
-        acc.flipY = true;
-        return acc;
-      }
-
-      rest = parseFloat(rest);
-
-      if (isNaN(rest)) {
-        return acc;
-      }
-
-      switch (first) {
-        case 'grow':
-          acc.size = acc.size + rest;
-          break;
-        case 'shrink':
-          acc.size = acc.size - rest;
-          break;
-        case 'left':
-          acc.x = acc.x - rest;
-          break;
-        case 'right':
-          acc.x = acc.x + rest;
-          break;
-        case 'up':
-          acc.y = acc.y - rest;
-          break;
-        case 'down':
-          acc.y = acc.y + rest;
-          break;
-        case 'rotate':
-          acc.rotate = acc.rotate + rest;
-          break;
-      }
-
-      return acc;
-    }, transform);
-  }
-};
-
-var transformParser = function (node) {
-  return parseTransformString(node.getAttribute('data-fa-transform'));
-};
-
-var symbolParser = function (node) {
-  var symbol = node.getAttribute('data-fa-symbol');
-
-  return symbol === null ? false : symbol === '' ? true : symbol;
-};
-
-var attributesParser = function (node) {
-  var extraAttributes = toArray(node.attributes).reduce(function (acc, attr) {
-    if (acc.name !== 'class' && acc.name !== 'style') {
-      acc[attr.name] = attr.value;
-    }
-    return acc;
-  }, {});
-
-  var title = node.getAttribute('title');
-
-  if (config$1.autoA11y) {
-    if (title) {
-      extraAttributes['aria-labelledby'] = config$1.replacementClass + '-title-' + nextUniqueId();
-    } else {
-      extraAttributes['aria-hidden'] = 'true';
-    }
-  }
-
-  return extraAttributes;
-};
-
-var maskParser = function (node) {
-  var mask = node.getAttribute('data-fa-mask');
-
-  if (!mask) {
-    return emptyCanonicalIcon();
-  } else {
-    return getCanonicalIcon(mask.split(' ').map(function (i) {
-      return i.trim();
-    }));
-  }
-};
-
-function parseMeta(node) {
-  var _classParser = classParser(node),
-      iconName = _classParser.iconName,
-      prefix = _classParser.prefix,
-      extraClasses = _classParser.rest;
-
-  var extraStyles = styleParser(node);
-  var transform = transformParser(node);
-  var symbol = symbolParser(node);
-  var extraAttributes = attributesParser(node);
-  var mask = maskParser(node);
-
-  return {
-    iconName: iconName,
-    title: node.getAttribute('title'),
-    prefix: prefix,
-    transform: transform,
-    symbol: symbol,
-    mask: mask,
-    extra: {
-      classes: extraClasses,
-      styles: extraStyles,
-      attributes: extraAttributes
-    }
-  };
-}
-
-function MissingIcon(error) {
-  this.name = 'MissingIcon';
-  this.message = error || 'Icon unavailable';
-  this.stack = new Error().stack;
-}
-
-MissingIcon.prototype = Object.create(Error.prototype);
-MissingIcon.prototype.constructor = MissingIcon;
-
-var FILL = { fill: 'currentColor' };
-var ANIMATION_BASE = {
-  attributeType: 'XML',
-  repeatCount: 'indefinite',
-  dur: '2s'
-};
-var RING = {
-  tag: 'path',
-  attributes: _extends({}, FILL, {
-    d: 'M156.5,447.7l-12.6,29.5c-18.7-9.5-35.9-21.2-51.5-34.9l22.7-22.7C127.6,430.5,141.5,440,156.5,447.7z M40.6,272H8.5 c1.4,21.2,5.4,41.7,11.7,61.1L50,321.2C45.1,305.5,41.8,289,40.6,272z M40.6,240c1.4-18.8,5.2-37,11.1-54.1l-29.5-12.6 C14.7,194.3,10,216.7,8.5,240H40.6z M64.3,156.5c7.8-14.9,17.2-28.8,28.1-41.5L69.7,92.3c-13.7,15.6-25.5,32.8-34.9,51.5 L64.3,156.5z M397,419.6c-13.9,12-29.4,22.3-46.1,30.4l11.9,29.8c20.7-9.9,39.8-22.6,56.9-37.6L397,419.6z M115,92.4 c13.9-12,29.4-22.3,46.1-30.4l-11.9-29.8c-20.7,9.9-39.8,22.6-56.8,37.6L115,92.4z M447.7,355.5c-7.8,14.9-17.2,28.8-28.1,41.5 l22.7,22.7c13.7-15.6,25.5-32.9,34.9-51.5L447.7,355.5z M471.4,272c-1.4,18.8-5.2,37-11.1,54.1l29.5,12.6 c7.5-21.1,12.2-43.5,13.6-66.8H471.4z M321.2,462c-15.7,5-32.2,8.2-49.2,9.4v32.1c21.2-1.4,41.7-5.4,61.1-11.7L321.2,462z M240,471.4c-18.8-1.4-37-5.2-54.1-11.1l-12.6,29.5c21.1,7.5,43.5,12.2,66.8,13.6V471.4z M462,190.8c5,15.7,8.2,32.2,9.4,49.2h32.1 c-1.4-21.2-5.4-41.7-11.7-61.1L462,190.8z M92.4,397c-12-13.9-22.3-29.4-30.4-46.1l-29.8,11.9c9.9,20.7,22.6,39.8,37.6,56.9 L92.4,397z M272,40.6c18.8,1.4,36.9,5.2,54.1,11.1l12.6-29.5C317.7,14.7,295.3,10,272,8.5V40.6z M190.8,50 c15.7-5,32.2-8.2,49.2-9.4V8.5c-21.2,1.4-41.7,5.4-61.1,11.7L190.8,50z M442.3,92.3L419.6,115c12,13.9,22.3,29.4,30.5,46.1 l29.8-11.9C470,128.5,457.3,109.4,442.3,92.3z M397,92.4l22.7-22.7c-15.6-13.7-32.8-25.5-51.5-34.9l-12.6,29.5 C370.4,72.1,384.4,81.5,397,92.4z'
-  })
-};
-var OPACITY_ANIMATE = _extends({}, ANIMATION_BASE, {
-  attributeName: 'opacity'
-});
-var DOT = {
-  tag: 'circle',
-  attributes: _extends({}, FILL, {
-    cx: '256',
-    cy: '364',
-    r: '28'
-  }),
-  children: [{ tag: 'animate', attributes: _extends({}, ANIMATION_BASE, { attributeName: 'r', values: '28;14;28;28;14;28;' }) }, { tag: 'animate', attributes: _extends({}, OPACITY_ANIMATE, { values: '1;0;1;1;0;1;' }) }]
-};
-var QUESTION = {
-  tag: 'path',
-  attributes: _extends({}, FILL, {
-    opacity: '1',
-    d: 'M263.7,312h-16c-6.6,0-12-5.4-12-12c0-71,77.4-63.9,77.4-107.8c0-20-17.8-40.2-57.4-40.2c-29.1,0-44.3,9.6-59.2,28.7 c-3.9,5-11.1,6-16.2,2.4l-13.1-9.2c-5.6-3.9-6.9-11.8-2.6-17.2c21.2-27.2,46.4-44.7,91.2-44.7c52.3,0,97.4,29.8,97.4,80.2 c0,67.6-77.4,63.5-77.4,107.8C275.7,306.6,270.3,312,263.7,312z'
-  }),
-  children: [{ tag: 'animate', attributes: _extends({}, OPACITY_ANIMATE, { values: '1;0;0;0;0;1;' }) }]
-};
-var EXCLAMATION = {
-  tag: 'path',
-  attributes: _extends({}, FILL, {
-    opacity: '0',
-    d: 'M232.5,134.5l7,168c0.3,6.4,5.6,11.5,12,11.5h9c6.4,0,11.7-5.1,12-11.5l7-168c0.3-6.8-5.2-12.5-12-12.5h-23 C237.7,122,232.2,127.7,232.5,134.5z'
-  }),
-  children: [{ tag: 'animate', attributes: _extends({}, OPACITY_ANIMATE, { values: '0;0;1;1;0;0;' }) }]
-};
-
-var missing = { tag: 'g', children: [RING, DOT, QUESTION, EXCLAMATION] };
-
-var styles = namespace.styles;
-
-var LAYERS_TEXT_CLASSNAME = 'fa-layers-text';
-var FONT_FAMILY_PATTERN = /Font Awesome 5 (Solid|Regular|Light|Brands)/;
-var STYLE_TO_PREFIX = {
-  'Solid': 'fas',
-  'Regular': 'far',
-  'Light': 'fal',
-  'Brands': 'fab'
-};
-
-function findIcon(iconName, prefix) {
-  var val = {
-    found: false,
-    width: 512,
-    height: 512,
-    icon: missing
-  };
-
-  if (iconName && prefix && styles[prefix] && styles[prefix][iconName]) {
-    var icon = styles[prefix][iconName];
-    var width = icon[0];
-    var height = icon[1];
-    var vectorData = icon.slice(4);
-
-    val = {
-      found: true,
-      width: width,
-      height: height,
-      icon: { tag: 'path', attributes: { fill: 'currentColor', d: vectorData[0] } }
-    };
-  } else if (iconName && prefix && !config$1.showMissingIcons) {
-    throw new MissingIcon('Icon is missing for prefix ' + prefix + ' with icon name ' + iconName);
-  }
-
-  return val;
-}
-
-function generateSvgReplacementMutation(node, nodeMeta) {
-  var iconName = nodeMeta.iconName,
-      title = nodeMeta.title,
-      prefix = nodeMeta.prefix,
-      transform = nodeMeta.transform,
-      symbol = nodeMeta.symbol,
-      mask = nodeMeta.mask,
-      extra = nodeMeta.extra;
-
-
-  return [node, makeInlineSvgAbstract({
-    icons: {
-      main: findIcon(iconName, prefix),
-      mask: findIcon(mask.iconName, mask.prefix)
-    },
-    prefix: prefix,
-    iconName: iconName,
-    transform: transform,
-    symbol: symbol,
-    mask: mask,
-    title: title,
-    extra: extra,
-    watchable: true
-  })];
-}
-
-function generateLayersText(node, nodeMeta) {
-  var title = nodeMeta.title,
-      transform = nodeMeta.transform,
-      extra = nodeMeta.extra;
-
-
-  var width = null;
-  var height = null;
-
-  if (IS_IE) {
-    var computedFontSize = parseInt(getComputedStyle(node).fontSize, 10);
-    var boundingClientRect = node.getBoundingClientRect();
-    width = boundingClientRect.width / computedFontSize;
-    height = boundingClientRect.height / computedFontSize;
-  }
-
-  if (config$1.autoA11y && !title) {
-    extra.attributes['aria-hidden'] = 'true';
-  }
-
-  return [node, makeLayersTextAbstract({
-    content: node.innerHTML,
-    width: width,
-    height: height,
-    transform: transform,
-    title: title,
-    extra: extra,
-    watchable: true
-  })];
-}
-
-function generateMutation(node) {
-  var nodeMeta = parseMeta(node);
-
-  if (~nodeMeta.extra.classes.indexOf(LAYERS_TEXT_CLASSNAME)) {
-    return generateLayersText(node, nodeMeta);
-  } else {
-    return generateSvgReplacementMutation(node, nodeMeta);
-  }
-}
-
-function remove(node) {
-  if (typeof node.remove === 'function') {
-    node.remove();
-  } else if (node && node.parentNode) {
-    node.parentNode.removeChild(node);
-  }
-}
-
-function searchPseudoElements(root) {
-  if (!IS_DOM) return;
-
-  var end = perf.begin('searchPseudoElements');
-
-  disableObservation(function () {
-    toArray(root.querySelectorAll('*')).forEach(function (node) {
-      [':before', ':after'].forEach(function (pos) {
-        var styles = WINDOW.getComputedStyle(node, pos);
-        var fontFamily = styles.getPropertyValue('font-family').match(FONT_FAMILY_PATTERN);
-        var children = toArray(node.children);
-        var pseudoElement = children.filter(function (c) {
-          return c.getAttribute(DATA_FA_PSEUDO_ELEMENT) === pos;
-        })[0];
-
-        if (pseudoElement) {
-          if (pseudoElement.nextSibling && pseudoElement.nextSibling.textContent.indexOf(DATA_FA_PSEUDO_ELEMENT) > -1) {
-            remove(pseudoElement.nextSibling);
-          }
-          remove(pseudoElement);
-          pseudoElement = null;
-        }
-
-        if (fontFamily && !pseudoElement) {
-          var content = styles.getPropertyValue('content');
-          var i = DOCUMENT.createElement('i');
-          i.setAttribute('class', '' + STYLE_TO_PREFIX[fontFamily[1]]);
-          i.setAttribute(DATA_FA_PSEUDO_ELEMENT, pos);
-          i.innerText = content.length === 3 ? content.substr(1, 1) : content;
-          if (pos === ':before') {
-            node.insertBefore(i, node.firstChild);
-          } else {
-            node.appendChild(i);
-          }
-        }
-      });
-    });
-  });
-
-  end();
-}
-
-function onTree(root) {
-  var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-  if (!IS_DOM) return;
-
-  var htmlClassList = DOCUMENT.documentElement.classList;
-  var hclAdd = function hclAdd(suffix) {
-    return htmlClassList.add(HTML_CLASS_I2SVG_BASE_CLASS + '-' + suffix);
-  };
-  var hclRemove = function hclRemove(suffix) {
-    return htmlClassList.remove(HTML_CLASS_I2SVG_BASE_CLASS + '-' + suffix);
-  };
-  var prefixes = Object.keys(styles);
-  var prefixesDomQuery = ['.' + LAYERS_TEXT_CLASSNAME + ':not([' + DATA_FA_I2SVG + '])'].concat(prefixes.map(function (p) {
-    return '.' + p + ':not([' + DATA_FA_I2SVG + '])';
-  })).join(', ');
-
-  if (prefixesDomQuery.length === 0) {
-    return;
-  }
-
-  var candidates = toArray(root.querySelectorAll(prefixesDomQuery));
-
-  if (candidates.length > 0) {
-    hclAdd('pending');
-    hclRemove('complete');
-  } else {
-    return;
-  }
-
-  var mark = perf.begin('onTree');
-
-  var mutations = candidates.reduce(function (acc, node) {
-    try {
-      var mutation = generateMutation(node);
-
-      if (mutation) {
-        acc.push(mutation);
-      }
-    } catch (e) {
-      if (!PRODUCTION) {
-        if (e instanceof MissingIcon) {
-          console.error(e);
-        }
-      }
-    }
-
-    return acc;
-  }, []);
-
-  mark();
-
-  perform(mutations, function () {
-    hclAdd('active');
-    hclAdd('complete');
-    hclRemove('pending');
-
-    if (typeof callback === 'function') callback();
-  });
-}
-
-function onNode(node) {
-  var callback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
-
-  var mutation = generateMutation(node);
-
-  if (mutation) {
-    perform([mutation], callback);
-  }
-}
-
-var baseStyles = "svg:not(:root).svg-inline--fa {\n  overflow: visible; }\n\n.svg-inline--fa {\n  display: inline-block;\n  font-size: inherit;\n  height: 1em;\n  overflow: visible;\n  vertical-align: -.125em; }\n  .svg-inline--fa.fa-lg {\n    vertical-align: -.225em; }\n  .svg-inline--fa.fa-w-1 {\n    width: 0.0625em; }\n  .svg-inline--fa.fa-w-2 {\n    width: 0.125em; }\n  .svg-inline--fa.fa-w-3 {\n    width: 0.1875em; }\n  .svg-inline--fa.fa-w-4 {\n    width: 0.25em; }\n  .svg-inline--fa.fa-w-5 {\n    width: 0.3125em; }\n  .svg-inline--fa.fa-w-6 {\n    width: 0.375em; }\n  .svg-inline--fa.fa-w-7 {\n    width: 0.4375em; }\n  .svg-inline--fa.fa-w-8 {\n    width: 0.5em; }\n  .svg-inline--fa.fa-w-9 {\n    width: 0.5625em; }\n  .svg-inline--fa.fa-w-10 {\n    width: 0.625em; }\n  .svg-inline--fa.fa-w-11 {\n    width: 0.6875em; }\n  .svg-inline--fa.fa-w-12 {\n    width: 0.75em; }\n  .svg-inline--fa.fa-w-13 {\n    width: 0.8125em; }\n  .svg-inline--fa.fa-w-14 {\n    width: 0.875em; }\n  .svg-inline--fa.fa-w-15 {\n    width: 0.9375em; }\n  .svg-inline--fa.fa-w-16 {\n    width: 1em; }\n  .svg-inline--fa.fa-w-17 {\n    width: 1.0625em; }\n  .svg-inline--fa.fa-w-18 {\n    width: 1.125em; }\n  .svg-inline--fa.fa-w-19 {\n    width: 1.1875em; }\n  .svg-inline--fa.fa-w-20 {\n    width: 1.25em; }\n  .svg-inline--fa.fa-pull-left {\n    margin-right: .3em;\n    width: auto; }\n  .svg-inline--fa.fa-pull-right {\n    margin-left: .3em;\n    width: auto; }\n  .svg-inline--fa.fa-border {\n    height: 1.5em; }\n  .svg-inline--fa.fa-li {\n    width: 2em; }\n  .svg-inline--fa.fa-fw {\n    width: 1.25em; }\n\n.fa-layers svg.svg-inline--fa {\n  bottom: 0;\n  left: 0;\n  margin: auto;\n  position: absolute;\n  right: 0;\n  top: 0; }\n\n.fa-layers {\n  display: inline-block;\n  height: 1em;\n  position: relative;\n  text-align: center;\n  vertical-align: -.125em;\n  width: 1em; }\n  .fa-layers svg.svg-inline--fa {\n    -webkit-transform-origin: center center;\n            transform-origin: center center; }\n\n.fa-layers-text, .fa-layers-counter {\n  display: inline-block;\n  position: absolute;\n  text-align: center; }\n\n.fa-layers-text {\n  left: 50%;\n  top: 50%;\n  -webkit-transform: translate(-50%, -50%);\n          transform: translate(-50%, -50%);\n  -webkit-transform-origin: center center;\n          transform-origin: center center; }\n\n.fa-layers-counter {\n  background-color: #ff253a;\n  border-radius: 1em;\n  -webkit-box-sizing: border-box;\n          box-sizing: border-box;\n  color: #fff;\n  height: 1.5em;\n  line-height: 1;\n  max-width: 5em;\n  min-width: 1.5em;\n  overflow: hidden;\n  padding: .25em;\n  right: 0;\n  text-overflow: ellipsis;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top right;\n          transform-origin: top right; }\n\n.fa-layers-bottom-right {\n  bottom: 0;\n  right: 0;\n  top: auto;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: bottom right;\n          transform-origin: bottom right; }\n\n.fa-layers-bottom-left {\n  bottom: 0;\n  left: 0;\n  right: auto;\n  top: auto;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: bottom left;\n          transform-origin: bottom left; }\n\n.fa-layers-top-right {\n  right: 0;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top right;\n          transform-origin: top right; }\n\n.fa-layers-top-left {\n  left: 0;\n  right: auto;\n  top: 0;\n  -webkit-transform: scale(0.25);\n          transform: scale(0.25);\n  -webkit-transform-origin: top left;\n          transform-origin: top left; }\n\n.fa-lg {\n  font-size: 1.33333em;\n  line-height: 0.75em;\n  vertical-align: -.0667em; }\n\n.fa-xs {\n  font-size: .75em; }\n\n.fa-sm {\n  font-size: .875em; }\n\n.fa-1x {\n  font-size: 1em; }\n\n.fa-2x {\n  font-size: 2em; }\n\n.fa-3x {\n  font-size: 3em; }\n\n.fa-4x {\n  font-size: 4em; }\n\n.fa-5x {\n  font-size: 5em; }\n\n.fa-6x {\n  font-size: 6em; }\n\n.fa-7x {\n  font-size: 7em; }\n\n.fa-8x {\n  font-size: 8em; }\n\n.fa-9x {\n  font-size: 9em; }\n\n.fa-10x {\n  font-size: 10em; }\n\n.fa-fw {\n  text-align: center;\n  width: 1.25em; }\n\n.fa-ul {\n  list-style-type: none;\n  margin-left: 2.5em;\n  padding-left: 0; }\n  .fa-ul > li {\n    position: relative; }\n\n.fa-li {\n  left: -2em;\n  position: absolute;\n  text-align: center;\n  width: 2em;\n  line-height: inherit; }\n\n.fa-border {\n  border: solid 0.08em #eee;\n  border-radius: .1em;\n  padding: .2em .25em .15em; }\n\n.fa-pull-left {\n  float: left; }\n\n.fa-pull-right {\n  float: right; }\n\n.fa.fa-pull-left,\n.fas.fa-pull-left,\n.far.fa-pull-left,\n.fal.fa-pull-left,\n.fab.fa-pull-left {\n  margin-right: .3em; }\n\n.fa.fa-pull-right,\n.fas.fa-pull-right,\n.far.fa-pull-right,\n.fal.fa-pull-right,\n.fab.fa-pull-right {\n  margin-left: .3em; }\n\n.fa-spin {\n  -webkit-animation: fa-spin 2s infinite linear;\n          animation: fa-spin 2s infinite linear; }\n\n.fa-pulse {\n  -webkit-animation: fa-spin 1s infinite steps(8);\n          animation: fa-spin 1s infinite steps(8); }\n\n@-webkit-keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n            transform: rotate(0deg); }\n  100% {\n    -webkit-transform: rotate(360deg);\n            transform: rotate(360deg); } }\n\n@keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n            transform: rotate(0deg); }\n  100% {\n    -webkit-transform: rotate(360deg);\n            transform: rotate(360deg); } }\n\n.fa-rotate-90 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)\";\n  -webkit-transform: rotate(90deg);\n          transform: rotate(90deg); }\n\n.fa-rotate-180 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2)\";\n  -webkit-transform: rotate(180deg);\n          transform: rotate(180deg); }\n\n.fa-rotate-270 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=3)\";\n  -webkit-transform: rotate(270deg);\n          transform: rotate(270deg); }\n\n.fa-flip-horizontal {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)\";\n  -webkit-transform: scale(-1, 1);\n          transform: scale(-1, 1); }\n\n.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(1, -1);\n          transform: scale(1, -1); }\n\n.fa-flip-horizontal.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(-1, -1);\n          transform: scale(-1, -1); }\n\n:root .fa-rotate-90,\n:root .fa-rotate-180,\n:root .fa-rotate-270,\n:root .fa-flip-horizontal,\n:root .fa-flip-vertical {\n  -webkit-filter: none;\n          filter: none; }\n\n.fa-stack {\n  display: inline-block;\n  height: 2em;\n  position: relative;\n  width: 2em; }\n\n.fa-stack-1x,\n.fa-stack-2x {\n  bottom: 0;\n  left: 0;\n  margin: auto;\n  position: absolute;\n  right: 0;\n  top: 0; }\n\n.svg-inline--fa.fa-stack-1x {\n  height: 1em;\n  width: 1em; }\n\n.svg-inline--fa.fa-stack-2x {\n  height: 2em;\n  width: 2em; }\n\n.fa-inverse {\n  color: #fff; }\n\n.sr-only {\n  border: 0;\n  clip: rect(0, 0, 0, 0);\n  height: 1px;\n  margin: -1px;\n  overflow: hidden;\n  padding: 0;\n  position: absolute;\n  width: 1px; }\n\n.sr-only-focusable:active, .sr-only-focusable:focus {\n  clip: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  position: static;\n  width: auto; }\n";
-
-var css = function () {
-  var dfp = DEFAULT_FAMILY_PREFIX;
-  var drc = DEFAULT_REPLACEMENT_CLASS;
-  var fp = config$1.familyPrefix;
-  var rc = config$1.replacementClass;
-  var s = baseStyles;
-
-  if (fp !== dfp || rc !== drc) {
-    var dPatt = new RegExp('\\.' + dfp + '\\-', 'g');
-    var rPatt = new RegExp('\\.' + drc, 'g');
-
-    s = s.replace(dPatt, '.' + fp + '-').replace(rPatt, '.' + rc);
-  }
-
-  return s;
-};
-
-function define(prefix, icons) {
-  var normalized = Object.keys(icons).reduce(function (acc, iconName) {
-    var icon = icons[iconName];
-    var expanded = !!icon.icon;
-
-    if (expanded) {
-      acc[icon.iconName] = icon.icon;
-    } else {
-      acc[iconName] = icon;
-    }
-    return acc;
-  }, {});
-
-  if (typeof namespace.hooks.addPack === 'function') {
-    namespace.hooks.addPack(prefix, normalized);
-  } else {
-    namespace.styles[prefix] = _extends({}, namespace.styles[prefix] || {}, normalized);
-  }
-
-  /**
-   * Font Awesome 4 used the prefix of `fa` for all icons. With the introduction
-   * of new styles we needed to differentiate between them. Prefix `fa` is now an alias
-   * for `fas` so we'll easy the upgrade process for our users by automatically defining
-   * this as well.
-   */
-  if (prefix === 'fas') {
-    define('fa', icons);
-  }
-}
-
-var Library = function () {
-  function Library() {
-    classCallCheck(this, Library);
-
-    this.definitions = {};
-  }
-
-  createClass(Library, [{
-    key: 'add',
-    value: function add() {
-      var _this = this;
-
-      for (var _len = arguments.length, definitions = Array(_len), _key = 0; _key < _len; _key++) {
-        definitions[_key] = arguments[_key];
-      }
-
-      var additions = definitions.reduce(this._pullDefinitions, {});
-
-      Object.keys(additions).forEach(function (key) {
-        _this.definitions[key] = _extends({}, _this.definitions[key] || {}, additions[key]);
-        define(key, additions[key]);
-      });
-    }
-  }, {
-    key: 'reset',
-    value: function reset() {
-      this.definitions = {};
-    }
-  }, {
-    key: '_pullDefinitions',
-    value: function _pullDefinitions(additions, definition) {
-      var normalized = definition.prefix && definition.iconName && definition.icon ? { 0: definition } : definition;
-
-      Object.keys(normalized).map(function (key) {
-        var _normalized$key = normalized[key],
-            prefix = _normalized$key.prefix,
-            iconName = _normalized$key.iconName,
-            icon = _normalized$key.icon;
-
-
-        if (!additions[prefix]) additions[prefix] = {};
-
-        additions[prefix][iconName] = icon;
-      });
-
-      return additions;
-    }
-  }]);
-  return Library;
-}();
-
-function prepIcon(icon) {
-  var width = icon[0];
-  var height = icon[1];
-  var vectorData = icon.slice(4);
-
-  return {
-    found: true,
-    width: width,
-    height: height,
-    icon: { tag: 'path', attributes: { fill: 'currentColor', d: vectorData[0] } }
-  };
-}
-
-var _cssInserted = false;
-
-function ensureCss() {
-  if (!config$1.autoAddCss) {
-    return;
-  }
-
-  if (!_cssInserted) {
-    insertCss(css());
-  }
-
-  _cssInserted = true;
-}
-
-function apiObject(val, abstractCreator) {
-  Object.defineProperty(val, 'abstract', {
-    get: abstractCreator
-  });
-
-  Object.defineProperty(val, 'html', {
-    get: function get() {
-      return val.abstract.map(function (a) {
-        return toHtml(a);
-      });
-    }
-  });
-
-  Object.defineProperty(val, 'node', {
-    get: function get() {
-      if (!IS_DOM) return;
-
-      var container = DOCUMENT.createElement('div');
-      container.innerHTML = val.html;
-      return container.children;
-    }
-  });
-
-  return val;
-}
-
-function findIconDefinition(params) {
-  var _params$prefix = params.prefix,
-      prefix = _params$prefix === undefined ? 'fa' : _params$prefix,
-      iconName = params.iconName;
-
-
-  if (!iconName) return;
-
-  return iconFromMapping(library.definitions, prefix, iconName) || iconFromMapping(namespace.styles, prefix, iconName);
-}
-
-function resolveIcons(next) {
-  return function (maybeIconDefinition) {
-    var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    var iconDefinition = (maybeIconDefinition || {}).icon ? maybeIconDefinition : findIconDefinition(maybeIconDefinition || {});
-
-    var mask = params.mask;
-
-
-    if (mask) {
-      mask = (mask || {}).icon ? mask : findIconDefinition(mask || {});
-    }
-
-    return next(iconDefinition, _extends({}, params, { mask: mask }));
-  };
-}
-
-var library = new Library();
-
-var noAuto = function noAuto() {
-  auto(false);
-  disconnect();
-};
-
-var dom = {
-  i2svg: function i2svg() {
-    var params = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    if (IS_DOM) {
-      ensureCss();
-
-      var _params$node = params.node,
-          node = _params$node === undefined ? DOCUMENT : _params$node,
-          _params$callback = params.callback,
-          callback = _params$callback === undefined ? function () {} : _params$callback;
-
-
-      if (config$1.searchPseudoElements) {
-        searchPseudoElements(node);
-      }
-
-      onTree(node, callback);
-    }
-  },
-
-  css: css,
-
-  insertCss: function insertCss$$1() {
-    insertCss(css());
-  }
-};
-
-var parse = {
-  transform: function transform(transformString) {
-    return parseTransformString(transformString);
-  }
-};
-
-var icon = resolveIcons(function (iconDefinition) {
-  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var _params$transform = params.transform,
-      transform = _params$transform === undefined ? meaninglessTransform : _params$transform,
-      _params$symbol = params.symbol,
-      symbol = _params$symbol === undefined ? false : _params$symbol,
-      _params$mask = params.mask,
-      mask = _params$mask === undefined ? null : _params$mask,
-      _params$title = params.title,
-      title = _params$title === undefined ? null : _params$title,
-      _params$classes = params.classes,
-      classes = _params$classes === undefined ? [] : _params$classes,
-      _params$attributes = params.attributes,
-      attributes = _params$attributes === undefined ? {} : _params$attributes,
-      _params$styles = params.styles,
-      styles = _params$styles === undefined ? {} : _params$styles;
-
-
-  if (!iconDefinition) return;
-
-  var prefix = iconDefinition.prefix,
-      iconName = iconDefinition.iconName,
-      icon = iconDefinition.icon;
-
-
-  return apiObject(_extends({ type: 'icon' }, iconDefinition), function () {
-    ensureCss();
-
-    if (config$1.autoA11y) {
-      if (title) {
-        attributes['aria-labelledby'] = config$1.replacementClass + '-title-' + nextUniqueId();
-      } else {
-        attributes['aria-hidden'] = 'true';
-      }
-    }
-
-    return makeInlineSvgAbstract({
-      icons: {
-        main: prepIcon(icon),
-        mask: mask ? prepIcon(mask.icon) : { found: false, width: null, height: null, icon: {} }
-      },
-      prefix: prefix,
-      iconName: iconName,
-      transform: _extends({}, meaninglessTransform, transform),
-      symbol: symbol,
-      title: title,
-      extra: {
-        attributes: attributes,
-        styles: styles,
-        classes: classes
-      }
-    });
-  });
-});
-
-var text = function text(content) {
-  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-  var _params$transform2 = params.transform,
-      transform = _params$transform2 === undefined ? meaninglessTransform : _params$transform2,
-      _params$title2 = params.title,
-      title = _params$title2 === undefined ? null : _params$title2,
-      _params$classes2 = params.classes,
-      classes = _params$classes2 === undefined ? [] : _params$classes2,
-      _params$attributes2 = params.attributes,
-      attributes = _params$attributes2 === undefined ? {} : _params$attributes2,
-      _params$styles2 = params.styles,
-      styles = _params$styles2 === undefined ? {} : _params$styles2;
-
-
-  return apiObject({ type: 'text', content: content }, function () {
-    ensureCss();
-
-    return makeLayersTextAbstract({
-      content: content,
-      transform: _extends({}, meaninglessTransform, transform),
-      title: title,
-      extra: {
-        attributes: attributes,
-        styles: styles,
-        classes: [config$1.familyPrefix + '-layers-text'].concat(toConsumableArray(classes))
-      }
-    });
-  });
-};
-
-var layer = function layer(assembler) {
-  return apiObject({ type: 'layer' }, function () {
-    ensureCss();
-
-    var children = [];
-
-    assembler(function (args) {
-      Array.isArray(args) ? args.map(function (a) {
-        children = children.concat(a.abstract);
-      }) : children = children.concat(args.abstract);
-    });
-
-    return [{
-      tag: 'span',
-      attributes: { class: config$1.familyPrefix + '-layers' },
-      children: children
-    }];
-  });
-};
-
-var api$1 = {
-  noAuto: noAuto,
-  dom: dom,
-  library: library,
-  parse: parse,
-  findIconDefinition: findIconDefinition,
-  icon: icon,
-  text: text,
-  layer: layer
-};
-
-var autoReplace = function autoReplace() {
-  if (IS_DOM && config$1.autoReplaceSvg) api$1.dom.i2svg({ node: DOCUMENT });
-};
-
-function bootstrap() {
-  if (IS_BROWSER) {
-    if (!WINDOW.FontAwesome) {
-      WINDOW.FontAwesome = api$1;
-    }
-
-    domready(function () {
-      if (Object.keys(namespace.styles).length > 0) {
-        autoReplace();
-      }
-
-      if (config$1.observeMutations && typeof MutationObserver === 'function') {
-        observe({
-          treeCallback: onTree,
-          nodeCallback: onNode,
-          pseudoElementsCallback: searchPseudoElements
-        });
-      }
-    });
-  }
-
-  namespace.hooks = _extends({}, namespace.hooks, {
-
-    addPack: function addPack(prefix, icons) {
-      namespace.styles[prefix] = _extends({}, namespace.styles[prefix] || {}, icons);
-
-      build();
-      autoReplace();
-    },
-
-    addShims: function addShims(shims) {
-      var _namespace$shims;
-
-      (_namespace$shims = namespace.shims).push.apply(_namespace$shims, toConsumableArray(shims));
-
-      build();
-      autoReplace();
-    }
-  });
-}
-
-Object.defineProperty(api$1, 'config', {
-  get: function get() {
-    return config$1;
-  },
-
-  set: function set(newConfig) {
-    update(newConfig);
-  }
-});
-
-if (IS_DOM) bunker(bootstrap);
-
-var config = api$1.config;
-
-
-/* harmony default export */ __webpack_exports__["default"] = (api$1);
-
-
-/***/ }),
-/* 227 */
-/***/ (function(module, exports, __webpack_require__) {
-
-/* WEBPACK VAR INJECTION */(function(global) {var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*
- 2017 Julian Garnier
- Released under the MIT license
-*/
-var $jscomp={scope:{}};$jscomp.defineProperty="function"==typeof Object.defineProperties?Object.defineProperty:function(e,r,p){if(p.get||p.set)throw new TypeError("ES3 does not support getters and setters.");e!=Array.prototype&&e!=Object.prototype&&(e[r]=p.value)};$jscomp.getGlobal=function(e){return"undefined"!=typeof window&&window===e?e:"undefined"!=typeof global&&null!=global?global:e};$jscomp.global=$jscomp.getGlobal(this);$jscomp.SYMBOL_PREFIX="jscomp_symbol_";
-$jscomp.initSymbol=function(){$jscomp.initSymbol=function(){};$jscomp.global.Symbol||($jscomp.global.Symbol=$jscomp.Symbol)};$jscomp.symbolCounter_=0;$jscomp.Symbol=function(e){return $jscomp.SYMBOL_PREFIX+(e||"")+$jscomp.symbolCounter_++};
-$jscomp.initSymbolIterator=function(){$jscomp.initSymbol();var e=$jscomp.global.Symbol.iterator;e||(e=$jscomp.global.Symbol.iterator=$jscomp.global.Symbol("iterator"));"function"!=typeof Array.prototype[e]&&$jscomp.defineProperty(Array.prototype,e,{configurable:!0,writable:!0,value:function(){return $jscomp.arrayIterator(this)}});$jscomp.initSymbolIterator=function(){}};$jscomp.arrayIterator=function(e){var r=0;return $jscomp.iteratorPrototype(function(){return r<e.length?{done:!1,value:e[r++]}:{done:!0}})};
-$jscomp.iteratorPrototype=function(e){$jscomp.initSymbolIterator();e={next:e};e[$jscomp.global.Symbol.iterator]=function(){return this};return e};$jscomp.array=$jscomp.array||{};$jscomp.iteratorFromArray=function(e,r){$jscomp.initSymbolIterator();e instanceof String&&(e+="");var p=0,m={next:function(){if(p<e.length){var u=p++;return{value:r(u,e[u]),done:!1}}m.next=function(){return{done:!0,value:void 0}};return m.next()}};m[Symbol.iterator]=function(){return m};return m};
-$jscomp.polyfill=function(e,r,p,m){if(r){p=$jscomp.global;e=e.split(".");for(m=0;m<e.length-1;m++){var u=e[m];u in p||(p[u]={});p=p[u]}e=e[e.length-1];m=p[e];r=r(m);r!=m&&null!=r&&$jscomp.defineProperty(p,e,{configurable:!0,writable:!0,value:r})}};$jscomp.polyfill("Array.prototype.keys",function(e){return e?e:function(){return $jscomp.iteratorFromArray(this,function(e){return e})}},"es6-impl","es3");var $jscomp$this=this;
-(function(e,r){ true?!(__WEBPACK_AMD_DEFINE_ARRAY__ = [], __WEBPACK_AMD_DEFINE_FACTORY__ = (r),
-				__WEBPACK_AMD_DEFINE_RESULT__ = (typeof __WEBPACK_AMD_DEFINE_FACTORY__ === 'function' ?
-				(__WEBPACK_AMD_DEFINE_FACTORY__.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__)) : __WEBPACK_AMD_DEFINE_FACTORY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__)):"object"===typeof module&&module.exports?module.exports=r():e.anime=r()})(this,function(){function e(a){if(!h.col(a))try{return document.querySelectorAll(a)}catch(c){}}function r(a,c){for(var d=a.length,b=2<=arguments.length?arguments[1]:void 0,f=[],n=0;n<d;n++)if(n in a){var k=a[n];c.call(b,k,n,a)&&f.push(k)}return f}function p(a){return a.reduce(function(a,d){return a.concat(h.arr(d)?p(d):d)},[])}function m(a){if(h.arr(a))return a;
-h.str(a)&&(a=e(a)||a);return a instanceof NodeList||a instanceof HTMLCollection?[].slice.call(a):[a]}function u(a,c){return a.some(function(a){return a===c})}function C(a){var c={},d;for(d in a)c[d]=a[d];return c}function D(a,c){var d=C(a),b;for(b in a)d[b]=c.hasOwnProperty(b)?c[b]:a[b];return d}function z(a,c){var d=C(a),b;for(b in c)d[b]=h.und(a[b])?c[b]:a[b];return d}function T(a){a=a.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i,function(a,c,d,k){return c+c+d+d+k+k});var c=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(a);
-a=parseInt(c[1],16);var d=parseInt(c[2],16),c=parseInt(c[3],16);return"rgba("+a+","+d+","+c+",1)"}function U(a){function c(a,c,b){0>b&&(b+=1);1<b&&--b;return b<1/6?a+6*(c-a)*b:.5>b?c:b<2/3?a+(c-a)*(2/3-b)*6:a}var d=/hsl\((\d+),\s*([\d.]+)%,\s*([\d.]+)%\)/g.exec(a)||/hsla\((\d+),\s*([\d.]+)%,\s*([\d.]+)%,\s*([\d.]+)\)/g.exec(a);a=parseInt(d[1])/360;var b=parseInt(d[2])/100,f=parseInt(d[3])/100,d=d[4]||1;if(0==b)f=b=a=f;else{var n=.5>f?f*(1+b):f+b-f*b,k=2*f-n,f=c(k,n,a+1/3),b=c(k,n,a);a=c(k,n,a-1/3)}return"rgba("+
-255*f+","+255*b+","+255*a+","+d+")"}function y(a){if(a=/([\+\-]?[0-9#\.]+)(%|px|pt|em|rem|in|cm|mm|ex|ch|pc|vw|vh|vmin|vmax|deg|rad|turn)?$/.exec(a))return a[2]}function V(a){if(-1<a.indexOf("translate")||"perspective"===a)return"px";if(-1<a.indexOf("rotate")||-1<a.indexOf("skew"))return"deg"}function I(a,c){return h.fnc(a)?a(c.target,c.id,c.total):a}function E(a,c){if(c in a.style)return getComputedStyle(a).getPropertyValue(c.replace(/([a-z])([A-Z])/g,"$1-$2").toLowerCase())||"0"}function J(a,c){if(h.dom(a)&&
-u(W,c))return"transform";if(h.dom(a)&&(a.getAttribute(c)||h.svg(a)&&a[c]))return"attribute";if(h.dom(a)&&"transform"!==c&&E(a,c))return"css";if(null!=a[c])return"object"}function X(a,c){var d=V(c),d=-1<c.indexOf("scale")?1:0+d;a=a.style.transform;if(!a)return d;for(var b=[],f=[],n=[],k=/(\w+)\((.+?)\)/g;b=k.exec(a);)f.push(b[1]),n.push(b[2]);a=r(n,function(a,b){return f[b]===c});return a.length?a[0]:d}function K(a,c){switch(J(a,c)){case "transform":return X(a,c);case "css":return E(a,c);case "attribute":return a.getAttribute(c)}return a[c]||
-0}function L(a,c){var d=/^(\*=|\+=|-=)/.exec(a);if(!d)return a;var b=y(a)||0;c=parseFloat(c);a=parseFloat(a.replace(d[0],""));switch(d[0][0]){case "+":return c+a+b;case "-":return c-a+b;case "*":return c*a+b}}function F(a,c){return Math.sqrt(Math.pow(c.x-a.x,2)+Math.pow(c.y-a.y,2))}function M(a){a=a.points;for(var c=0,d,b=0;b<a.numberOfItems;b++){var f=a.getItem(b);0<b&&(c+=F(d,f));d=f}return c}function N(a){if(a.getTotalLength)return a.getTotalLength();switch(a.tagName.toLowerCase()){case "circle":return 2*
-Math.PI*a.getAttribute("r");case "rect":return 2*a.getAttribute("width")+2*a.getAttribute("height");case "line":return F({x:a.getAttribute("x1"),y:a.getAttribute("y1")},{x:a.getAttribute("x2"),y:a.getAttribute("y2")});case "polyline":return M(a);case "polygon":var c=a.points;return M(a)+F(c.getItem(c.numberOfItems-1),c.getItem(0))}}function Y(a,c){function d(b){b=void 0===b?0:b;return a.el.getPointAtLength(1<=c+b?c+b:0)}var b=d(),f=d(-1),n=d(1);switch(a.property){case "x":return b.x;case "y":return b.y;
-case "angle":return 180*Math.atan2(n.y-f.y,n.x-f.x)/Math.PI}}function O(a,c){var d=/-?\d*\.?\d+/g,b;b=h.pth(a)?a.totalLength:a;if(h.col(b))if(h.rgb(b)){var f=/rgb\((\d+,\s*[\d]+,\s*[\d]+)\)/g.exec(b);b=f?"rgba("+f[1]+",1)":b}else b=h.hex(b)?T(b):h.hsl(b)?U(b):void 0;else f=(f=y(b))?b.substr(0,b.length-f.length):b,b=c&&!/\s/g.test(b)?f+c:f;b+="";return{original:b,numbers:b.match(d)?b.match(d).map(Number):[0],strings:h.str(a)||c?b.split(d):[]}}function P(a){a=a?p(h.arr(a)?a.map(m):m(a)):[];return r(a,
-function(a,d,b){return b.indexOf(a)===d})}function Z(a){var c=P(a);return c.map(function(a,b){return{target:a,id:b,total:c.length}})}function aa(a,c){var d=C(c);if(h.arr(a)){var b=a.length;2!==b||h.obj(a[0])?h.fnc(c.duration)||(d.duration=c.duration/b):a={value:a}}return m(a).map(function(a,b){b=b?0:c.delay;a=h.obj(a)&&!h.pth(a)?a:{value:a};h.und(a.delay)&&(a.delay=b);return a}).map(function(a){return z(a,d)})}function ba(a,c){var d={},b;for(b in a){var f=I(a[b],c);h.arr(f)&&(f=f.map(function(a){return I(a,
-c)}),1===f.length&&(f=f[0]));d[b]=f}d.duration=parseFloat(d.duration);d.delay=parseFloat(d.delay);return d}function ca(a){return h.arr(a)?A.apply(this,a):Q[a]}function da(a,c){var d;return a.tweens.map(function(b){b=ba(b,c);var f=b.value,e=K(c.target,a.name),k=d?d.to.original:e,k=h.arr(f)?f[0]:k,w=L(h.arr(f)?f[1]:f,k),e=y(w)||y(k)||y(e);b.from=O(k,e);b.to=O(w,e);b.start=d?d.end:a.offset;b.end=b.start+b.delay+b.duration;b.easing=ca(b.easing);b.elasticity=(1E3-Math.min(Math.max(b.elasticity,1),999))/
-1E3;b.isPath=h.pth(f);b.isColor=h.col(b.from.original);b.isColor&&(b.round=1);return d=b})}function ea(a,c){return r(p(a.map(function(a){return c.map(function(b){var c=J(a.target,b.name);if(c){var d=da(b,a);b={type:c,property:b.name,animatable:a,tweens:d,duration:d[d.length-1].end,delay:d[0].delay}}else b=void 0;return b})})),function(a){return!h.und(a)})}function R(a,c,d,b){var f="delay"===a;return c.length?(f?Math.min:Math.max).apply(Math,c.map(function(b){return b[a]})):f?b.delay:d.offset+b.delay+
-b.duration}function fa(a){var c=D(ga,a),d=D(S,a),b=Z(a.targets),f=[],e=z(c,d),k;for(k in a)e.hasOwnProperty(k)||"targets"===k||f.push({name:k,offset:e.offset,tweens:aa(a[k],d)});a=ea(b,f);return z(c,{children:[],animatables:b,animations:a,duration:R("duration",a,c,d),delay:R("delay",a,c,d)})}function q(a){function c(){return window.Promise&&new Promise(function(a){return p=a})}function d(a){return g.reversed?g.duration-a:a}function b(a){for(var b=0,c={},d=g.animations,f=d.length;b<f;){var e=d[b],
-k=e.animatable,h=e.tweens,n=h.length-1,l=h[n];n&&(l=r(h,function(b){return a<b.end})[0]||l);for(var h=Math.min(Math.max(a-l.start-l.delay,0),l.duration)/l.duration,w=isNaN(h)?1:l.easing(h,l.elasticity),h=l.to.strings,p=l.round,n=[],m=void 0,m=l.to.numbers.length,t=0;t<m;t++){var x=void 0,x=l.to.numbers[t],q=l.from.numbers[t],x=l.isPath?Y(l.value,w*x):q+w*(x-q);p&&(l.isColor&&2<t||(x=Math.round(x*p)/p));n.push(x)}if(l=h.length)for(m=h[0],w=0;w<l;w++)p=h[w+1],t=n[w],isNaN(t)||(m=p?m+(t+p):m+(t+" "));
-else m=n[0];ha[e.type](k.target,e.property,m,c,k.id);e.currentValue=m;b++}if(b=Object.keys(c).length)for(d=0;d<b;d++)H||(H=E(document.body,"transform")?"transform":"-webkit-transform"),g.animatables[d].target.style[H]=c[d].join(" ");g.currentTime=a;g.progress=a/g.duration*100}function f(a){if(g[a])g[a](g)}function e(){g.remaining&&!0!==g.remaining&&g.remaining--}function k(a){var k=g.duration,n=g.offset,w=n+g.delay,r=g.currentTime,x=g.reversed,q=d(a);if(g.children.length){var u=g.children,v=u.length;
-if(q>=g.currentTime)for(var G=0;G<v;G++)u[G].seek(q);else for(;v--;)u[v].seek(q)}if(q>=w||!k)g.began||(g.began=!0,f("begin")),f("run");if(q>n&&q<k)b(q);else if(q<=n&&0!==r&&(b(0),x&&e()),q>=k&&r!==k||!k)b(k),x||e();f("update");a>=k&&(g.remaining?(t=h,"alternate"===g.direction&&(g.reversed=!g.reversed)):(g.pause(),g.completed||(g.completed=!0,f("complete"),"Promise"in window&&(p(),m=c()))),l=0)}a=void 0===a?{}:a;var h,t,l=0,p=null,m=c(),g=fa(a);g.reset=function(){var a=g.direction,c=g.loop;g.currentTime=
-0;g.progress=0;g.paused=!0;g.began=!1;g.completed=!1;g.reversed="reverse"===a;g.remaining="alternate"===a&&1===c?2:c;b(0);for(a=g.children.length;a--;)g.children[a].reset()};g.tick=function(a){h=a;t||(t=h);k((l+h-t)*q.speed)};g.seek=function(a){k(d(a))};g.pause=function(){var a=v.indexOf(g);-1<a&&v.splice(a,1);g.paused=!0};g.play=function(){g.paused&&(g.paused=!1,t=0,l=d(g.currentTime),v.push(g),B||ia())};g.reverse=function(){g.reversed=!g.reversed;t=0;l=d(g.currentTime)};g.restart=function(){g.pause();
-g.reset();g.play()};g.finished=m;g.reset();g.autoplay&&g.play();return g}var ga={update:void 0,begin:void 0,run:void 0,complete:void 0,loop:1,direction:"normal",autoplay:!0,offset:0},S={duration:1E3,delay:0,easing:"easeOutElastic",elasticity:500,round:0},W="translateX translateY translateZ rotate rotateX rotateY rotateZ scale scaleX scaleY scaleZ skewX skewY perspective".split(" "),H,h={arr:function(a){return Array.isArray(a)},obj:function(a){return-1<Object.prototype.toString.call(a).indexOf("Object")},
-pth:function(a){return h.obj(a)&&a.hasOwnProperty("totalLength")},svg:function(a){return a instanceof SVGElement},dom:function(a){return a.nodeType||h.svg(a)},str:function(a){return"string"===typeof a},fnc:function(a){return"function"===typeof a},und:function(a){return"undefined"===typeof a},hex:function(a){return/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(a)},rgb:function(a){return/^rgb/.test(a)},hsl:function(a){return/^hsl/.test(a)},col:function(a){return h.hex(a)||h.rgb(a)||h.hsl(a)}},A=function(){function a(a,
-d,b){return(((1-3*b+3*d)*a+(3*b-6*d))*a+3*d)*a}return function(c,d,b,f){if(0<=c&&1>=c&&0<=b&&1>=b){var e=new Float32Array(11);if(c!==d||b!==f)for(var k=0;11>k;++k)e[k]=a(.1*k,c,b);return function(k){if(c===d&&b===f)return k;if(0===k)return 0;if(1===k)return 1;for(var h=0,l=1;10!==l&&e[l]<=k;++l)h+=.1;--l;var l=h+(k-e[l])/(e[l+1]-e[l])*.1,n=3*(1-3*b+3*c)*l*l+2*(3*b-6*c)*l+3*c;if(.001<=n){for(h=0;4>h;++h){n=3*(1-3*b+3*c)*l*l+2*(3*b-6*c)*l+3*c;if(0===n)break;var m=a(l,c,b)-k,l=l-m/n}k=l}else if(0===
-n)k=l;else{var l=h,h=h+.1,g=0;do m=l+(h-l)/2,n=a(m,c,b)-k,0<n?h=m:l=m;while(1e-7<Math.abs(n)&&10>++g);k=m}return a(k,d,f)}}}}(),Q=function(){function a(a,b){return 0===a||1===a?a:-Math.pow(2,10*(a-1))*Math.sin(2*(a-1-b/(2*Math.PI)*Math.asin(1))*Math.PI/b)}var c="Quad Cubic Quart Quint Sine Expo Circ Back Elastic".split(" "),d={In:[[.55,.085,.68,.53],[.55,.055,.675,.19],[.895,.03,.685,.22],[.755,.05,.855,.06],[.47,0,.745,.715],[.95,.05,.795,.035],[.6,.04,.98,.335],[.6,-.28,.735,.045],a],Out:[[.25,
-.46,.45,.94],[.215,.61,.355,1],[.165,.84,.44,1],[.23,1,.32,1],[.39,.575,.565,1],[.19,1,.22,1],[.075,.82,.165,1],[.175,.885,.32,1.275],function(b,c){return 1-a(1-b,c)}],InOut:[[.455,.03,.515,.955],[.645,.045,.355,1],[.77,0,.175,1],[.86,0,.07,1],[.445,.05,.55,.95],[1,0,0,1],[.785,.135,.15,.86],[.68,-.55,.265,1.55],function(b,c){return.5>b?a(2*b,c)/2:1-a(-2*b+2,c)/2}]},b={linear:A(.25,.25,.75,.75)},f={},e;for(e in d)f.type=e,d[f.type].forEach(function(a){return function(d,f){b["ease"+a.type+c[f]]=h.fnc(d)?
-d:A.apply($jscomp$this,d)}}(f)),f={type:f.type};return b}(),ha={css:function(a,c,d){return a.style[c]=d},attribute:function(a,c,d){return a.setAttribute(c,d)},object:function(a,c,d){return a[c]=d},transform:function(a,c,d,b,f){b[f]||(b[f]=[]);b[f].push(c+"("+d+")")}},v=[],B=0,ia=function(){function a(){B=requestAnimationFrame(c)}function c(c){var b=v.length;if(b){for(var d=0;d<b;)v[d]&&v[d].tick(c),d++;a()}else cancelAnimationFrame(B),B=0}return a}();q.version="2.2.0";q.speed=1;q.running=v;q.remove=
-function(a){a=P(a);for(var c=v.length;c--;)for(var d=v[c],b=d.animations,f=b.length;f--;)u(a,b[f].animatable.target)&&(b.splice(f,1),b.length||d.pause())};q.getValue=K;q.path=function(a,c){var d=h.str(a)?e(a)[0]:a,b=c||100;return function(a){return{el:d,property:a,totalLength:N(d)*(b/100)}}};q.setDashoffset=function(a){var c=N(a);a.setAttribute("stroke-dasharray",c);return c};q.bezier=A;q.easings=Q;q.timeline=function(a){var c=q(a);c.pause();c.duration=0;c.add=function(d){c.children.forEach(function(a){a.began=
-!0;a.completed=!0});m(d).forEach(function(b){var d=z(b,D(S,a||{}));d.targets=d.targets||a.targets;b=c.duration;var e=d.offset;d.autoplay=!1;d.direction=c.direction;d.offset=h.und(e)?b:L(e,b);c.began=!0;c.completed=!0;c.seek(d.offset);d=q(d);d.began=!0;d.completed=!0;d.duration>b&&(c.duration=d.duration);c.children.push(d)});c.seek(0);c.reset();c.autoplay&&c.restart();return c};return c};q.random=function(a,c){return Math.floor(Math.random()*(c-a+1))+a};return q});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
-
-/***/ }),
-/* 228 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -101200,11 +97408,4118 @@ var index_esm = {
 
 
 /***/ }),
-/* 229 */
+/* 178 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/**
+ * vue-paginate v3.6.0
+ * (c) 2018 Taha Shashtari
+ * @license MIT
+ */
+(function (global, factory) {
+   true ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.VuePaginate = factory());
+}(this, function () { 'use strict';
+
+  var warn = function () {}
+  var formatComponentName
+
+  var hasConsole = typeof console !== 'undefined'
+
+  warn = function (msg, vm, type) {
+    if ( type === void 0 ) type = 'error';
+
+    if (hasConsole) {
+      console[type]("[vue-paginate]: " + msg + " " + (
+        vm ? formatLocation(formatComponentName(vm)) : ''
+        ))
+    }
+  }
+
+  formatComponentName = function (vm) {
+    if (vm.$root === vm) {
+      return 'root instance'
+    }
+    var name = vm._isVue
+    ? vm.$options.name || vm.$options._componentTag
+    : vm.name
+    return (
+      (name ? ("component <" + name + ">") : "anonymous component") +
+      (vm._isVue && vm.$options.__file ? (" at " + (vm.$options.__file)) : '')
+      )
+  }
+
+  var formatLocation = function (str) {
+    if (str === 'anonymous component') {
+      str += " - use the \"name\" option for better debugging messages."
+    }
+    return ("\n(found in " + str + ")")
+  }
+
+  var Paginate = {
+    name: 'paginate',
+    props: {
+      name: {
+        type: String,
+        required: true
+      },
+      list: {
+        type: Array,
+        required: true
+      },
+      per: {
+        type: Number,
+        default: 3,
+        validator: function validator (value) {
+          return value > 0
+        }
+      },
+      tag: {
+        type: String,
+        default: 'ul'
+      },
+      container: {
+        type: Object,
+        default: null
+      }
+    },
+    data: function data () {
+      return {
+        initialListSize: this.list.length
+      }
+    },
+    computed: {
+      parent: function parent () {
+        return this.container ? this.container : this.$parent
+      },
+      currentPage: {
+        get: function get () {
+          if (this.parent.paginate[this.name]) {
+            return this.parent.paginate[this.name].page
+          }
+        },
+        set: function set (page) {
+          this.parent.paginate[this.name].page = page
+        }
+      },
+      pageItemsCount: function pageItemsCount () {
+        var numOfItems = this.list.length
+        var first = this.currentPage * this.per + 1
+        var last = Math.min((this.currentPage * this.per) + this.per, numOfItems)
+        return (first + "-" + last + " of " + numOfItems)
+      },
+
+      lastPage: function lastPage () {
+        return Math.ceil(this.list.length / this.per)
+      }
+    },
+    mounted: function mounted () {
+      if (this.per <= 0) {
+        warn(("<paginate name=\"" + (this.name) + "\"> 'per' prop can't be 0 or less."), this.parent)
+      }
+      if (!this.parent.paginate[this.name]) {
+        warn(("'" + (this.name) + "' is not registered in 'paginate' array."), this.parent)
+        return
+      }
+      this.paginateList()
+    },
+    watch: {
+      currentPage: function currentPage () {
+        this.paginateList()
+      },
+      list: function list () {
+        if (this.currentPage >= this.lastPage) {
+          this.currentPage = this.lastPage - 1
+        }
+        this.paginateList()
+      },
+      per: function per () {
+        this.currentPage = 0
+        this.paginateList()
+      }
+    },
+    methods: {
+      paginateList: function paginateList () {
+        var index = this.currentPage * this.per
+        var paginatedList = this.list.slice(index, index + this.per)
+        this.parent.paginate[this.name].list = paginatedList
+      },
+      goToPage: function goToPage (page) {
+        var lastPage = Math.ceil(this.list.length / this.per)
+        if (page > lastPage) {
+          warn(("You cannot go to page " + page + ". The last page is " + lastPage + "."), this.parent)
+          return
+        }
+        this.currentPage = page - 1
+      }
+    },
+    render: function render (h) {
+      return h(this.tag, {}, this.$slots.default)
+    }
+  }
+
+  var LEFT_ARROW = '«'
+  var RIGHT_ARROW = '»'
+  var ELLIPSES = '…'
+
+  var LimitedLinksGenerator = function LimitedLinksGenerator (listOfPages, currentPage, limit) {
+    this.listOfPages = listOfPages
+    this.lastPage = listOfPages.length - 1
+    this.currentPage = currentPage === this.lastPage
+      ? this.lastPage - 1
+      : currentPage
+    this.limit = limit
+  };
+
+  LimitedLinksGenerator.prototype.generate = function generate () {
+    var firstHalf = this._buildFirstHalf()
+    var secondHalf = this._buildSecondHalf()
+    return firstHalf.concat( secondHalf)
+  };
+
+  LimitedLinksGenerator.prototype._buildFirstHalf = function _buildFirstHalf () {
+    var firstHalf = this._allPagesButLast()
+      .slice(
+        this._currentChunkIndex(),
+        this._currentChunkIndex() + this.limit
+      )
+    // Add backward ellipses with first page if needed
+    if (this.currentPage >= this.limit) {
+      firstHalf.unshift(ELLIPSES)
+      firstHalf.unshift(0)
+    }
+    // Add ellipses if needed
+    if (this.lastPage - this.limit > this._currentChunkIndex()) {
+      firstHalf.push(ELLIPSES)
+    }
+    return firstHalf
+  };
+
+  LimitedLinksGenerator.prototype._buildSecondHalf = function _buildSecondHalf () {
+    var secondHalf = [this.lastPage]
+    return secondHalf
+  };
+
+  LimitedLinksGenerator.prototype._currentChunkIndex = function _currentChunkIndex () {
+    var currentChunk = Math.floor(this.currentPage / this.limit)
+    return currentChunk * this.limit 
+  };
+
+  LimitedLinksGenerator.prototype._allPagesButLast = function _allPagesButLast () {
+      var this$1 = this;
+
+    return this.listOfPages.filter(function (n) { return n !== this$1.lastPage; })
+  };
+
+  var PaginateLinks = {
+    name: 'paginate-links',
+    props: {
+      for: {
+        type: String,
+        required: true
+      },
+      limit: {
+        type: Number,
+        default: 0
+      },
+      simple: {
+        type: Object,
+        default: null,
+        validator: function validator (obj) {
+          return obj.prev && obj.next
+        }
+      },
+      stepLinks: {
+        type: Object,
+        default: function () {
+          return {
+            prev: LEFT_ARROW,
+            next: RIGHT_ARROW
+          }
+        },
+        validator: function validator$1 (obj) {
+          return obj.prev && obj.next
+        }
+      },
+      showStepLinks: {
+        type: Boolean
+      },
+      hideSinglePage: {
+        type: Boolean
+      },
+      classes: {
+        type: Object,
+        default: null
+      },
+      async: {
+        type: Boolean,
+        default: false
+      },
+      container: {
+        type: Object,
+        default: null
+      }
+    },
+    data: function data () {
+      return {
+        listOfPages: [],
+        numberOfPages: 0,
+        target: null
+      }
+    },
+    computed: {
+      parent: function parent () {
+        return this.container ? this.container.el : this.$parent
+      },
+      state: function state () {
+        return this.container ? this.container.state : this.$parent.paginate[this.for]
+      },
+      currentPage: {
+        get: function get () {
+          if (this.state) {
+            return this.state.page
+          }
+        },
+        set: function set (page) {
+          this.state.page = page
+        }
+      }
+    },
+    mounted: function mounted () {
+      var this$1 = this;
+
+      if (this.simple && this.limit) {
+        warn(("<paginate-links for=\"" + (this.for) + "\"> 'simple' and 'limit' props can't be used at the same time. In this case, 'simple' will take precedence, and 'limit' will be ignored."), this.parent, 'warn')
+      }
+      if (this.simple && !this.simple.next) {
+        warn(("<paginate-links for=\"" + (this.for) + "\"> 'simple' prop doesn't contain 'next' value."), this.parent)
+      }
+      if (this.simple && !this.simple.prev) {
+        warn(("<paginate-links for=\"" + (this.for) + "\"> 'simple' prop doesn't contain 'prev' value."), this.parent)
+      }
+      if (this.stepLinks && !this.stepLinks.next) {
+        warn(("<paginate-links for=\"" + (this.for) + "\"> 'step-links' prop doesn't contain 'next' value."), this.parent)
+      }
+      if (this.stepLinks && !this.stepLinks.prev) {
+        warn(("<paginate-links for=\"" + (this.for) + "\"> 'step-links' prop doesn't contain 'prev' value."), this.parent)
+      }
+      this.$nextTick(function () {
+        this$1.updateListOfPages()
+      })
+    },
+    watch: {
+      'state': {
+        handler: function handler () {
+          this.updateListOfPages()
+        },
+        deep: true
+      },
+      currentPage: function currentPage (toPage, fromPage) {
+        this.$emit('change', toPage + 1, fromPage + 1)
+      }
+    },
+    methods: {
+      updateListOfPages: function updateListOfPages () {
+        this.target = getTargetPaginateComponent(this.parent.$children, this.for)
+        if (!this.target) {
+          if (this.async) { return }
+          warn(("<paginate-links for=\"" + (this.for) + "\"> can't be used without its companion <paginate name=\"" + (this.for) + "\">"), this.parent)
+          warn("To fix that issue you may need to use :async=\"true\" on <paginate-links> component to allow for asyncronous rendering", this.parent, 'warn')
+          return
+        }
+        this.numberOfPages = Math.ceil(this.target.list.length / this.target.per)
+        this.listOfPages = getListOfPageNumbers(this.numberOfPages)
+      }
+    },
+    render: function render (h) {
+      var this$1 = this;
+
+      if (!this.target && this.async) { return null }
+
+      var links = this.simple
+        ? getSimpleLinks(this, h)
+        : this.limit > 1
+        ? getLimitedLinks(this, h)
+        : getFullLinks(this, h)
+
+      if (this.hideSinglePage && this.numberOfPages <= 1) {
+        return null
+      }
+
+      var el = h('ul', {
+        class: ['paginate-links', this.for]
+      }, links)
+
+      if (this.classes) {
+        this.$nextTick(function () {
+          addAdditionalClasses(el.elm, this$1.classes)
+        })
+      }
+      return el
+    }
+  }
+
+  function getFullLinks (vm, h) {
+    var allLinks = vm.showStepLinks
+      ? [vm.stepLinks.prev ].concat( vm.listOfPages, [vm.stepLinks.next])
+      : vm.listOfPages
+    return allLinks.map(function (link) {
+      var data = {
+        on: {
+          click: function (e) {
+            e.preventDefault()
+            vm.currentPage = getTargetPageForLink(
+              link,
+              vm.limit,
+              vm.currentPage,
+              vm.listOfPages,
+              vm.stepLinks
+            )
+          }
+        }
+      }
+      var liClasses = getClassesForLink(
+        link,
+        vm.currentPage,
+        vm.listOfPages.length - 1,
+        vm.stepLinks
+      )
+      var linkText = link === vm.stepLinks.next || link === vm.stepLinks.prev
+        ? link
+        : link + 1 // it means it's a number
+      return h('li', { class: liClasses }, [h('a', data, linkText)])
+    })
+  }
+
+  function getLimitedLinks (vm, h) {
+    var limitedLinks = new LimitedLinksGenerator(
+      vm.listOfPages,
+      vm.currentPage,
+      vm.limit,
+      vm.stepLinks
+    ).generate()
+
+    limitedLinks = vm.showStepLinks
+      ? [vm.stepLinks.prev ].concat( limitedLinks, [vm.stepLinks.next])
+      : limitedLinks
+
+    var limitedLinksMetadata = getLimitedLinksMetadata(limitedLinks)
+
+    return limitedLinks.map(function (link, index) {
+      var data = {
+        on: {
+          click: function (e) {
+            e.preventDefault()
+            vm.currentPage = getTargetPageForLink(
+              link,
+              vm.limit,
+              vm.currentPage,
+              vm.listOfPages,
+              vm.stepLinks,
+              limitedLinksMetadata[index]
+            )
+          }
+        }
+      }
+      var liClasses = getClassesForLink(
+        link,
+        vm.currentPage,
+        vm.listOfPages.length - 1,
+        vm.stepLinks
+      )
+      // If the link is a number,
+      // then incremented by 1 (since it's 0 based).
+      // otherwise, do nothing (so, it's a symbol).
+      var text = (link === parseInt(link, 10)) ? link + 1 : link
+      return h('li', { class: liClasses }, [h('a', data, text)])
+    })
+  }
+
+  function getSimpleLinks (vm, h) {
+    var lastPage = vm.listOfPages.length - 1
+    var prevData = {
+      on: {
+        click: function (e) {
+          e.preventDefault()
+          if (vm.currentPage > 0) { vm.currentPage -= 1 }
+        }
+      }
+    }
+    var nextData = {
+      on: {
+        click: function (e) {
+          e.preventDefault()
+          if (vm.currentPage < lastPage) { vm.currentPage += 1 }
+        }
+      }
+    }
+    var nextListData = { class: ['next', vm.currentPage >= lastPage ? 'disabled' : ''] }
+    var prevListData = { class: ['prev', vm.currentPage <= 0 ? 'disabled' : ''] }
+    var prevLink = h('li', prevListData, [h('a', prevData, vm.simple.prev)])
+    var nextLink = h('li', nextListData, [h('a', nextData, vm.simple.next)])
+    return [prevLink, nextLink]
+  }
+
+  function getTargetPaginateComponent (children, targetName) {
+    return children
+      .filter(function (child) { return (child.$vnode.componentOptions.tag === 'paginate'); })
+      .find(function (child) { return child.name === targetName; })
+  }
+
+  function getListOfPageNumbers (numberOfPages) {
+    // converts number of pages into an array
+    // that contains each individual page number
+    // For Example: 4 => [0, 1, 2, 3]
+    return Array.apply(null, { length: numberOfPages })
+      .map(function (val, index) { return index; })
+  }
+
+  function getClassesForLink(link, currentPage, lastPage, ref) {
+    var prev = ref.prev;
+    var next = ref.next;
+
+    var liClass = []
+    if (link === prev) {
+      liClass.push('left-arrow')
+    } else if (link === next) {
+      liClass.push('right-arrow')
+    } else if (link === ELLIPSES) {
+      liClass.push('ellipses')
+    } else {
+      liClass.push('number')
+    }
+
+    if (link === currentPage) {
+      liClass.push('active')
+    }
+
+    if (link === prev && currentPage <= 0) {
+      liClass.push('disabled')
+    } else if (link === next && currentPage >= lastPage) {
+      liClass.push('disabled')
+    }
+    return liClass
+  }
+
+  function getTargetPageForLink (link, limit, currentPage, listOfPages, ref, metaData) {
+    var prev = ref.prev;
+    var next = ref.next;
+    if ( metaData === void 0 ) metaData = null;
+
+    var currentChunk = Math.floor(currentPage / limit)
+    if (link === prev) {
+      return (currentPage - 1) < 0 ? 0 : currentPage - 1
+    } else if (link === next) {
+      return (currentPage + 1 > listOfPages.length - 1)
+        ? listOfPages.length - 1
+        : currentPage + 1
+    } else if (metaData && metaData === 'right-ellipses') {
+      return (currentChunk + 1) * limit
+    } else if (metaData && metaData === 'left-ellipses') {
+      var chunkContent = listOfPages.slice(currentChunk * limit, currentChunk * limit + limit)
+      var isLastPage = currentPage === listOfPages.length - 1
+      if (isLastPage && chunkContent.length === 1) {
+        currentChunk--
+      }
+      return (currentChunk - 1) * limit + limit - 1
+    }
+    // which is number
+    return link
+  }
+
+  /**
+   * Mainly used here to check whether the displayed
+   * ellipses is for showing previous or next links
+   */
+  function getLimitedLinksMetadata (limitedLinks) {
+    return limitedLinks.map(function (link, index) {
+      if (link === ELLIPSES && limitedLinks[index - 1] === 0) {
+        return 'left-ellipses'
+      } else if (link === ELLIPSES && limitedLinks[index - 1] !== 0) {
+        return 'right-ellipses'
+      }
+      return link
+    })
+  }
+
+  function addAdditionalClasses (linksContainer, classes) {
+    Object.keys(classes).forEach(function (selector) {
+      if (selector === 'ul') {
+        var selectorValue = classes['ul']
+        if (Array.isArray(selectorValue)) {
+          selectorValue.forEach(function (c) { return linksContainer.classList.add(c); })
+        } else {
+          linksContainer.classList.add(selectorValue)
+        }
+      }
+      linksContainer.querySelectorAll(selector).forEach(function (node) {
+        var selectorValue = classes[selector]
+        if (Array.isArray(selectorValue)) {
+          selectorValue.forEach(function (c) { return node.classList.add(c); })
+        } else {
+          node.classList.add(selectorValue)
+        }
+      })
+    })
+  }
+
+  function paginateDataGenerator (listNames) {
+    if ( listNames === void 0 ) listNames = [];
+
+    return listNames.reduce(function (curr, listName) {
+      curr[listName] = {
+        list: [],
+        page: 0
+      }
+      return curr
+    }, {})
+  }
+
+  var vuePaginate = {}
+
+  vuePaginate.install = function (Vue) {
+    Vue.mixin({
+      created: function created () {
+        if (this.paginate !== 'undefined' && this.paginate instanceof Array) {
+          this.paginate = paginateDataGenerator(this.paginate)
+        }
+      },
+      methods: {
+        paginated: function paginated (listName) {
+          if (!this.paginate || !this.paginate[listName]) {
+            warn(("'" + listName + "' is not registered in 'paginate' array."), this)
+            return
+          }
+          return this.paginate[listName].list
+        }
+      }
+    })
+    Vue.component('paginate', Paginate)
+    Vue.component('paginate-links', PaginateLinks)
+  }
+
+  if (typeof window !== 'undefined' && window.Vue) {
+    window.Vue.use(vuePaginate)
+  }
+
+  return vuePaginate;
+
+}));
+
+/***/ }),
+/* 179 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Index_vue__ = __webpack_require__(180);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__components_Index_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__components_Index_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue__ = __webpack_require__(186);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue__ = __webpack_require__(191);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Tokens_vue__ = __webpack_require__(196);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__components_Tokens_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3__components_Tokens_vue__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_E404_vue__ = __webpack_require__(201);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__components_E404_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_4__components_E404_vue__);
+
+
+
+
+
+
+var routes = [{ path: '/', component: __WEBPACK_IMPORTED_MODULE_0__components_Index_vue___default.a, name: 'Index' }, { path: '/login', component: __WEBPACK_IMPORTED_MODULE_2__components_Auth_Login_vue___default.a, name: 'Login' }, { path: '/dashboard', component: __WEBPACK_IMPORTED_MODULE_1__components_Dashboard_vue___default.a, name: 'Dashboard' }, { path: '/tokens', component: __WEBPACK_IMPORTED_MODULE_3__components_Tokens_vue___default.a, name: 'Tokens' }, { path: '*', component: __WEBPACK_IMPORTED_MODULE_4__components_E404_vue___default.a }];
+
+/* harmony default export */ __webpack_exports__["a"] = (routes);
+
+/***/ }),
+/* 180 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(181)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(184)
+/* template */
+var __vue_template__ = __webpack_require__(185)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-384052eb"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Index.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-384052eb", Component.options)
+  } else {
+    hotAPI.reload("data-v-384052eb", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 181 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(182);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("9e1cdd34", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-384052eb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Index.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-384052eb\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Index.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 182 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.container-flag[data-v-384052eb] {\n  width: 23px;\n  margin: auto;\n  -webkit-transform: translateX(-21px) translateY(14px);\n  transform: translateX(-21px) translateY(14px);\n  position: absolute;\n  top: -17px;\n  right: 0;\n  left: 0;\n  bottom: 0;\n}\n.position-flag[data-v-384052eb] {\n  -webkit-transform: translateY(-29px) translateX(-31px);\n          transform: translateY(-29px) translateX(-31px);\n}\n.event-schedule[data-v-384052eb] {\n  min-height: 4rem;\n  display: inline-block;\n  width: 100%;\n  position: relative;\n  top: -5px;\n}\n.pin-circle[data-v-384052eb] {\n  position: absolute;\n  -webkit-transform: translateX(-50%);\n          transform: translateX(-50%);\n  left: 50%;\n  top: 0;\n  bottom: 0;\n}\n.pin-circle[data-v-384052eb]:before {\n    display: inline-block;\n    position: absolute;\n    left: 50%;\n    -webkit-transform: translateX(-50%);\n            transform: translateX(-50%);\n    width: 1em;\n    height: 1em;\n    border: solid #fff59d 2px;\n    border-radius: 50%;\n    background-color: #fff59d;\n    content: ' ';\n}\n.pin-circle[data-v-384052eb]:after {\n    display: inline-block;\n    position: absolute;\n    left: 50%;\n    -webkit-transform: translateX(-50%);\n            transform: translateX(-50%);\n    width: 0;\n    margin-top: 1rem;\n    height: 100%;\n    border: solid #fff59d 1px;\n    content: ' ';\n}\n.right-event[data-v-384052eb] {\n  float: right;\n  width: 50%;\n  padding-left: 40px;\n  text-align: left;\n  top: -50%;\n  -webkit-transform: translateY(-50%);\n          transform: translateY(-50%);\n}\n.left-event[data-v-384052eb] {\n  float: left;\n  width: 50%;\n  padding-right: 40px;\n  text-align: right;\n  top: -50%;\n  -webkit-transform: translateY(-50%);\n          transform: translateY(-50%);\n}\n.date-event[data-v-384052eb] {\n  font-size: 1.5rem;\n  font-weight: bold;\n}\n.info-event[data-v-384052eb] {\n  font-size: 1.1rem;\n}\n.item-event[data-v-384052eb] {\n  margin-bottom: 10px;\n}\n.special-margin[data-v-384052eb] {\n  margin-bottom: 105px;\n}\n.end-schedule[data-v-384052eb] {\n  position: absolute;\n  left: 50%;\n  bottom: -16px;\n  background: #fff59d;\n  width: 100px;\n  height: 20px;\n  line-height: 20px;\n  font-weight: bold;\n  color: #041323;\n  -webkit-transform: translateX(-50%);\n          transform: translateX(-50%);\n  text-align: center;\n  border-radius: 2px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 183 */
+/***/ (function(module, exports) {
+
+/**
+ * Translates the list format produced by css-loader into something
+ * easier to manipulate.
+ */
+module.exports = function listToStyles (parentId, list) {
+  var styles = []
+  var newStyles = {}
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i]
+    var id = item[0]
+    var css = item[1]
+    var media = item[2]
+    var sourceMap = item[3]
+    var part = {
+      id: parentId + ':' + i,
+      css: css,
+      media: media,
+      sourceMap: sourceMap
+    }
+    if (!newStyles[id]) {
+      styles.push(newStyles[id] = { id: id, parts: [part] })
+    } else {
+      newStyles[id].parts.push(part)
+    }
+  }
+  return styles
+}
+
+
+/***/ }),
+/* 184 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {};
+  },
+
+  methods: {},
+  mounted: function mounted() {
+    this.$root.scrollMagicClass = new scrollIndex.default();
+    var flag = document.querySelector(".flag");
+    TweenMax.set(flag, { x: 65 });
+    TweenMax.to(flag, 2, { x: 0, repeat: -1, ease: Linear.easeNone });
+  },
+  destroyed: function destroyed() {
+    this.$root.scrollMagicClass.destroy();
+    this.$root.scrollMagicClass = null;
+  }
+});
+
+/***/ }),
+/* 185 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c("div", { staticClass: "navbar-items hide-on-med-and-down" }, [
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "home-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("home")
+            }
+          }
+        },
+        [_vm._v("Inicio")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "info-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("info")
+            }
+          }
+        },
+        [_vm._v("¿Qué es?")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "search-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("we-search")
+            }
+          }
+        },
+        [_vm._v("¿Qué buscamos?")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "participate-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("participate")
+            }
+          }
+        },
+        [_vm._v("¿Quiénes participan?")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "schedule-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("schedule")
+            }
+          }
+        },
+        [_vm._v("Cronograma")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "judge-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("judges")
+            }
+          }
+        },
+        [_vm._v("Jurados")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "award-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("awards")
+            }
+          }
+        },
+        [_vm._v("Premios")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "inscription-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("inscriptions")
+            }
+          }
+        },
+        [_vm._v("Inscripción")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item",
+          attrs: { id: "conctact-item" },
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              _vm.$root.goToView("conctact")
+            }
+          }
+        },
+        [_vm._v("Contacto")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        [
+          !_vm.$root.auth
+            ? _c(
+                "router-link",
+                { staticClass: "item right", attrs: { to: "/login" } },
+                [_vm._v("Login")]
+              )
+            : _c(
+                "router-link",
+                { staticClass: "item right", attrs: { to: "/dashboard" } },
+                [_vm._v("Dashboard")]
+              )
+        ],
+        1
+      )
+    ]),
+    _vm._v(" "),
+    _c("div", { attrs: { id: "sections" } }, [
+      _c("section", { attrs: { id: "home" } }, [
+        _c("div", { staticClass: "container" }, [
+          _c("h1", { staticClass: "title-main normal" }, [
+            _vm._v("Hackathon Montería")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col s12 m12 l5" }, [
+            _c("div", { staticClass: "box-register" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "content-register" }, [
+                _c("div", { staticClass: "row" }, [
+                  _vm._m(1),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col s12 m6" }, [
+                    _c("button", { staticClass: "button-register" }, [
+                      _c("div", { staticClass: "icon-caracter" }, [
+                        _c(
+                          "svg",
+                          {
+                            staticStyle: {
+                              "enable-background": "new 0 0 25.916 25.916"
+                            },
+                            attrs: {
+                              version: "1.1",
+                              id: "businessman",
+                              xmlns: "http://www.w3.org/2000/svg",
+                              "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                              x: "0px",
+                              y: "0px",
+                              viewBox: "0 0 25.916 25.916",
+                              "xml:space": "preserve"
+                            }
+                          },
+                          [
+                            _c("g", { staticClass: "fill-caracter-icon" }, [
+                              _c("path", {
+                                attrs: {
+                                  d:
+                                    "M7.938,8.13c0.09,0.414,0.228,0.682,0.389,0.849c0.383,2.666,2.776,4.938,4.698,4.843\n\t\t\t                  \t\t\tc2.445-0.12,4.178-2.755,4.567-4.843c0.161-0.166,0.316-0.521,0.409-0.938c0.104-0.479,0.216-1.201-0.072-1.583\n\t\t\t                  \t\t\tc-0.017-0.02-0.127-0.121-0.146-0.138c0.275-0.992,0.879-2.762-0.625-4.353c-0.815-0.862-1.947-1.295-2.97-1.637\n\t\t\t                  \t\t\tc-3.02-1.009-5.152,0.406-6.136,2.759C7.981,3.256,7.522,4.313,8.078,6.32C8.024,6.356,7.975,6.402,7.934,6.458\n\t\t\t                  \t\t\tC7.645,6.839,7.833,7.651,7.938,8.13z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                attrs: {
+                                  d:
+                                    "M23.557,22.792c-0.084-1.835-0.188-4.743-1.791-7.122c0,0-0.457-0.623-1.541-1.037\n\t\t\t                  \t\t\tc0,0-2.354-0.717-3.438-1.492l-0.495,0.339l0.055,3.218l-2.972,7.934c-0.065,0.174-0.231,0.289-0.416,0.289\n\t\t\t                  \t\t\ts-0.351-0.115-0.416-0.289l-2.971-7.934c0,0,0.055-3.208,0.054-3.218c0.007,0.027-0.496-0.339-0.496-0.339\n\t\t\t                  \t\t\tc-1.082,0.775-3.437,1.492-3.437,1.492c-1.084,0.414-1.541,1.037-1.541,1.037c-1.602,2.379-1.708,5.287-1.792,7.122\n\t\t\t                  \t\t\tc-0.058,1.268,0.208,1.741,0.542,1.876c4.146,1.664,15.965,1.664,20.112,0C23.35,24.534,23.614,24.06,23.557,22.792z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                attrs: {
+                                  d:
+                                    "M13.065,14.847l-0.134,0.003c-0.432,0-0.868-0.084-1.296-0.232l1.178,1.803l-1.057,1.02\n\t\t\t                  \t\t\tl1.088,6.607c0.009,0.057,0.058,0.098,0.116,0.098c0.057,0,0.106-0.041,0.116-0.098l1.088-6.607l-1.058-1.02l1.161-1.776\n\t\t\t                  \t\t\tC13.888,14.756,13.487,14.83,13.065,14.847z"
+                                }
+                              })
+                            ])
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("span", [_vm._v("Empresario")])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col s12 m6" }, [
+                    _c("button", { staticClass: "button-register" }, [
+                      _c("div", { staticClass: "icon-caracter" }, [
+                        _c(
+                          "svg",
+                          {
+                            staticStyle: {
+                              "enable-background": "new 0 0 512 512"
+                            },
+                            attrs: {
+                              version: "1.1",
+                              id: "developer",
+                              xmlns: "http://www.w3.org/2000/svg",
+                              "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                              x: "0px",
+                              y: "0px",
+                              viewBox: "0 0 512 512",
+                              "xml:space": "preserve"
+                            }
+                          },
+                          [
+                            _c("g", { staticClass: "fill-caracter-icon" }, [
+                              _c("path", {
+                                attrs: {
+                                  d:
+                                    "M441.217,235.868l-37.982-8.802l12.093-37.912l-0.879-0.293c-14.881-4.96-31.125-9.049-48.264-12.282\n\t\t\t                  \t\t\tc-6.656,54.889-53.528,97.558-110.184,97.558c-55.875,0-102.231-41.501-109.884-95.295c-17.267,3.639-33.567,8.144-48.424,13.509\n\t\t\t                  \t\t\tl11.073,34.715l-38.004,8.807L0,366.342v79.397h84.333V311.805h343.333V445.74H512v-80.103L441.217,235.868z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                attrs: {
+                                  d:
+                                    "M380.972,81.566c-18.27-40.058-54.956-69.109-98.135-77.711c-17.809-3.548-35.865-3.548-53.674,0\n\t\t\t                  \t\t\tc-43.179,8.602-79.865,37.653-98.135,77.711l-36.553,80.144c44.649-14.98,101.279-23.544,160.609-24.199\n\t\t\t                  \t\t\tc58.917-0.643,115.535,6.531,160.653,20.281L380.972,81.566z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                attrs: {
+                                  d:
+                                    "M175.696,173.584c5.143,39.744,39.182,70.554,80.304,70.554c41.688,0,76.11-31.66,80.513-72.196\n\t\t\t                  \t\t\tC284.593,165.404,227.333,165.99,175.696,173.584z"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c("path", {
+                                attrs: {
+                                  d:
+                                    "M114.333,510.805h283.333v-169H114.333V510.805z M256,405.091l21.213,21.213L256,447.518l-21.213-21.213L256,405.091z"
+                                }
+                              })
+                            ])
+                          ]
+                        )
+                      ]),
+                      _vm._v(" "),
+                      _c("span", [_vm._v("Dev - Maker")])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col s12 center" }, [
+                    _c(
+                      "div",
+                      {
+                        staticClass: "more-info",
+                        on: {
+                          click: function($event) {
+                            _vm.$root.goToView("info")
+                          }
+                        }
+                      },
+                      [_c("a", [_vm._v("Mas información")])]
+                    )
+                  ])
+                ])
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col s12 m12 l7" }, [_c("word-writing")], 1)
+        ])
+      ]),
+      _vm._v(" "),
+      _c("section", { attrs: { id: "info" } }, [
+        _c("div", { staticClass: "container" }, [
+          _c("div", { staticClass: "row" }, [
+            _c("div", { staticClass: "col s12" }, [
+              _c("h2", { staticClass: "title-section" }, [
+                _vm._v("¿Qúe es la transformación digital?")
+              ]),
+              _vm._v(" "),
+              _c(
+                "div",
+                { staticClass: "col s12 container-content-info no-padding" },
+                [
+                  _vm._m(2),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col s12 m6" }, [
+                    _c("div", { staticClass: "content-info" }, [
+                      _vm._m(3),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        { staticClass: "animation-digital-transform" },
+                        [
+                          _c(
+                            "svg",
+                            {
+                              staticStyle: {
+                                "enable-background": "new 0 0 656 573.3"
+                              },
+                              attrs: {
+                                version: "1.1",
+                                id: "Layer_1",
+                                xmlns: "http://www.w3.org/2000/svg",
+                                "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                                x: "0px",
+                                y: "0px",
+                                viewBox: "0 0 656 273",
+                                "xml:space": "preserve"
+                              }
+                            },
+                            [
+                              _c("g", { staticClass: "memo-dt" }, [
+                                _c("rect", {
+                                  staticClass: "st6 memo-container",
+                                  attrs: {
+                                    x: "198.4",
+                                    y: "131.9",
+                                    width: "254",
+                                    height: "254"
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c(
+                                  "g",
+                                  { staticClass: "objects-drawed-pencil" },
+                                  [
+                                    _c("g", [
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M341.2,309.8c-2,0-3.6-1.6-3.6-3.6v-10.9c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v10.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC344.9,308.2,343.2,309.8,341.2,309.8"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M355.8,309.8c-2,0-3.6-1.6-3.6-3.6v-25.5c0-2,1.6-3.6,3.6-3.6c2,0,3.6,1.6,3.6,3.6v25.5\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC359.4,308.2,357.8,309.8,355.8,309.8"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M370.3,309.8c-2,0-3.6-1.6-3.6-3.6V288c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v18.2\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC374,308.2,372.4,309.8,370.3,309.8"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M384.9,309.8c-2,0-3.6-1.6-3.6-3.6v-43.7c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v43.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC388.5,308.2,386.9,309.8,384.9,309.8"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M399.5,309.8c-2,0-3.6-1.6-3.6-3.6V277c0-2,1.6-3.6,3.6-3.6s3.6,1.6,3.6,3.6v29.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC403.1,308.2,401.5,309.8,399.5,309.8"
+                                        }
+                                      })
+                                    ]),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "st8",
+                                      attrs: {
+                                        d:
+                                          "M319.4,257c0,21.1-17.1,38.2-38.2,38.2S243,278.1,243,257s17.1-38.2,38.2-38.2S319.4,235.9,319.4,257"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "st8",
+                                      attrs: {
+                                        d:
+                                          "M279.4,218.9C279.4,218.9,279.4,218.9,279.4,218.9l-0.1,39.9c0,0.1,0.1,0.1,0.1,0.1h39.8c0,0,0,0,0.1-0.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC320.4,236.3,301.9,217.8,279.4,218.9"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("g", [
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M381.3,237h-29.1c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h29.1c2,0,3.6,1.6,3.6,3.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC384.9,235.4,383.3,237,381.3,237"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M399.5,237c-0.9,0-1.9-0.4-2.6-1.1c-0.1-0.2-0.3-0.4-0.4-0.5c-0.1-0.2-0.3-0.4-0.3-0.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc-0.1-0.2-0.2-0.4-0.2-0.7c0-0.3-0.1-0.5-0.1-0.7c0-0.2,0-0.5,0.1-0.7c0-0.2,0.1-0.4,0.2-0.7c0.1-0.2,0.2-0.4,0.3-0.7\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc0.1-0.2,0.3-0.4,0.4-0.5c1.3-1.3,3.8-1.3,5.2,0c0.7,0.7,1.1,1.6,1.1,2.6c0,1-0.4,1.9-1.1,2.6C401.3,236.6,400.4,237,399.5,237"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M399.5,218.8h-10.9c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h10.9c2,0,3.6,1.6,3.6,3.6S401.5,218.8,399.5,218.8"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M359.4,218.8h-7.3c-2,0-3.6-1.6-3.6-3.6s1.6-3.6,3.6-3.6h7.3c2,0,3.6,1.6,3.6,3.6S361.4,218.8,359.4,218.8"
+                                        }
+                                      }),
+                                      _vm._v(" "),
+                                      _c("path", {
+                                        staticClass: "st8",
+                                        attrs: {
+                                          d:
+                                            "M374,218.8c-0.9,0-1.9-0.4-2.6-1.1c-0.7-0.7-1.1-1.6-1.1-2.6c0-0.9,0.4-1.9,1.1-2.6c0.4-0.3,0.7-0.6,1.2-0.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc1.3-0.6,2.9-0.3,4,0.8c0.7,0.7,1.1,1.6,1.1,2.6c0,0.9-0.4,1.9-1.1,2.6C375.9,218.4,374.9,218.8,374,218.8"
+                                        }
+                                      })
+                                    ])
+                                  ]
+                                ),
+                                _vm._v(" "),
+                                _c("g", { staticClass: "pencil-dt" }, [
+                                  _c("path", {
+                                    staticClass: "st7",
+                                    attrs: {
+                                      d:
+                                        "M358.2,222.4c1.4,1.4,1.4,3.7,0,5.1l-1.3,1.3l20.8-5.7l-20.2-20.2l-5.7,20.8l1.3-1.3\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC354.6,221,356.8,221,358.2,222.4z"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st9",
+                                    attrs: {
+                                      d:
+                                        "M357,228.8l1.3-1.3c1.4-1.4,1.4-3.7,0-5.1c-1.4-1.4-3.7-1.4-5.1,0l-1.3,1.3l-1.9,7L357,228.8z"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("polygon", {
+                                    staticClass: "st10",
+                                    attrs: {
+                                      points:
+                                        "474.6,126.4 454.3,106 357.6,202.7 357.6,202.8 377.8,223.1 377.9,223 "
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st11",
+                                    attrs: {
+                                      d:
+                                        "M497.5,93.3l-10.3-10.3c-2.8-2.8-7.3-2.8-10.1,0l-12.8,12.8l20.3,20.3l12.8-12.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC500.3,100.7,500.3,96.1,497.5,93.3z"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("rect", {
+                                    staticClass: "st7",
+                                    attrs: {
+                                      x: "462.3",
+                                      y: "96.7",
+                                      transform:
+                                        "matrix(0.7071 -0.7071 0.7071 0.7071 58.9513 364.5358)",
+                                      width: "14.4",
+                                      height: "28.8"
+                                    }
+                                  })
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c("g", { staticClass: "computer-dt" }, [
+                                _c("path", {
+                                  staticClass: "st0",
+                                  attrs: {
+                                    d:
+                                      "M584,389.8H72V120.6c0-17.1,13.8-30.9,30.9-30.9h450.2c17.1,0,30.9,13.8,30.9,30.9L584,389.8L584,389.8z"
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("path", {
+                                  staticClass: "st1",
+                                  attrs: {
+                                    d:
+                                      "M433.9,566.3H222.1c0-19.5,15.8-35.3,35.3-35.3h141.2C418.1,531,433.9,546.8,433.9,566.3"
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("polygon", {
+                                  staticClass: "st2",
+                                  attrs: {
+                                    points:
+                                      "389.8,531 266.2,531 283.9,460.4 372.1,460.4 \t"
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("path", {
+                                  staticClass: "st1",
+                                  attrs: {
+                                    d:
+                                      "M553.1,460.4H102.9c-17.1,0-30.9-13.8-30.9-30.9v-39.7h512v39.7C584,446.6,570.2,460.4,553.1,460.4"
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("g", { staticClass: "bars-horizontal" }, [
+                                  _c("path", {
+                                    staticClass: "st3",
+                                    attrs: {
+                                      d:
+                                        "M363.3,363.3c-4.9,0-8.8-4-8.8-8.8V328c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v26.5\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC372.1,359.4,368.2,363.3,363.3,363.3"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st3",
+                                    attrs: {
+                                      d:
+                                        "M398.6,363.3c-4.9,0-8.8-4-8.8-8.8v-61.8c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v61.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC407.4,359.4,403.5,363.3,398.6,363.3"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st3",
+                                    attrs: {
+                                      d:
+                                        "M433.9,363.3c-4.9,0-8.8-4-8.8-8.8v-44.1c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v44.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC442.8,359.4,438.8,363.3,433.9,363.3"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st3",
+                                    attrs: {
+                                      d:
+                                        "M469.2,363.3c-4.9,0-8.8-4-8.8-8.8V248.6c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v105.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC478.1,359.4,474.1,363.3,469.2,363.3"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st3",
+                                    attrs: {
+                                      d:
+                                        "M504.6,363.3c-4.9,0-8.8-4-8.8-8.8v-70.6c0-4.9,3.9-8.8,8.8-8.8s8.8,4,8.8,8.8v70.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC513.4,359.4,509.4,363.3,504.6,363.3"
+                                    }
+                                  })
+                                ]),
+                                _vm._v(" "),
+                                _c("path", {
+                                  staticClass: "st4",
+                                  attrs: {
+                                    d:
+                                      "M310.3,235.3c0,51.2-41.5,92.7-92.7,92.7S125,286.5,125,235.3s41.5-92.7,92.7-92.7S310.3,184.1,310.3,235.3"
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("path", {
+                                  staticClass: "st5 graphic-part",
+                                  attrs: {
+                                    d:
+                                      "M213.4,142.7c0,0-0.1,0.1-0.1,0.1v96.6c0,0.2,0.1,0.3,0.3,0.3h96.6c0,0,0.1-0.1,0.1-0.1\n\t\t\t\t\t\t\t\t\t\t\t\t\t\tC312.7,185,267.9,140.3,213.4,142.7"
+                                  }
+                                }),
+                                _vm._v(" "),
+                                _c("g", { staticClass: "bars-vertical" }, [
+                                  _c("path", {
+                                    staticClass: "st4",
+                                    attrs: {
+                                      d:
+                                        "M460.4,186.8h-70.6c-4.9,0-8.8-4-8.8-8.8s3.9-8.8,8.8-8.8h70.6c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC469.2,182.8,465.3,186.8,460.4,186.8"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st4",
+                                    attrs: {
+                                      d:
+                                        "M504.6,186.8c-2.3,0-4.6-1-6.3-2.6c-0.4-0.4-0.8-0.9-1.1-1.3c-0.4-0.5-0.6-1.1-0.8-1.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc-0.3-0.5-0.4-1.1-0.5-1.6c-0.1-0.6-0.2-1.2-0.2-1.8s0.1-1.1,0.2-1.8c0.1-0.5,0.3-1.1,0.5-1.6c0.2-0.5,0.4-1.1,0.8-1.6\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc0.3-0.4,0.7-0.9,1.1-1.3c3.3-3.3,9.2-3.3,12.5,0c1.6,1.7,2.6,3.9,2.6,6.3c0,2.4-1,4.6-2.6,6.3\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC509.1,185.8,506.8,186.8,504.6,186.8"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st4",
+                                    attrs: {
+                                      d:
+                                        "M504.6,142.6h-26.5c-4.9,0-8.8-4-8.8-8.8c0-4.9,3.9-8.8,8.8-8.8h26.5c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC513.4,138.7,509.4,142.6,504.6,142.6"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st4",
+                                    attrs: {
+                                      d:
+                                        "M407.4,142.6h-17.7c-4.9,0-8.8-4-8.8-8.8c0-4.9,3.9-8.8,8.8-8.8h17.7c4.9,0,8.8,4,8.8,8.8\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tC416.3,138.7,412.3,142.6,407.4,142.6"
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "st4",
+                                    attrs: {
+                                      d:
+                                        "M442.8,142.6c-2.3,0-4.6-1-6.3-2.6c-1.6-1.7-2.6-4-2.6-6.3c0-2.3,1-4.6,2.6-6.3c0.9-0.8,1.8-1.4,2.9-1.9\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\tc3.3-1.4,7.1-0.6,9.6,1.9c1.6,1.7,2.6,4,2.6,6.3c0,2.3-1,4.6-2.6,6.3C447.3,141.6,445.1,142.6,442.8,142.6"
+                                    }
+                                  })
+                                ])
+                              ]),
+                              _vm._v(" "),
+                              _c(
+                                "g",
+                                {
+                                  staticClass: "transform-arrow",
+                                  attrs: { fill: "#f28a7c" }
+                                },
+                                [
+                                  _c("g", { staticClass: "icon_arrow-line" }, [
+                                    _c("path", {
+                                      staticClass: "arrow-line-a",
+                                      attrs: {
+                                        d:
+                                          "m 30.201849,72.467726 2.78648,0.161796 0.287637,-4.674096 -2.804458,-0.161796 z"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "arrow-line-b",
+                                      attrs: {
+                                        d:
+                                          "m 35.073695,61.303828 -2.750526,-0.683137 -1.06066,4.566232 2.660639,0.66516 z"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "arrow-line-c",
+                                      attrs: {
+                                        d:
+                                          "m 33.707421,57.744325 2.444911,1.312342 2.265139,-4.062868 -2.498843,-1.348297 z"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "arrow-line-d",
+                                      attrs: {
+                                        d:
+                                          "m 37.752311,51.578114 2.157275,1.707842 2.912321,-3.613435 -2.193229,-1.743797 z"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "arrow-line-e",
+                                      attrs: {
+                                        d:
+                                          "m 42.749998,46.005153 1.599979,2.301094 3.865118,-2.552776 -1.599979,-2.337047 z"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "arrow-line-f",
+                                      attrs: {
+                                        d:
+                                          "m 49.275755,42.229922 0.916842,2.624685 4.422413,-1.52807 -0.898864,-2.606707 z"
+                                      }
+                                    }),
+                                    _vm._v(" "),
+                                    _c("path", {
+                                      staticClass: "arrow-line-g",
+                                      attrs: {
+                                        d:
+                                          "m 56.232967,40.036693 0.287636,2.804457 4.602187,-0.431455 -0.233705,-2.732548 z"
+                                      }
+                                    })
+                                  ]),
+                                  _vm._v(" "),
+                                  _c("path", {
+                                    staticClass: "arrow-end",
+                                    attrs: {
+                                      d:
+                                        "m 60.392578,33.474609 -2.042969,2.113282 5.839844,5.648437 -5.583984,5.773438 2.113281,2.042968 7.587891,-7.845703 -0.107422,-0.103515 z"
+                                    }
+                                  })
+                                ]
+                              )
+                            ]
+                          )
+                        ]
+                      )
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _vm._m(4)
+                ]
+              )
+            ])
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("section", { attrs: { id: "we-search" } }, [
+        _c("div", { staticClass: "container" }, [
+          _c("h2", { staticClass: "title-section" }, [
+            _vm._v("¿Qué buscamos?")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col s12 container-content-info" }, [
+            _vm._m(5),
+            _vm._v(" "),
+            _c("div", { staticClass: "col s12 m6" }, [
+              _c("div", { staticClass: "content-solution-image" }, [
+                _c(
+                  "svg",
+                  {
+                    staticStyle: { "enable-background": "new 0 0 464 464" },
+                    attrs: {
+                      version: "1.1",
+                      id: "solution-business",
+                      xmlns: "http://www.w3.org/2000/svg",
+                      "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                      x: "0px",
+                      y: "0px",
+                      viewBox: "0 0 464 464",
+                      "xml:space": "preserve"
+                    }
+                  },
+                  [
+                    _c("path", {
+                      staticStyle: { fill: "#A6001E" },
+                      attrs: {
+                        d:
+                          "M64,328c0,4.418-3.582,8-8,8s-8,3.582-8,8v16c0,13.255,10.745,24,24,24h16c13.255,0,24-10.745,24-24\n\t\t\t\t\t\t\t\t\t\tv-16c0-4.418-3.582-8-8-8c-4.418,0-8-3.582-8-8c0-8.837,7.163-16,16-16h40v-40c0-8.837-7.163-16-16-16c-4.418,0-8,3.582-8,8\n\t\t\t\t\t\t\t\t\t\ts-3.582,8-8,8h-16c-13.255,0-24-10.745-24-24v-16c0-13.255,10.745-24,24-24h16c4.418,0,8,3.582,8,8s3.582,8,8,8\n\t\t\t\t\t\t\t\t\t\tc8.837,0,16-7.163,16-16v-48C68.053,160,0,228.053,0,312h48C56.837,312,64,319.163,64,328z"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("path", {
+                      staticStyle: { fill: "#F40E34" },
+                      attrs: {
+                        d:
+                          "M72,372c-6.617,0-12-5.383-12-12v-12.398c9.117-1.859,16-9.945,16-19.602c0-15.438-12.563-28-28-28\n\t\t\t\t\t\t\t\t\t\tH12.508C18.281,232.359,72.359,178.281,140,172.508V208c0,0.898-0.297,1.727-0.797,2.398C136.773,202.086,129.086,196,120,196h-16\n\t\t\t\t\t\t\t\t\t\tc-19.852,0-36,16.148-36,36v16c0,19.852,16.148,36,36,36h16c9.086,0,16.773-6.086,19.203-14.398c0.5,0.672,0.797,1.5,0.797,2.398v28\n\t\t\t\t\t\t\t\t\t\th-28c-15.438,0-28,12.563-28,28c0,9.656,6.883,17.742,16,19.602V360c0,6.617-5.383,12-12,12H72z"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("path", {
+                      staticStyle: { fill: "#E7B900" },
+                      attrs: {
+                        d:
+                          "M176,392c4.418,0,8,3.582,8,8s3.582,8,8,8h8c17.673,0,32-14.327,32-32s-14.327-32-32-32h-8\n\t\t\t\t\t\t\t\t\t\tc-4.418,0-8,3.582-8,8s-3.582,8-8,8c-13.255,0-24-10.745-24-24v-24h-40c-8.837,0-16,7.163-16,16c0,4.418,3.582,8,8,8\n\t\t\t\t\t\t\t\t\t\tc4.418,0,8,3.582,8,8v16c0,13.255-10.745,24-24,24H72c-13.255,0-24-10.745-24-24v-16c0-4.418,3.582-8,8-8s8-3.582,8-8\n\t\t\t\t\t\t\t\t\t\tc0-8.837-7.163-16-16-16H0c0,83.947,68.053,152,152,152v-48C152,402.745,162.745,392,176,392z"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("path", {
+                      staticStyle: { fill: "#FFD422" },
+                      attrs: {
+                        d:
+                          "M140,451.492C72.359,445.719,18.281,391.641,12.508,324H48c0.898,0,1.727,0.297,2.398,0.797\n\t\t\t\t\t\t\t\t\t\tC42.086,327.227,36,334.914,36,344v16c0,19.852,16.148,36,36,36h16c19.852,0,36-16.148,36-36v-16\n\t\t\t\t\t\t\t\t\t\tc0-9.086-6.086-16.773-14.398-19.203c0.672-0.5,1.5-0.797,2.398-0.797h28v12c0,19.852,16.148,36,36,36\n\t\t\t\t\t\t\t\t\t\tc9.656,0,17.742-6.883,19.602-16H200c11.031,0,20,8.969,20,20s-8.969,20-20,20h-4.398c-1.859-9.117-9.945-16-19.602-16\n\t\t\t\t\t\t\t\t\t\tc-19.852,0-36,16.148-36,36V451.492z"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("g", { staticClass: "puzzle-blue" }, [
+                      _c("path", {
+                        staticStyle: { fill: "#1E81CE" },
+                        attrs: {
+                          d:
+                            "M240,288c0-4.418,3.582-8,8-8s8-3.582,8-8v-8c0-17.673-14.327-32-32-32s-32,14.327-32,32v8\n\t\t\t\t\t\t\t\t\t\t\tc0,4.418,3.582,8,8,8s8,3.582,8,8c0,13.255-10.745,24-24,24h-32v24c0,13.255,10.745,24,24,24c4.418,0,8-3.582,8-8s3.582-8,8-8h8\n\t\t\t\t\t\t\t\t\t\t\tc17.673,0,32,14.327,32,32s-14.327,32-32,32h-8c-4.418,0-8-3.582-8-8s-3.582-8-8-8c-13.255,0-24,10.745-24,24v48\n\t\t\t\t\t\t\t\t\t\t\tc83.947,0,152-68.053,152-152h-40C250.745,312,240,301.255,240,288z"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("path", {
+                        staticStyle: { fill: "#5AAAE7" },
+                        attrs: {
+                          d:
+                            "M164,416c0-5.406,3.594-9.984,8.516-11.484C174.57,413.375,182.523,420,192,420h8\n\t\t\t\t\t\t\t\t\t\t\tc24.258,0,44-19.742,44-44s-19.742-44-44-44h-8c-9.477,0-17.43,6.625-19.484,15.484c-4.922-1.5-8.516-6.078-8.516-11.484v-12h20\n\t\t\t\t\t\t\t\t\t\t\tc19.852,0,36-16.148,36-36c0-9.656-6.883-17.742-16-19.602V264c0-11.031,8.969-20,20-20s20,8.969,20,20v4.398\n\t\t\t\t\t\t\t\t\t\t\tc-9.117,1.859-16,9.945-16,19.602c0,19.852,16.148,36,36,36h27.492C285.719,391.641,231.641,445.719,164,451.492V416z"
+                        }
+                      })
+                    ]),
+                    _vm._v(" "),
+                    _c("g", { staticClass: "hand-puzzle" }, [
+                      _c("path", {
+                        staticStyle: { fill: "#5EAC24" },
+                        attrs: {
+                          d:
+                            "M267.022,97.013c-3.119-3.129-3.112-8.194,0.017-11.314s3.136-8.185,0.017-11.314l-11.297-11.331\n\t\t\t\t\t\t\t\t\t\t\tc-9.359-9.387-24.554-9.409-33.941-0.051l-11.331,11.297c-9.387,9.359-9.409,24.554-0.051,33.941l11.297,11.331\n\t\t\t\t\t\t\t\t\t\t\tc3.12,3.129,8.185,3.136,11.314,0.017c3.129-3.12,8.194-3.112,11.314,0.017c6.239,6.258,6.224,16.388-0.034,22.627L216,170.476\n\t\t\t\t\t\t\t\t\t\t\tl28.242,28.327c6.239,6.258,16.37,6.273,22.627,0.034c3.129-3.12,3.136-8.185,0.017-11.314c-3.119-3.129-3.112-8.194,0.017-11.314\n\t\t\t\t\t\t\t\t\t\t\tl11.331-11.297c9.387-9.359,24.583-9.336,33.941,0.051l11.297,11.331c9.359,9.387,9.336,24.583-0.051,33.941l-11.331,11.297\n\t\t\t\t\t\t\t\t\t\t\tc-3.129,3.12-8.194,3.112-11.314-0.017c-3.119-3.129-8.185-3.136-11.314-0.017c-6.258,6.239-6.273,16.37-0.034,22.627l33.89,33.992\n\t\t\t\t\t\t\t\t\t\t\tc59.449-59.271,59.593-155.512,0.322-214.96l-33.992,33.89C283.392,103.286,273.261,103.271,267.022,97.013z"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("path", {
+                        staticStyle: { fill: "#69C229" },
+                        attrs: {
+                          d:
+                            "M297.93,235.656c-0.758-0.766-1.039-1.617-1.133-2.258c2.93,1.609,6.219,2.469,9.648,2.469\n\t\t\t\t\t\t\t\t\t\t\tc5.32,0,10.336-2.07,14.109-5.828l11.344-11.305c6.805-6.797,10.563-15.828,10.578-25.445c0.008-9.617-3.719-18.656-10.516-25.469\n\t\t\t\t\t\t\t\t\t\t\tl-11.289-11.328c-6.805-6.828-15.859-10.586-25.492-10.586c-9.602,0-18.625,3.734-25.422,10.516l-11.328,11.289\n\t\t\t\t\t\t\t\t\t\t\tc-3.773,3.766-5.867,8.781-5.875,14.125c-0.008,3.422,0.836,6.711,2.438,9.625c-0.648-0.094-1.5-0.375-2.258-1.133L232.969,170.5\n\t\t\t\t\t\t\t\t\t\t\tl19.828-19.766c10.938-10.906,10.961-28.672,0.055-39.602c-3.766-3.789-8.797-5.883-14.164-5.883c-3.969,0-7.766,1.156-11,3.297\n\t\t\t\t\t\t\t\t\t\t\tl-8.75-8.781c-4.672-4.68-4.664-12.297,0.023-16.977l11.328-11.281c2.266-2.258,5.273-3.508,8.477-3.508\n\t\t\t\t\t\t\t\t\t\t\tc3.211,0,6.227,1.258,8.5,3.531l8.75,8.773c-2.156,3.234-3.328,7.047-3.328,11.039c-0.008,5.328,2.063,10.352,5.828,14.133\n\t\t\t\t\t\t\t\t\t\t\tc5.297,5.32,12.336,8.242,19.836,8.242c7.461,0,14.484-2.906,19.773-8.18l25.133-25.055C344.5,105.711,356.047,137.313,356,170.68\n\t\t\t\t\t\t\t\t\t\t\ts-11.688,64.938-33.008,90.109L297.93,235.656z"
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c("path", {
+                        staticStyle: { fill: "#FFB398" },
+                        attrs: {
+                          d:
+                            "M256,40l30.64-30.64c6.006-6,14.151-9.367,22.64-9.36H464v112h-24l-24,32h-88v-16\n\t\t\t\t\t\t\t\t\t\t\tc0.032-13.606,8.664-25.704,21.52-30.16c3.358-1.225,6.906-1.848,10.48-1.84l0,0c13.255,0,24-10.745,24-24V56\n\t\t\t\t\t\t\t\t\t\t\tc0-13.255-10.745-24-24-24h-34.72c-8.489-0.007-16.634,3.36-22.64,9.36L280,64L256,40z"
+                        }
+                      })
+                    ])
+                  ]
+                )
+              ])
+            ]),
+            _vm._v(" "),
+            _vm._m(6)
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _vm._m(7),
+      _vm._v(" "),
+      _c("section", { attrs: { id: "schedule" } }, [
+        _c("div", { staticClass: "container" }, [
+          _c("h2", { staticClass: "title-section special-margin" }, [
+            _vm._v("Cronograma")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col s12 m10 offset-m1" }, [
+            _c("div", { staticClass: "schedule" }, [
+              _c("div", { staticClass: "event-schedule" }, [
+                _c("div", { staticClass: "pin-circle" }, [
+                  _c("div", { staticClass: "container-flag" }, [
+                    _c(
+                      "svg",
+                      {
+                        staticStyle: { "enable-background": "new 0 0 70 42" },
+                        attrs: {
+                          xmlns: "http://www.w3.org/2000/svg",
+                          "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                          version: "1.1",
+                          x: "0px",
+                          y: "0px",
+                          viewBox: "0 0 70 42"
+                        }
+                      },
+                      [
+                        _c("defs", [
+                          _c("clipPath", { attrs: { id: "flagMask" } }, [
+                            _c("polygon", {
+                              attrs: {
+                                id: "mask",
+                                points:
+                                  "100,31 33.032,31 49.467,49.826 32.684,69 100,69 \t"
+                              }
+                            })
+                          ])
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "g",
+                          {
+                            staticClass: "position-flag",
+                            attrs: { "clip-path": "url(#flagMask)" }
+                          },
+                          [
+                            _c("path", {
+                              staticClass: "flag",
+                              attrs: {
+                                fill: "#FFF59D",
+                                d:
+                                  "M100,31c-8.118,0-8.364,4.504-16.471,4.504\n\t\t\t\t\t\t\t\t\t\t\t\t\tc-7.657,0-8.026-4.504-16.47-4.504c-8.675,0-8.675,4.504-16.471,4.504c-8.091,0-8.091-4.504-16.471-4.504\n\t\t\t\t\t\t\t\t\t\t\t\t\tc-8.492,0-8.739,4.504-16.47,4.504C9.027,35.504,9.37,31,1.178,31c-8.734,0-8.589,4.504-16.471,4.504S-24.251,31-31.763,31v34.438\n\t\t\t\t\t\t\t\t\t\t\t\t\tc0,0,7.849,3.66,16.47,3.66c7.914,0,8.653-3.66,16.471-3.66c7.822,0,7.357,3.66,16.47,3.66s9.12-3.66,16.47-3.66\n\t\t\t\t\t\t\t\t\t\t\t\t\tc8.01,0,8.133,3.66,16.471,3.66c7.276,0,7.549-3.66,16.471-3.66c8.689,0,8.936,3.66,16.47,3.66c8.497,0,8.333-3.66,16.471-3.66V31z\n\t\t\t\t\t\t\t\t\t\t\t\t\t"
+                              }
+                            })
+                          ]
+                        )
+                      ]
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _vm._m(8),
+                _vm._v(" "),
+                _c("div", { staticClass: "right-event empty" })
+              ]),
+              _vm._v(" "),
+              _vm._m(9),
+              _vm._v(" "),
+              _vm._m(10),
+              _vm._v(" "),
+              _vm._m(11),
+              _vm._v(" "),
+              _vm._m(12),
+              _vm._v(" "),
+              _vm._m(13),
+              _vm._v(" "),
+              _vm._m(14)
+            ])
+          ]),
+          _vm._v(" "),
+          _c("h2", { staticClass: "title-section" }, [_vm._v("Retos")]),
+          _vm._v(" "),
+          _vm._m(15),
+          _vm._v(" "),
+          _vm._m(16),
+          _vm._v(" "),
+          _vm._m(17),
+          _vm._v(" "),
+          _vm._m(18),
+          _vm._v(" "),
+          _vm._m(19)
+        ])
+      ]),
+      _vm._v(" "),
+      _vm._m(20),
+      _vm._v(" "),
+      _c("section", { attrs: { id: "awards" } }, [
+        _c("div", { staticClass: "container" }, [
+          _c("h2", { staticClass: "title-section" }, [_vm._v("Premios")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "container-awards" }, [
+            _c("div", { staticClass: "award-podium-icon" }, [
+              _c(
+                "svg",
+                {
+                  staticStyle: { "enable-background": "new 0 0 165 512" },
+                  attrs: {
+                    xmlns: "http://www.w3.org/2000/svg",
+                    "xmlns:xlink": "http://www.w3.org/1999/xlink",
+                    version: "1.1",
+                    x: "0px",
+                    y: "0px",
+                    viewBox: "0 0 512 165",
+                    "xml:space": "preserve"
+                  }
+                },
+                [
+                  _c("g", { staticClass: "award-icon" }, [
+                    _c("path", {
+                      staticClass: "line-award-2",
+                      staticStyle: { fill: "#2B414D" },
+                      attrs: {
+                        d:
+                          "M308.567,161.452l-152.025,68.923l122.88,270.966l66.166-55.926l85.465-12.603  C431.053,432.812,308.567,161.452,308.567,161.452z"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("path", {
+                      staticClass: "line-award-1",
+                      staticStyle: { fill: "#475F6C" },
+                      attrs: {
+                        d:
+                          "M195.927,164.209l152.025,68.923l-122.88,271.36l-66.166-56.32l-85.858-12.603  C73.047,435.569,195.927,164.209,195.927,164.209z"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("path", {
+                      staticStyle: { fill: "#FFE082" },
+                      attrs: {
+                        d:
+                          "M449.17,197.292c0,14.572-20.874,26.782-24.025,40.566c-3.151,14.178,10.634,34.265,4.726,47.262  c-6.302,12.997-30.326,14.572-38.991,25.6s-4.726,35.446-15.754,44.505s-33.083-0.394-45.686,5.908s-19.298,29.932-33.083,33.083  c-13.391,3.151-29.538-14.966-43.717-14.966c-14.178,0-30.326,18.117-43.717,14.966c-13.785-3.151-20.48-26.782-33.083-33.083  c-12.603-6.302-35.052,3.151-45.686-5.908c-11.028-9.058-7.089-33.477-15.754-44.505s-32.689-12.603-38.991-25.6  c-5.908-12.603,7.877-33.083,4.726-47.262c-3.938-13.785-24.812-25.994-24.812-40.566s20.874-26.782,24.025-40.566  c3.151-14.178-10.634-34.265-4.726-47.262c6.302-12.997,30.326-14.572,38.991-25.6s4.726-35.446,15.754-44.505  s33.083,0.394,45.686-5.908c12.603-6.302,19.298-29.932,33.083-33.083c13.391-3.151,29.538,14.966,43.717,14.966  c14.178,0,30.326-18.117,43.717-14.966c13.785,3.151,20.48,26.782,33.083,33.083c12.603,6.302,35.052-3.151,45.686,5.908  c11.028,9.058,7.089,33.477,15.754,44.505s32.689,12.603,38.991,25.6c5.908,12.603-7.877,33.083-4.726,47.262  C428.296,170.511,449.17,182.72,449.17,197.292z"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("path", {
+                      staticStyle: { fill: "#D7B354" },
+                      attrs: {
+                        d:
+                          "M252.247,118.523c-43.717,0-78.769,35.446-78.769,78.769s35.446,78.769,78.769,78.769  c43.717,0,78.769-35.446,78.769-78.769S295.963,118.523,252.247,118.523z M252.247,232.738c-19.692,0-35.446-15.754-35.446-35.446  s15.754-35.446,35.446-35.446s35.446,15.754,35.446,35.446S271.939,232.738,252.247,232.738z M252.247,55.507  c-78.375,0-141.785,63.409-141.785,141.785s63.409,141.785,141.785,141.785s141.784-63.41,141.784-141.785  S330.622,55.507,252.247,55.507z M252.247,315.446c-65.378,0-118.154-52.775-118.154-118.154S186.868,79.138,252.247,79.138  s118.154,52.775,118.154,118.154S317.625,315.446,252.247,315.446z"
+                      }
+                    })
+                  ])
+                ]
+              )
+            ]),
+            _vm._v(" "),
+            _vm._m(21)
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _vm._m(22),
+      _vm._v(" "),
+      _vm._m(23),
+      _vm._v(" "),
+      _vm._m(24)
+    ])
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("header", [
+      _vm._v("\n\t\t\t      \t\t¡Haz parte del "),
+      _c("span", { staticClass: "r-text" }, [_vm._v("evento!")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12" }, [
+      _c("img", {
+        staticClass: "responsive-img",
+        attrs: { src: "/images/logo.png", width: "200" }
+      }),
+      _vm._v(" "),
+      _c("p", { staticClass: "description-text" }, [
+        _vm._v("Simplemente selecciona tu rol:")
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 m6" }, [
+      _c("div", { staticClass: "content-info" }, [
+        _c("span", [
+          _vm._v(
+            "La transformación digital es el proceso por el cual las empresas reorganizan sus métodos de trabajo y estrategias, para obtener más beneficios gracias a la implementación de las nuevas tecnologías, reconstruye las dinámicas de las organizaciones para adaptarlas a las necesidades del presente y del futuro."
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "title-time" }, [
+      _vm._v("¡Es hora de "),
+      _c("span", { staticClass: "sub" }, [_vm._v("transformar")]),
+      _vm._v(" tu empresa!")
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12" }, [
+      _c("h2", { staticClass: "subtitle-section" }, [
+        _vm._v("¿Qué ventajas aporta la Transformación Digital?")
+      ]),
+      _vm._v(" "),
+      _c("span", { staticClass: "text-justify" }, [
+        _vm._v(
+          "La clave para la organización es ver la transformación digital como una oportunidad que permite combinar prácticas y formas de hacer que dan como resultado nuevas técnicas y habilidades como las siguientes:"
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "container-objects" }, [
+        _c("div", { staticClass: "object" }, [
+          _c("div", { staticClass: "container-img" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/advantage/online-shopping.svg" }
+            })
+          ]),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [
+            _vm._v("Generar experiencias nuevas al cliente")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "object" }, [
+          _c("div", { staticClass: "container-img" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/advantage/businessmen_efi.svg" }
+            })
+          ]),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object two-lines" }, [
+            _vm._v("Mejorar la eficiencia operativa")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "object" }, [
+          _c("div", { staticClass: "container-img" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/advantage/businessman_money.svg" }
+            })
+          ]),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [
+            _vm._v("Generar nuevas fuentes de ingresos")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "object" }, [
+          _c("div", { staticClass: "container-img" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/advantage/student.svg" }
+            })
+          ]),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [
+            _vm._v("Responder rápido a los cambios en el mercado")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "object" }, [
+          _c("div", { staticClass: "container-img" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/advantage/profits.svg" }
+            })
+          ]),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object" }, [
+            _vm._v("Crear una ventaja competitiva para la organización")
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "object" }, [
+          _c("div", { staticClass: "container-img" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/advantage/meeting.svg" }
+            })
+          ]),
+          _vm._v(" "),
+          _c("span", { staticClass: "title-object two-lines" }, [
+            _vm._v("Mejorar la colaboración interna")
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "content-info step-row" }, [
+      _c("span", [
+        _vm._v(
+          "Queremos realizar una maratón tecnológica, denominada hackathon. Este evento consiste en la asignación de las necesidades tecnológicas de las empresas del departamento de Córdoba a varios grupos de desarrolladores, para que compitan por un premio a la mejor solución tecnológica (prototipo) de las necesidades presentadas, con el fin de mejorar el proceso de transformación productiva y digital de nuestros empresarios."
+        )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 m6 no-padding" }, [
+      _c("div", { staticClass: "content-info" }, [
+        _c("span", [
+          _vm._v(
+            "Para el desarrollo del mencionado evento se requiere convocar a un grupo de empresarios con el objetivo de capacitarlos en la identificación de sus necesidades tecnológicas, tendientes a la automatización y optimización de sus actividades mercantiles; para la solución (prototipo) de dichas necesidades se requiere de la conformación de los team makers (programadores) y de un espacio optimo y adecuado para el desarrollo del evento."
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "participate" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h2", { staticClass: "title-section" }, [
+          _vm._v("¿Quiénes participan?")
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col s12 m6 container-content-info" }, [
+            _c("div", { staticClass: "container-participate enterprise" }, [
+              _c("div", { staticClass: "card-participate" }, [
+                _c("img", {
+                  staticClass: "responsive-img",
+                  attrs: { src: "/images/participate/teamwork.svg" }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-title-participate" }, [
+                _c("span", { staticClass: "title" }, [_vm._v("Empresas")])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-info-participate" }, [
+                _vm._v(
+                  "Las empresas requieren soluciones tecnológicas para el potenciamiento de su operatividad, ya sea replantear los modelos de negocios u optimizar procesos de la cadena de valor. Las empresas identificarán las necesidades que limitan sus procesos de transformación digital, y serán expuestas ante los makers para el desarrollo de soluciones tecnológicas.\n\t\t\t  \t\t\t\t"
+                )
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col s12 m6 container-content-info" }, [
+            _c("div", { staticClass: "container-participate developer" }, [
+              _c("div", { staticClass: "card-participate" }, [
+                _c("img", {
+                  staticClass: "responsive-img",
+                  attrs: { src: "/images/participate/hacker.svg" }
+                })
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-title-participate" }, [
+                _c("span", { staticClass: "title" }, [
+                  _vm._v("Desarrolladores - Makers")
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-info-participate" }, [
+                _vm._v(
+                  "Los makers son agentes generadores de ideas y conocimientos para la resolución de problemas. Son los desarrolladores de las soluciones a las dificultades presentadas por los empresarios; estos son profesionales o estudiantes, técnicos o tecnólogos que conforman el capital humano. \n\t\t\t  \t\t\t\t"
+                )
+              ])
+            ])
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "left-event" }, [
+      _c("div", { staticClass: "date-event" }, [_vm._v("21 al 27 de Mayo")]),
+      _vm._v(" "),
+      _c("div", { staticClass: "info-event" }, [
+        _vm._v(
+          "Visitas para recolección de información para diagnóstico sobre las necesidades de los empresarios."
+        )
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "event-schedule" }, [
+      _c("div", { staticClass: "pin-circle" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "left-event empty" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "right-event" }, [
+        _c("div", { staticClass: "date-event" }, [_vm._v("30 de Mayo")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-event" }, [
+          _c("div", { staticClass: "item-event" }, [
+            _vm._v(
+              "Capacitación a empresarios en transformación digital.\n\t\t\t\t\t\t\t\t\t\t"
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "item-event" }, [
+            _vm._v("Publicación de retos.\n\t\t\t\t\t\t\t\t\t\t")
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "event-schedule" }, [
+      _c("div", { staticClass: "pin-circle" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "left-event" }, [
+        _c("div", { staticClass: "date-event" }, [_vm._v("01 al 16 de Junio")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-event" }, [
+          _c("div", { staticClass: "item-event" }, [
+            _vm._v("Registro de Makers.")
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "item-event" }, [
+            _vm._v("Selección de Makers.")
+          ])
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "right-event empty" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "event-schedule" }, [
+      _c("div", { staticClass: "pin-circle" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "left-event empty" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "right-event" }, [
+        _c("div", { staticClass: "date-event" }, [_vm._v("08 de Junio")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-event" }, [
+          _vm._v("Publicación y notificación a Makers.")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "event-schedule" }, [
+      _c("div", { staticClass: "pin-circle" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "left-event" }, [
+        _c("div", { staticClass: "date-event" }, [_vm._v("13 de Junio")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-event" }, [
+          _vm._v("Capacitación en prototopado.")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "right-event empty" })
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "event-schedule" }, [
+      _c("div", { staticClass: "pin-circle" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "left-event empty" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "right-event" }, [
+        _c("div", { staticClass: "date-event" }, [_vm._v("27 al 29 de Junio")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-event" }, [
+          _vm._v("Desarrollo de la Hackathon.")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "event-schedule" }, [
+      _c("div", { staticClass: "pin-circle" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "left-event" }, [
+        _c("div", { staticClass: "date-event" }, [_vm._v("29 de Junio")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-event" }, [
+          _vm._v("Cierre de la Hackaton.")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "right-event empty" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "end-schedule" }, [_vm._v("FIN")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 container-content-info" }, [
+      _c("div", { staticClass: "content-info margin-default-bottom" }, [
+        _c("span", [
+          _vm._v(
+            "Proponemos los siguientes retos a cumplir para que el evento sea todo un exito."
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 m6 l3" }, [
+      _c("div", { staticClass: "container-challenge" }, [
+        _c("div", { staticClass: "title-number-challenge" }, [
+          _c("div", { staticClass: "bg-number" }, [
+            _c("span", { staticClass: "number-challenge" }, [_vm._v("1")])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "challenge-icon" }, [
+          _c("div", [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/challenges/car-repair.svg" }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "title-challenge" }, [_vm._v("Diagnóstico")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-challenge" }, [
+          _vm._v(
+            "Socialización del proyecto al sector productivo y capacitación en Transformación Productiva y Digital"
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 m6 l3" }, [
+      _c("div", { staticClass: "container-challenge" }, [
+        _c("div", { staticClass: "title-number-challenge" }, [
+          _c("div", { staticClass: "bg-number" }, [
+            _c("span", { staticClass: "number-challenge" }, [_vm._v("2")])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "challenge-icon" }, [
+          _c("div", [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/challenges/user.svg" }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "title-challenge" }, [_vm._v("Selección")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-challenge" }, [
+          _vm._v(
+            "Reclutamiento y selección de los Makers, socialización del proyecto y capacitación en prototipado."
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 m6 l3" }, [
+      _c("div", { staticClass: "container-challenge" }, [
+        _c("div", { staticClass: "title-number-challenge" }, [
+          _c("div", { staticClass: "bg-number" }, [
+            _c("span", { staticClass: "number-challenge" }, [_vm._v("3")])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "challenge-icon" }, [
+          _c("div", [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/challenges/problem.svg" }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "title-challenge" }, [_vm._v("Necesidades")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-challenge" }, [
+          _vm._v("Categorización de necesidades y conformación de Makers Team.")
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "col s12 m6 l3" }, [
+      _c("div", { staticClass: "container-challenge" }, [
+        _c("div", { staticClass: "title-number-challenge" }, [
+          _c("div", { staticClass: "bg-number" }, [
+            _c("span", { staticClass: "number-challenge" }, [_vm._v("4")])
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "challenge-icon" }, [
+          _c("div", [
+            _c("img", {
+              staticClass: "responsive-img mini",
+              attrs: { src: "/images/challenges/employee_female.svg" }
+            }),
+            _vm._v(" "),
+            _c("img", {
+              staticClass: "responsive-img mini",
+              attrs: { src: "/images/challenges/employee_male.svg" }
+            })
+          ])
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "title-challenge" }, [_vm._v("Desarrollo")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "info-challenge" }, [
+          _vm._v(
+            "Desarrollo tecnológico para solucionar la necesidad planteada por el sector empresarial."
+          )
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "judges" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c(
+          "h2",
+          { staticClass: "title-section", attrs: { id: "title-section-two" } },
+          [_vm._v("Jurados")]
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "container-judges" }, [
+          _c("div", { staticClass: "judge" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/judges/omar.jpg" }
+            }),
+            _vm._v(" "),
+            _c("span", { staticClass: "name" }, [_vm._v("Omar Flórez")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "info" }, [
+              _c("span", [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t\t    consequat."
+                )
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "judge" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/judges/sergio.jpg" }
+            }),
+            _vm._v(" "),
+            _c("span", { staticClass: "name" }, [_vm._v("Sergio Molina")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "info" }, [
+              _c("span", [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t\t    consequat."
+                )
+              ])
+            ])
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "judge" }, [
+            _c("img", {
+              staticClass: "responsive-img",
+              attrs: { src: "/images/judges/uribe.png" }
+            }),
+            _vm._v(" "),
+            _c("span", { staticClass: "name" }, [_vm._v("Uribe")]),
+            _vm._v(" "),
+            _c("div", { staticClass: "info" }, [
+              _c("span", [
+                _vm._v(
+                  "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod\n\t\t\t\t\t\t    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,\n\t\t\t\t\t\t    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo\n\t\t\t\t\t\t    consequat."
+                )
+              ])
+            ])
+          ])
+        ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "container-info-award" }, [
+      _c("div", { staticClass: "col s12 m4" }, [
+        _c("div", { staticClass: "place-award first" }, [_vm._v("1er puesto")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "price-award first" }, [_vm._v("$ 3.000.000")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col s12 m4" }, [
+        _c("div", { staticClass: "place-award second" }, [
+          _vm._v("2do puesto")
+        ]),
+        _vm._v(" "),
+        _c("div", { staticClass: "price-award second" }, [
+          _vm._v("$ 2.000.000")
+        ])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col s12 m4" }, [
+        _c("div", { staticClass: "place-award third" }, [_vm._v("3er puesto")]),
+        _vm._v(" "),
+        _c("div", { staticClass: "price-award third" }, [_vm._v("$ 1.000.000")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "inscriptions" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Inscripción")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("section", { attrs: { id: "conctact" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h2", { staticClass: "title-section" }, [_vm._v("Contacto")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("footer", { attrs: { id: "footer" } }, [
+      _c("div", { staticClass: "container" }, [
+        _c("h1", { staticClass: "title-main" }, [_vm._v("PATROCINADORES")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-384052eb", module.exports)
+  }
+}
+
+/***/ }),
+/* 186 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(187)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(189)
+/* template */
+var __vue_template__ = __webpack_require__(190)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-78b73b2d"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Dashboard.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-78b73b2d", Component.options)
+  } else {
+    hotAPI.reload("data-v-78b73b2d", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 187 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(188);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("8ba9bafc", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-78b73b2d\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Dashboard.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-78b73b2d\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Dashboard.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 188 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/***/ }),
+/* 189 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      tokens: [],
+      loading: false
+    };
+  },
+
+  methods: {
+    getTokens: function getTokens() {
+      var vm = this;
+      vm.loading = true;
+      axios.get('/api/user/tokens').then(function (response) {
+        vm.tokens = response.data.data;
+        setTimeout(function () {
+          $('.tooltipped').tooltip();
+        }, 10);
+      }).catch(function (error) {
+        console.log(error);
+      }).then(function () {
+        vm.loading = false;
+      });
+    }
+  },
+  mounted: function mounted() {
+    var vm = this;
+    var loginCard = anime({
+      targets: '#dashboard_card',
+      duration: 1250,
+      easing: 'easeInOutQuart',
+      translateY: 0,
+      opacity: 1,
+      scale: 1,
+      delay: 0
+    });
+  }
+});
+
+/***/ }),
+/* 190 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "admin_panel" },
+    [_c("menu-admin"), _vm._v(" "), _vm._m(0)],
+    1
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "container" }, [
+      _c("div", { staticClass: "row" }, [
+        _c(
+          "div",
+          {
+            staticClass: "col s12",
+            staticStyle: {
+              opacity: "0",
+              transform: "translateY(100px) scale(0.8)"
+            },
+            attrs: { id: "dashboard_card" }
+          },
+          [
+            _c("div", { staticClass: "card" }, [
+              _c("div", { staticClass: "card-content" }, [
+                _c("span", { staticClass: "card-title" }, [_vm._v("Dashboard")])
+              ])
+            ])
+          ]
+        )
+      ])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-78b73b2d", module.exports)
+  }
+}
+
+/***/ }),
+/* 191 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(192)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(194)
+/* template */
+var __vue_template__ = __webpack_require__(195)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-17ca704c"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Auth\\Login.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-17ca704c", Component.options)
+  } else {
+    hotAPI.reload("data-v-17ca704c", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 192 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(193);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("4ba3116b", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17ca704c\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../../node_modules/sass-loader/lib/loader.js!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Login.vue", function() {
+     var newContent = require("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-17ca704c\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../../node_modules/sass-loader/lib/loader.js!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Login.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 193 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.copyright[data-v-17ca704c] {\n  font-size: .8rem;\n  position: relative;\n  z-index: 1;\n  margin: 0px;\n  padding: 1.4rem 0px 1.4rem 0px;\n}\n.card-title[data-v-17ca704c] {\n  font-size: 3rem;\n  text-align: center;\n}\n.btn[data-v-17ca704c] {\n  width: 100%;\n}\n.divider[data-v-17ca704c] {\n  width: 100%;\n}\n#login_card[data-v-17ca704c] {\n  background-color: #f5f5f5 !important;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 194 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      email: '',
+      password: '',
+      loading: false
+    };
+  },
+
+  methods: {
+    login: function login() {
+      var vm = this;
+      vm.loading = true;
+      axios.post(vm.$root.apiMap.login, {
+        'grant_type': 'password',
+        'client_id': vm.$root.client_id,
+        'client_secret': vm.$root.client_secret,
+        'username': vm.email,
+        'password': vm.password,
+        'scope': '*'
+      }).then(function (response) {
+        vm.$root.token = response.data.access_token;
+        setTimeout(function () {
+          vm.$root.getUser();
+          vm.$router.push("/dashboard");
+        }, 10);
+      }).catch(function (error) {
+        M.toastError(error);
+      }).then(function () {
+        vm.loading = false;
+      });
+      return false;
+    }
+  },
+  mounted: function mounted() {
+    var loginCard = anime({
+      targets: '#login_card',
+      duration: 1250,
+      easing: 'easeInOutQuart',
+      translateY: 0,
+      opacity: 1,
+      scale: 1,
+      delay: 0
+    });
+    var loginCardBg = anime({
+      targets: '#login_card .bg',
+      opacity: 1,
+      borderRadius: '0%',
+      easing: 'easeInSine',
+      duration: 500,
+      scale: 1,
+      delay: 500,
+      complete: function complete() {
+        $('input#email').focus();
+        $('.copyright').removeClass('grey-text');
+        $('.card-title').removeClass('grey-text');
+      }
+    });
+  }
+});
+
+/***/ }),
+/* 195 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", [
+    _c(
+      "div",
+      {
+        staticClass: "valign-wrapper",
+        staticStyle: { width: "100%", height: "100%", position: "absolute" }
+      },
+      [
+        _c("div", { staticClass: "valign", staticStyle: { width: "100%" } }, [
+          _c("div", { staticClass: "container" }, [
+            _c("div", { staticClass: "row" }, [
+              _c("div", { staticClass: "col s12 m6 offset-m3" }, [
+                _c(
+                  "div",
+                  {
+                    staticClass: "card",
+                    staticStyle: { opacity: "0", transform: "scale(0.8)" },
+                    attrs: { id: "login_card" }
+                  },
+                  [
+                    _c("div", {
+                      staticClass: "bg",
+                      staticStyle: {
+                        "z-index": "-1",
+                        "border-radius": "100%",
+                        transform: "scale(0)",
+                        "background-color": "white",
+                        opacity: "0",
+                        height: "100%",
+                        width: "100%",
+                        position: "absolute"
+                      }
+                    }),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "card-content" }, [
+                      _c("span", { staticClass: "card-title grey-text" }, [
+                        _vm._v("Hackathon")
+                      ]),
+                      _vm._v(" "),
+                      _c(
+                        "form",
+                        {
+                          on: {
+                            submit: function($event) {
+                              $event.preventDefault()
+                              return _vm.login($event)
+                            }
+                          }
+                        },
+                        [
+                          _c("div", { staticClass: "row" }, [
+                            _c("div", { staticClass: "input-field col s12" }, [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "validate",
+                                    rawName: "v-validate",
+                                    value: "required|email",
+                                    expression: "'required|email'"
+                                  },
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.email,
+                                    expression: "email"
+                                  }
+                                ],
+                                class: {
+                                  invalid:
+                                    _vm.errors.first("email") != undefined
+                                },
+                                attrs: {
+                                  placeholder: "example@correo.com",
+                                  id: "email",
+                                  name: "email",
+                                  type: "email"
+                                },
+                                domProps: { value: _vm.email },
+                                on: {
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.email = $event.target.value
+                                  }
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c(
+                                "label",
+                                {
+                                  staticClass: "active",
+                                  attrs: { for: "email" }
+                                },
+                                [_vm._v("Correo")]
+                              ),
+                              _vm._v(" "),
+                              _c("span", {
+                                staticClass: "helper-text",
+                                attrs: {
+                                  "data-error": _vm.errors.first("email")
+                                }
+                              })
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _c("div", { staticClass: "row" }, [
+                            _c("div", { staticClass: "input-field col s12" }, [
+                              _c("input", {
+                                directives: [
+                                  {
+                                    name: "validate",
+                                    rawName: "v-validate",
+                                    value: "required",
+                                    expression: "'required'"
+                                  },
+                                  {
+                                    name: "model",
+                                    rawName: "v-model",
+                                    value: _vm.password,
+                                    expression: "password"
+                                  }
+                                ],
+                                class: {
+                                  invalid:
+                                    _vm.errors.first("password") != undefined
+                                },
+                                attrs: {
+                                  placeholder: "*********",
+                                  id: "password",
+                                  name: "password",
+                                  type: "password"
+                                },
+                                domProps: { value: _vm.password },
+                                on: {
+                                  input: function($event) {
+                                    if ($event.target.composing) {
+                                      return
+                                    }
+                                    _vm.password = $event.target.value
+                                  }
+                                }
+                              }),
+                              _vm._v(" "),
+                              _c(
+                                "label",
+                                {
+                                  staticClass: "active",
+                                  attrs: { for: "password" }
+                                },
+                                [_vm._v("Contraseña")]
+                              ),
+                              _vm._v(" "),
+                              _c("span", {
+                                staticClass: "helper-text",
+                                attrs: {
+                                  "data-error": _vm.errors.first("password")
+                                }
+                              })
+                            ])
+                          ]),
+                          _vm._v(" "),
+                          _vm._m(0)
+                        ]
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "divider" }),
+                    _vm._v(" "),
+                    _c(
+                      "p",
+                      { staticClass: "center-align copyright grey-text" },
+                      [_vm._v("SEGRITH.TECH © 2018")]
+                    )
+                  ]
+                )
+              ])
+            ])
+          ])
+        ])
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "col s12" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn mainColor waves-effect waves-light",
+            attrs: { type: "submit", id: "btn_login" }
+          },
+          [_vm._v("Iniciar sesión")]
+        )
+      ])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-17ca704c", module.exports)
+  }
+}
+
+/***/ }),
+/* 196 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(197)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(199)
+/* template */
+var __vue_template__ = __webpack_require__(200)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-a60c8a5e"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\Tokens.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-a60c8a5e", Component.options)
+  } else {
+    hotAPI.reload("data-v-a60c8a5e", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 197 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(198);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("8f5640d4", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-a60c8a5e\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Tokens.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-a60c8a5e\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./Tokens.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 198 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.btn-floating.tooltipped[data-v-a60c8a5e] {\n  font-size: 20px;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 199 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      tokens: [],
+      loading: false
+    };
+  },
+
+  methods: {
+    getTokens: function getTokens() {
+      var vm = this;
+      vm.loading = true;
+      axios.get('/api/user/tokens').then(function (response) {
+        vm.tokens = response.data.data;
+        setTimeout(function () {
+          $('.tooltipped').tooltip();
+        }, 10);
+      }).catch(function (error) {
+        console.log(error);
+        M.toast({ html: "Hubo un error al obtener los tokens" }, 6000);
+      }).then(function () {
+        vm.loading = false;
+      });
+    },
+    deleteToken: function deleteToken(index) {
+      var vm = this;
+      vm.loading = true;
+      axios.delete('/api/user/tokens/' + vm.tokens[index].id).then(function (response) {
+        vm.getTokens();
+      }).catch(function (error) {
+        console.log(error);
+        M.toast({ html: "Hubo un error al eliminar el token" }, 6000);
+      }).then(function () {
+        setTimeout(function () {
+          vm.$root.getUser();
+        }, 10);
+        vm.loading = false;
+      });
+    }
+  },
+  mounted: function mounted() {
+    var vm = this;
+    vm.getTokens();
+    var loginCard = anime({
+      targets: '#tokens_card',
+      duration: 1250,
+      easing: 'easeInOutQuart',
+      translateY: 0,
+      opacity: 1,
+      scale: 1,
+      delay: 0
+    });
+  }
+});
+
+/***/ }),
+/* 200 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "admin_panel" },
+    [
+      _c("menu-admin"),
+      _vm._v(" "),
+      _c("div", { staticClass: "container" }, [
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col s12" }, [
+            _c(
+              "div",
+              {
+                staticClass: "card",
+                staticStyle: {
+                  opacity: "0",
+                  transform: "translateY(100px) scale(0.8)"
+                },
+                attrs: { id: "tokens_card" }
+              },
+              [
+                _c("div", { staticClass: "card-content" }, [
+                  _c("span", { staticClass: "card-title" }, [
+                    _vm._v("Sesiones Activas")
+                  ]),
+                  _vm._v(" "),
+                  _c("table", { staticClass: "striped highlight" }, [
+                    _vm._m(0),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      _vm._l(_vm.tokens, function(token, i) {
+                        return _c("tr", { key: i }, [
+                          _c("td", [_vm._v(_vm._s(token.id))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(token.created_at))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(token.expires_at))]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _vm._v(
+                              _vm._s(token.revoked ? "Inactiva" : "Activa")
+                            )
+                          ]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c(
+                              "a",
+                              {
+                                staticClass:
+                                  "btn-floating tooltipped red waves-effect waves-light",
+                                class: { disabled: token.revoked },
+                                attrs: {
+                                  disabled: token.revoked,
+                                  "data-position": "bottom",
+                                  "data-tooltip": "Cerrar conexión"
+                                },
+                                on: {
+                                  click: function($event) {
+                                    _vm.deleteToken(i)
+                                  }
+                                }
+                              },
+                              [
+                                _c("font-awesome-icon", {
+                                  attrs: { icon: "trash" }
+                                })
+                              ],
+                              1
+                            )
+                          ])
+                        ])
+                      })
+                    )
+                  ])
+                ])
+              ]
+            )
+          ])
+        ])
+      ])
+    ],
+    1
+  )
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("Token")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Creado")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Expira")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Estado")])
+      ])
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-a60c8a5e", module.exports)
+  }
+}
+
+/***/ }),
+/* 201 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(202)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(204)
+/* template */
+var __vue_template__ = __webpack_require__(205)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-2ce9e1ac"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\E404.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-2ce9e1ac", Component.options)
+  } else {
+    hotAPI.reload("data-v-2ce9e1ac", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 202 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(203);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("dfbdba4c", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2ce9e1ac\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./E404.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-2ce9e1ac\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./E404.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 203 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(false);
+// imports
+
+
+// module
+exports.push([module.i, "", ""]);
+
+// exports
+
+
+/***/ }),
+/* 204 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {};
+  },
+
+  methods: {},
+  mounted: function mounted() {}
+});
+
+/***/ }),
+/* 205 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _vm._m(0)
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [_c("h1", [_vm._v("Nada prro")])])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-2ce9e1ac", module.exports)
+  }
+}
+
+/***/ }),
+/* 206 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {(function (global, factory) {
-	 true ? factory(exports, __webpack_require__(226)) :
+	 true ? factory(exports, __webpack_require__(140)) :
 	typeof define === 'function' && define.amd ? define(['exports', '@fortawesome/fontawesome'], factory) :
 	(factory((global['vue-fontawesome'] = {}),global.FontAwesome));
 }(this, (function (exports,fontawesome) { 'use strict';
@@ -101895,10 +102210,10 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(2)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 230 */
+/* 207 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -103907,6 +104222,953 @@ bunker(function () {
 
 /* harmony default export */ __webpack_exports__["a"] = (icons$1);
 
+
+/***/ }),
+/* 208 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(209)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(211)
+/* template */
+var __vue_template__ = __webpack_require__(212)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-117390fa"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\App.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-117390fa", Component.options)
+  } else {
+    hotAPI.reload("data-v-117390fa", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 209 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(210);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("57d36db9", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-117390fa\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./App.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 210 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.MainLoader[data-v-117390fa] {\n  position: absolute;\n  right: 50%;\n  top: 50%;\n  -webkit-transform: translate(-50%, -50%);\n          transform: translate(-50%, -50%);\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 211 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {};
+  },
+
+  methods: {},
+  mounted: function mounted() {}
+});
+
+/***/ }),
+/* 212 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "row" },
+    [
+      _vm.$root.loaded
+        ? _c("router-view")
+        : _c("div", { staticClass: "MainLoader" }, [
+            _c("div", { staticClass: "preloader-wrapper big active" }, [
+              _c("div", { staticClass: "spinner-layer spinner-blue-only" }, [
+                _c("div", { staticClass: "circle-clipper left" }, [
+                  _c("div", { staticClass: "circle" })
+                ]),
+                _c("div", { staticClass: "gap-patch" }, [
+                  _c("div", { staticClass: "circle" })
+                ]),
+                _c("div", { staticClass: "circle-clipper right" }, [
+                  _c("div", { staticClass: "circle" })
+                ])
+              ])
+            ])
+          ])
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-117390fa", module.exports)
+  }
+}
+
+/***/ }),
+/* 213 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+function injectStyle (ssrContext) {
+  if (disposed) return
+  __webpack_require__(214)
+}
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(216)
+/* template */
+var __vue_template__ = __webpack_require__(218)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = injectStyle
+/* scopeId */
+var __vue_scopeId__ = "data-v-8dd9b02a"
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\wordWriting.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-8dd9b02a", Component.options)
+  } else {
+    hotAPI.reload("data-v-8dd9b02a", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 214 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(215);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(5)("24dd7849", content, false, {});
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-8dd9b02a\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./wordWriting.vue", function() {
+     var newContent = require("!!../../../../node_modules/css-loader/index.js!../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"vue\":true,\"id\":\"data-v-8dd9b02a\",\"scoped\":true,\"hasInlineConfig\":true}!../../../../node_modules/sass-loader/lib/loader.js!../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./wordWriting.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 215 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(4)(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.word-text[data-v-8dd9b02a] {\n  position: relative;\n  padding-right: 8px;\n}\n.slash[data-v-8dd9b02a] {\n  position: absolute;\n  top: 0px;\n  right: 0;\n  width: 0;\n  height: 100%;\n  border-left: .3em solid #FFFFFF;\n  box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  -moz-box-sizing: border-box;\n  -webkit-animation: parpadeo 1s step-end infinite;\n          animation: parpadeo 1s step-end infinite;\n}\n.command-input[data-v-8dd9b02a], .help-box[data-v-8dd9b02a] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  border: 0px;\n  position: absolute;\n  width: 100%;\n  height: 30px;\n  line-height: 20px;\n  top: 25px;\n  left: 0px;\n  margin: 0px;\n  padding: 5px 10px;\n  color: #c5d6da;\n  background: inherit;\n  outline: none;\n  font-family: \"Helvetica Neue\", 'Roboto', arial, sans-serif;\n}\n.command-input.move-input-cmd[data-v-8dd9b02a], .help-box.move-input-cmd[data-v-8dd9b02a] {\n    top: 75px;\n}\n.help-box span[data-v-8dd9b02a] {\n  display: block;\n}\n.write-mode[data-v-8dd9b02a] {\n  font-weight: 400;\n  font-size: 1.4rem;\n  margin: auto;\n  display: block;\n  padding: 0 10px;\n}\n.write-mode #word[data-v-8dd9b02a] {\n    margin-right: 6px;\n    display: inline-block;\n}\n.write-mode .container-word[data-v-8dd9b02a] {\n    position: relative;\n    line-height: 39px;\n    text-align: left;\n}\n.write-mode #slash[data-v-8dd9b02a] {\n    position: absolute;\n    top: 0px;\n    right: 0;\n    width: 0;\n    height: 100%;\n    outline: none;\n    background-color: #222122;\n    box-sizing: border-box;\n    -webkit-box-sizing: border-box;\n    animation: escribiendo 1s steps(12, end) infinite alternate;\n    -webkit-animation: escribiendo 1s steps(12, end) infinite alternate;\n    -moz-animation: escribiendo 1s steps(12, end) infinite alternate;\n}\n.container-console[data-v-8dd9b02a] {\n  position: relative;\n}\n.console[data-v-8dd9b02a] {\n  background: #222122;\n  border-radius: 3px;\n  position: relative;\n}\n.console.last[data-v-8dd9b02a] {\n    margin-top: 20px;\n    height: 110.29px;\n}\nheader[data-v-8dd9b02a] {\n  padding: 2px 5px;\n  content: '';\n  position: relative;\n  width: 100%;\n  height: 25px;\n  top: 0;\n  background: #dbdbdb;\n  left: 0;\n  border: 1px solid rgba(100, 100, 100, 0.4);\n  border-radius: 2px 2px 0 0;\n  -webkit-box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);\n}\nheader[data-v-8dd9b02a]:after {\n    content: attr(data-title-cmd);\n    text-align: center;\n    color: #000;\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    top: 0;\n    left: 0;\n    font-weight: 400;\n}\nheader .help[data-v-8dd9b02a] {\n    color: #ffff;\n    border-width: 1px;\n    width: 19px;\n    height: 19px;\n    line-height: 19px;\n    text-align: center;\n    font-size: 1rem;\n    border-style: solid;\n    border-radius: 2px;\n    display: inline-block;\n    background: #2295f1;\n    border-color: #2196F3;\n    cursor: pointer;\n    z-index: 50;\n    position: absolute;\n    right: 4px;\n    top: 2.35px;\n}\nheader .help[data-v-8dd9b02a]:hover {\n      background: #0d7bd3;\n      border-color: #0c7cd5;\n}\n.button-navbar-mac[data-v-8dd9b02a] {\n  border-width: 1px;\n  width: 15px;\n  height: 15px;\n  border-style: solid;\n  border-radius: 50%;\n  display: inline-block;\n}\n.button-navbar-mac.close[data-v-8dd9b02a] {\n    background: #fc605c;\n    border-color: #dd4643;\n}\n.button-navbar-mac.maximize[data-v-8dd9b02a] {\n    background: #34c84a;\n    border-color: #26a933;\n}\n.button-navbar-mac.minify[data-v-8dd9b02a] {\n    background: #f8bf34;\n    border-color: #e3aa1f;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+/* 216 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue_resize__ = __webpack_require__(217);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {
+      word: 'crear',
+      step: 1,
+      command: '$ ',
+      help_show: false
+    };
+  },
+
+  methods: {
+    changeWords: function changeWords() {
+      switch (this.step) {
+        case 1:
+          this.word = 'crear';
+          break;
+        case 2:
+          this.word = 'explorar';
+          break;
+        case 3:
+          this.word = 'imaginar';
+          break;
+        case 4:
+          this.word = 'aprender';
+          break;
+        case 5:
+          this.word = 'descubrir';
+          break;
+        case 6:
+          this.word = 'invertir';
+          break;
+      }
+      if (this.step == 6) {
+        this.step = 0;
+      }
+    },
+    formatCommand: function formatCommand() {
+      var n = this.command;
+      if (n == '' || n == null) this.command = '$ ';
+    },
+    handleResize: function handleResize() {
+      var s = document.getElementById('slash');
+      var w = document.getElementById('width-word');
+      if (s.offsetWidth >= w.offsetWidth) {
+        this.step++;
+        this.changeWords();
+      }
+    },
+    showHelp: function showHelp() {
+      this.help_show = !this.help_show;
+    },
+    executeCommand: function executeCommand() {
+      var vm = this;
+      var c = vm.command;
+      if (c == "$ goto 1" || c == "$goto 1") {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('Estas en la primera sección', 1500);
+      } else if (c == "$ goto 2" || c == "$goto 2") {
+        vm.$root.goToView('info');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 3" || c == "$goto 3") {
+        vm.$root.goToView('judges');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 4" || c == "$goto 4") {
+        vm.$root.goToView('project-route');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 5" || c == "$goto 5") {
+        vm.$root.goToView('places');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 6" || c == "$goto 6") {
+        vm.$root.goToView('how-to-get');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 7" || c == "$goto 7") {
+        vm.$root.goToView('quotas');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 8" || c == "$goto 8") {
+        vm.$root.goToView('inscriptions');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ goto 9" || c == "$goto 9") {
+        vm.$root.goToView('challenges');
+        vm.command = "$ ";
+        if (vm.help_show) vm.help_show = false;
+      } else if (c == "$ dev" || c == "$dev") {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('Desarrollado por Segrith Tech', 1500);
+      } else if (c == "$ clear" || c == "$clear") {
+        vm.help_show = false;
+        vm.command = "$ ";
+      } else if (c == "$ help" || c == "$help") {
+        vm.help_show = true;
+        vm.command = "$ ";
+      } else if (c == "$ ls" || c == "$ls") {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('css favicon.ico fonts images  index.php', 3000);
+      } else {
+        if (vm.help_show) vm.help_show = false;
+        vm.messageCommand('Error de comando', 1500);
+      }
+    },
+    messageCommand: function messageCommand(m, t) {
+      var vm = this;
+      vm.command = m;
+      setTimeout(function () {
+        vm.command = "$ ";
+      }, t);
+    },
+    focusTerminal: function focusTerminal() {
+      document.getElementById('terminal-input').focus();
+    }
+  },
+  computed: {
+    date: function date() {
+      return moment().format('LLLL');
+    }
+  },
+  mounted: function mounted() {
+    var vm = this;
+  }
+});
+
+/***/ }),
+/* 217 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {/* unused harmony export install */
+/* unused harmony export ResizeObserver */
+function getInternetExplorerVersion() {
+	var ua = window.navigator.userAgent;
+
+	var msie = ua.indexOf('MSIE ');
+	if (msie > 0) {
+		// IE 10 or older => return version number
+		return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
+	}
+
+	var trident = ua.indexOf('Trident/');
+	if (trident > 0) {
+		// IE 11 => return version number
+		var rv = ua.indexOf('rv:');
+		return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
+	}
+
+	var edge = ua.indexOf('Edge/');
+	if (edge > 0) {
+		// Edge (IE 12+) => return version number
+		return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+	}
+
+	// other browser
+	return -1;
+}
+
+var isIE = void 0;
+
+function initCompat() {
+	if (!initCompat.init) {
+		initCompat.init = true;
+		isIE = getInternetExplorerVersion() !== -1;
+	}
+}
+
+var ResizeObserver = { render: function render() {
+		var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c('div', { staticClass: "resize-observer", attrs: { "tabindex": "-1" } });
+	}, staticRenderFns: [], _scopeId: 'data-v-b329ee4c',
+	name: 'resize-observer',
+
+	methods: {
+		notify: function notify() {
+			this.$emit('notify');
+		},
+		addResizeHandlers: function addResizeHandlers() {
+			this._resizeObject.contentDocument.defaultView.addEventListener('resize', this.notify);
+			if (this._w !== this.$el.offsetWidth || this._h !== this.$el.offsetHeight) {
+				this.notify();
+			}
+		},
+		removeResizeHandlers: function removeResizeHandlers() {
+			if (this._resizeObject && this._resizeObject.onload) {
+				if (!isIE && this._resizeObject.contentDocument) {
+					this._resizeObject.contentDocument.defaultView.removeEventListener('resize', this.notify);
+				}
+				delete this._resizeObject.onload;
+			}
+		}
+	},
+
+	mounted: function mounted() {
+		var _this = this;
+
+		initCompat();
+		this.$nextTick(function () {
+			_this._w = _this.$el.offsetWidth;
+			_this._h = _this.$el.offsetHeight;
+		});
+		var object = document.createElement('object');
+		this._resizeObject = object;
+		object.setAttribute('style', 'display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; pointer-events: none; z-index: -1;');
+		object.setAttribute('aria-hidden', 'true');
+		object.setAttribute('tabindex', -1);
+		object.onload = this.addResizeHandlers;
+		object.type = 'text/html';
+		if (isIE) {
+			this.$el.appendChild(object);
+		}
+		object.data = 'about:blank';
+		if (!isIE) {
+			this.$el.appendChild(object);
+		}
+	},
+	beforeDestroy: function beforeDestroy() {
+		this.removeResizeHandlers();
+	}
+};
+
+// Install the components
+function install(Vue) {
+	Vue.component('resize-observer', ResizeObserver);
+	/* -- Add more components here -- */
+}
+
+/* -- Plugin definition & Auto-install -- */
+/* You shouldn't have to modify the code below */
+
+// Plugin
+var plugin = {
+	// eslint-disable-next-line no-undef
+	version: "0.4.4",
+	install: install
+};
+
+// Auto-install
+var GlobalVue = null;
+if (typeof window !== 'undefined') {
+	GlobalVue = window.Vue;
+} else if (typeof global !== 'undefined') {
+	GlobalVue = global.Vue;
+}
+if (GlobalVue) {
+	GlobalVue.use(plugin);
+}
+
+
+/* unused harmony default export */ var _unused_webpack_default_export = (plugin);
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(1)))
+
+/***/ }),
+/* 218 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c("div", { staticClass: "container-console" }, [
+    _c("div", { staticClass: "console" }, [
+      _vm._m(0),
+      _vm._v(" "),
+      _c("span", { staticClass: "write-mode" }, [
+        _vm._v("Ultimo acceso: " + _vm._s(_vm.date))
+      ]),
+      _vm._v(" "),
+      _c("span", { staticClass: "write-mode" }, [
+        _vm._v("El evento donde podrás\n      "),
+        _c(
+          "span",
+          { staticClass: "container-word", attrs: { id: "width-word" } },
+          [
+            _c("div", { attrs: { id: "word" } }, [
+              _c("span", { staticClass: "word-text" }, [
+                _vm._v(_vm._s(_vm.word)),
+                _c("span", { staticClass: "slash" })
+              ])
+            ]),
+            _vm._v(" "),
+            _c(
+              "resize-observer",
+              { attrs: { id: "slash" }, on: { notify: _vm.handleResize } },
+              [_vm._v(" ")]
+            )
+          ],
+          1
+        )
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "container-algorithm-icon" }, [
+        _c(
+          "svg",
+          {
+            attrs: { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 64 64" }
+          },
+          [
+            _c("path", {
+              staticClass: "sun",
+              attrs: {
+                d:
+                  "m17 32c0-1.51 2.19-2.656 2.633-4.019.458-1.412-.624-3.623.231-4.8s3.308-.837 4.5-1.7 1.592-3.292 3-3.75c1.362-.443 3.126 1.269 4.636 1.269s3.274-1.712 4.637-1.269c1.412.458 1.829 2.895 3 3.751s3.631.513 4.5 1.7-.227 3.387.231 4.8c.442 1.362 2.632 2.508 2.632 4.018s-2.19 2.656-2.633 4.019c-.458 1.412.624 3.623-.231 4.8s-3.308.837-4.5 1.7-1.592 3.292-3 3.75c-1.362.443-3.126-1.269-4.636-1.269s-3.274 1.712-4.637 1.269c-1.412-.458-1.829-2.895-3-3.751s-3.631-.513-4.5-1.7.227-3.387-.231-4.8c-.442-1.362-2.632-2.508-2.632-4.018z",
+                fill: "#fcf05a"
+              }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              attrs: { cx: "32", cy: "32", fill: "#fdbd40", r: "10" }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "st0-solar half-saucer",
+              attrs: {
+                d:
+                  "m32 54a22 22 0 1 1 14.667-5.6l-1.334-1.49a19.948 19.948 0 1 0 -10.475 4.89l.284 1.98a22.186 22.186 0 0 1 -3.142.22z"
+              }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "st0-solar dish-outside",
+              attrs: {
+                d:
+                  "m32 60a28.008 28.008 0 0 1 -24.546-41.482l1.752.964a26 26 0 1 0 48.349 7.7l1.966-.368a28.025 28.025 0 0 1 -27.521 33.186z"
+              }
+            }),
+            _vm._v(" "),
+            _c("path", {
+              staticClass: "st0-solar dish-outside",
+              attrs: {
+                d:
+                  "m51.379 14.667a26.008 26.008 0 0 0 -33-4.815l-1.049-1.7a28.012 28.012 0 0 1 35.54 5.181z"
+              }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              staticClass: "dish-outside",
+              attrs: { cx: "12", cy: "13", fill: "#84f03c", r: "3" }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              staticClass: "half-saucer",
+              attrs: { cx: "41", cy: "51", fill: "#7fcac9", r: "2" }
+            }),
+            _vm._v(" "),
+            _c("circle", {
+              staticClass: "dish-outside",
+              attrs: { cx: "57", cy: "20", fill: "#fdbd40", r: "4" }
+            }),
+            _vm._v(" "),
+            _c("g", { attrs: { fill: "#7d8d9c" } }, [
+              _c("path", {
+                staticClass: "rect-anim-one",
+                attrs: { d: "m52 4h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-two",
+                attrs: { d: "m56 6h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-three",
+                attrs: { d: "m2 54h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-two",
+                attrs: { d: "m6 56h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-four",
+                attrs: { d: "m54 54h2v2h-2z" }
+              }),
+              _vm._v(" "),
+              _c("path", {
+                staticClass: "rect-anim-five",
+                attrs: { d: "m58 56h2v2h-2z" }
+              })
+            ])
+          ]
+        )
+      ])
+    ]),
+    _vm._v(" "),
+    _c(
+      "div",
+      { staticClass: "console last", on: { click: _vm.focusTerminal } },
+      [
+        _c("header", { attrs: { "data-title-cmd": "Ejecuta comandos" } }, [
+          _c("div", { staticClass: "close button-navbar-mac" }),
+          _vm._v(" "),
+          _c("div", { staticClass: "minify button-navbar-mac" }),
+          _vm._v(" "),
+          _c("div", { staticClass: "maximize button-navbar-mac" }),
+          _vm._v(" "),
+          _c(
+            "div",
+            { staticClass: "right help", on: { click: _vm.showHelp } },
+            [
+              !_vm.help_show
+                ? _c("span", [_vm._v("?")])
+                : _c("span", [_vm._v("X")])
+            ]
+          )
+        ]),
+        _vm._v(" "),
+        _vm.help_show
+          ? _c("div", { staticClass: "help-box" }, [
+              _c("span", [_vm._v("Puede ejecutar los siguientes comandos:")]),
+              _vm._v(" "),
+              _c("span", [
+                _vm._v("clear, dev, help, goto [número de la sección]")
+              ])
+            ])
+          : _vm._e(),
+        _vm._v(" "),
+        _c("input", {
+          directives: [
+            {
+              name: "model",
+              rawName: "v-model",
+              value: _vm.command,
+              expression: "command"
+            }
+          ],
+          staticClass: "command-input browser-default",
+          class: { "move-input-cmd": _vm.help_show },
+          attrs: { type: "text", spellcheck: "false", id: "terminal-input" },
+          domProps: { value: _vm.command },
+          on: {
+            input: [
+              function($event) {
+                if ($event.target.composing) {
+                  return
+                }
+                _vm.command = $event.target.value
+              },
+              _vm.formatCommand
+            ],
+            keyup: function($event) {
+              if (
+                !("button" in $event) &&
+                _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+              ) {
+                return null
+              }
+              return _vm.executeCommand($event)
+            }
+          }
+        })
+      ]
+    )
+  ])
+}
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("header", { attrs: { "data-title-cmd": "Terminal" } }, [
+      _c("div", { staticClass: "close button-navbar-mac" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "minify button-navbar-mac" }),
+      _vm._v(" "),
+      _c("div", { staticClass: "maximize button-navbar-mac" })
+    ])
+  }
+]
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-8dd9b02a", module.exports)
+  }
+}
+
+/***/ }),
+/* 219 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var disposed = false
+var normalizeComponent = __webpack_require__(3)
+/* script */
+var __vue_script__ = __webpack_require__(220)
+/* template */
+var __vue_template__ = __webpack_require__(221)
+/* template functional */
+var __vue_template_functional__ = false
+/* styles */
+var __vue_styles__ = null
+/* scopeId */
+var __vue_scopeId__ = null
+/* moduleIdentifier (server only) */
+var __vue_module_identifier__ = null
+var Component = normalizeComponent(
+  __vue_script__,
+  __vue_template__,
+  __vue_template_functional__,
+  __vue_styles__,
+  __vue_scopeId__,
+  __vue_module_identifier__
+)
+Component.options.__file = "resources\\assets\\js\\components\\MenuAdmin.vue"
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-51d923c9", Component.options)
+  } else {
+    hotAPI.reload("data-v-51d923c9", Component.options)
+  }
+  module.hot.dispose(function (data) {
+    disposed = true
+  })
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 220 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  data: function data() {
+    return {};
+  },
+
+  methods: {},
+  mounted: function mounted() {}
+});
+
+/***/ }),
+/* 221 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "div",
+    { staticClass: "navbar-items" },
+    [
+      _c("router-link", { staticClass: "item", attrs: { to: "/" } }, [
+        _vm._v("Inicio")
+      ]),
+      _vm._v(" "),
+      _c(
+        "router-link",
+        {
+          staticClass: "item",
+          class: { active: _vm.$route.name == "Dashboard" },
+          attrs: { to: "/dashboard" }
+        },
+        [_vm._v("Dashboard")]
+      ),
+      _vm._v(" "),
+      _c(
+        "router-link",
+        {
+          staticClass: "item",
+          class: { active: _vm.$route.name == "Tokens" },
+          attrs: { to: "/tokens" }
+        },
+        [_vm._v("Mis Sesiones")]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "item right",
+          on: {
+            click: function($event) {
+              $event.preventDefault()
+              return _vm.$root.logout($event)
+            }
+          }
+        },
+        [_vm._v("Logout")]
+      )
+    ],
+    1
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+module.exports = { render: render, staticRenderFns: staticRenderFns }
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+    require("vue-hot-reload-api")      .rerender("data-v-51d923c9", module.exports)
+  }
+}
+
+/***/ }),
+/* 222 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
 
 /***/ })
 /******/ ]);
