@@ -108,10 +108,10 @@ let scrollIndex = class scroll {
                                          .addIndicators()
                                          .setClassToggle("#participate-item", 'active')
 
-            let nav_4 = new ScrollMagic.Scene({ triggerElement: "#challenges", duration: document.getElementById('challenges').offsetHeight})
+            let nav_4 = new ScrollMagic.Scene({ triggerElement: "#schedule", duration: document.getElementById('schedule').offsetHeight})
                                          .addTo(controller)
                                          .addIndicators()
-                                         .setClassToggle("#challenge-item", 'active')                                                                                                   
+                                         .setClassToggle("#schedule-item", 'active')                                                                                                   
 
             let nav_5 = new ScrollMagic.Scene({ triggerElement: "#judges", duration: document.getElementById('judges').offsetHeight})
                                          .addTo(controller)
@@ -120,10 +120,10 @@ let scrollIndex = class scroll {
 
             
 
-            let nav_6 = new ScrollMagic.Scene({ triggerElement: "#prices", duration: document.getElementById('prices').offsetHeight})
+            let nav_6 = new ScrollMagic.Scene({ triggerElement: "#awards", duration: document.getElementById('awards').offsetHeight})
                                          .addTo(controller)
                                          .addIndicators()
-                                         .setClassToggle("#price-item", 'active')
+                                         .setClassToggle("#award-item", 'active')
 
             let nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight})
                                          .addTo(controller)
@@ -136,5 +136,4 @@ let scrollIndex = class scroll {
                                          .setClassToggle("#conctact-item", 'active')
     }
 }
-                               
 export default scrollIndex;

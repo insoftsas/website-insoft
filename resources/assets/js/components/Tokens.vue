@@ -23,6 +23,13 @@
                       <a v-else-if="token.last_access.user_agent.os.family == 'Android'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
                         <font-awesome-icon class="logo_os android" :icon="['fab', 'android']"/></a>
                       </a>
+                      <a v-else class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                        <font-awesome-icon class="logo_os os_x" :icon="['fab', 'question']"/></a>
+                      </a>
+
+                      <a v-if="token.last_access.user_agent.family == 'Chrome' || token.last_access.user_agent.family == 'Chrome Mobile' " class="logo_nav_cont">
+                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'chrome']"/></a>
+                      </a>
                       <div>
                         <p class="title_os">{{typeOfDevice(token)}}{{token.last_access.user_agent.os.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="'IP: '+token.last_access.ip">{{token.last_access.location}}</span></p>
                         <p>{{token.last_access.user_agent.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="moment(token.last_access.time).format('LLLL')">{{moment(token.last_access.time).fromNow()}}</span></p>
@@ -106,8 +113,8 @@
                 }
             }
         };
-        //request.open("GET", 'http://ip-api.com/json/'+vm.tokens[index].last_access.ip, true);
-        request.open("GET", 'http://ip-api.com/json/', true);
+        request.open("GET", 'http://ip-api.com/json/'+vm.tokens[index].last_access.ip, true);
+        //request.open("GET", 'http://ip-api.com/json/', true);
         request.send(null);
       },
       deleteToken: function(index) {
@@ -154,9 +161,21 @@
   font-weight: bold;
  }
  #sessions td {
+  position: relative;
   & >a, > p, > div{
     display: inline-block;
   }
+ }
+ .logo_nav_cont{
+    position:absolute;
+    left: 45px;
+    bottom: 14px;
+    & .logo_nav{
+
+      &.chrome{
+        color: rgb(73, 80, 87);
+      }
+    }
  }
  .logo_os{
     font-size: 40px;

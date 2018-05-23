@@ -305,3 +305,21 @@
     transform: rotate(-31deg) translateY(204px) translateX(-154px);
   }
 }
+
+@keyframes moveLineOne {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes moveLineTwo {
+  0% {
+    transform: rotate(-11deg) translateY(67px);
+  }
+  100% {
+    transform: rotate(-9deg) translateY(67px);
+  }
+}
