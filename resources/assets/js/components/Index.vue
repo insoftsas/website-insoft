@@ -4,7 +4,7 @@
 	    <div class="item" id="home-item" @click.prevent="$root.goToView('home')">Inicio</div>
 	    <div class="item" id="info-item" @click.prevent="$root.goToView('info')">¿Qué es?</div>
 	    <div class="item" id="search-item" @click.prevent="$root.goToView('we-search')">¿Qué buscamos?</div>
-	    <div class="item" id="participate-item" @click.prevent="$root.goToView('participate')">¿Quienes participan?</div>
+	    <div class="item" id="participate-item" @click.prevent="$root.goToView('participate')">¿Quiénes participan?</div>
 	    <div class="item" id="challenge-item" @click.prevent="$root.goToView('challenges')">Retos</div>
 	    <div class="item" id="judge-item" @click.prevent="$root.goToView('judges')">Jurados</div>
 	    <div class="item" id="price-item" @click.prevent="$root.goToView('prices')">Premios</div>
@@ -72,12 +72,12 @@
 		                    </g>
 		                  </svg>
 		                </div>
-		                <span>Desarrollador</span>
+		                <span>Dev - Maker</span>
 		              </button>
 		            </div>
 		            <div class="col s12 center">
-		            	<div class="more-info">
-		              	<a @click="$root.goToView('info')">Mas información</a>
+		            	<div class="more-info" @click="$root.goToView('info')">
+		              	<a>Mas información</a>
 		              </div>
 		            </div>
 		          </div>
@@ -94,11 +94,10 @@
 	  		<div class="row">
 	  			<div class="col s12">
 				    <h2 class="title-section">¿Qúe es la transformación digital?</h2>
-				    <div class="col s12 container-content-info">
+				    <div class="col s12 container-content-info no-padding">
 				    	<div class="col s12 m6">
 					    	<div class="content-info">
-							    <span>La transformación digital reconstruye las dinámicas de las organizaciones para adaptarlas a las necesidades del presente y del futuro.</span>
-							    <span>En la actualidad, la transformación digital no es una opción. Las empresas de hoy ya no pueden plantearse la adaptación a este nuevo panorama pues no hay otra manera de renovarse y competir que mediante la transformación digital.</span>
+							    <span>La transformación digital es el proceso por el cual las empresas reorganizan sus métodos de trabajo y estrategias, para obtener más beneficios gracias a la implementación de las nuevas tecnologías, reconstruye las dinámicas de las organizaciones para adaptarlas a las necesidades del presente y del futuro.</span>
 						    </div>
 					    </div>
 					    <div class="col s12 m6">
@@ -200,27 +199,44 @@
 				    		</div>
 				    	</div>
 				    	<div class="col s12">
+								<h2 class="subtitle-section">¿Qué ventajas aporta la Transformación Digital?</h2>
+								<span class="text-justify">La clave para la organización es ver la transformación digital como una oportunidad que permite combinar prácticas y formas de hacer que dan como resultado nuevas técnicas y habilidades como las siguientes:</span>
 								<div class="container-objects">
-									<h2 class="title-section">¿Qué ventajas aporta la Transformación Digital?</h2>
 						      <div class="object">
-						        <img src="/images/judges/omar.jpg" class="responsive-img" />
-						      	<span class="title-object">Omar Flórez</span>
-						        <div class="info">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						        <div class="container-img">
+						        	<img src="/images/advantage/online-shopping.svg" class="responsive-img" />
+					        	</div>
+						      	<span class="title-object">Generar experiencias nuevas al cliente</span>
 						      </div>
 						      <div class="object">
-						        <img src="/images/judges/sergio.jpg" class="responsive-img" />
-						      	<span class="title-object">Sergio Molina</span>
-						        <div class="info">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						        <div class="container-img">
+						        	<img src="/images/advantage/businessmen_efi.svg" class="responsive-img" />
+					        	</div>
+						      	<span class="title-object two-lines">Mejorar la eficiencia operativa</span>
 						      </div>
 						      <div class="object">
-						        <img src="/images/judges/cheo.jpg" class="responsive-img" />
-						      	<span class="title-object">Cheo</span>
-						        <div class="info">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						        <div class="container-img">
+						        	<img src="/images/advantage/businessman_money.svg" class="responsive-img" />
+					        	</div>
+						      	<span class="title-object">Generar nuevas fuentes de ingresos</span>
 						      </div>
 						      <div class="object">
-						        <img src="/images/judges/uribe.png" class="responsive-img" />
-						      	<span class="title-object">Uribe</span>
-						        <div class="info">Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+						        <div class="container-img">
+						        	<img src="/images/advantage/student.svg" class="responsive-img" />
+					        	</div>
+						      	<span class="title-object">Responder rápido a los cambios en el mercado</span>
+						      </div>
+						      <div class="object">
+						        <div class="container-img">
+						        	<img src="/images/advantage/profits.svg" class="responsive-img" />
+					        	</div>
+						      	<span class="title-object">Crear una ventaja competitiva para la organización</span>
+						      </div>
+						      <div class="object">
+						      	<div class="container-img">
+						        	<img src="/images/advantage/meeting.svg" class="responsive-img" />
+					        	</div>
+						      	<span class="title-object two-lines">Mejorar la colaboración interna</span>
 						      </div>
 						    </div>
 			    		</div>
@@ -232,11 +248,101 @@
     <section id="we-search">
 	  	<div class="container">
 	  		<h2 class="title-section">¿Qué buscamos?</h2>
+	  		<div class="col s12 container-content-info">
+	  			<div class="content-info step-row">
+					  <span>Queremos realizar una maratón tecnológica, denominada hackathon. Este evento consiste en la asignación de las necesidades tecnológicas de las empresas del departamento de Córdoba a varios grupos de desarrolladores, para que compitan por un premio a la mejor solución tecnológica (prototipo) de las necesidades presentadas, con el fin de mejorar el proceso de transformación productiva y digital de nuestros empresarios.</span>
+			    </div>
+			    <div class="col s12 m6">
+		    		<div class="content-solution-image">
+							<svg version="1.1" id="solution-business" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 464 464" style="enable-background:new 0 0 464 464;" xml:space="preserve">
+								<path style="fill:#A6001E;" d="M64,328c0,4.418-3.582,8-8,8s-8,3.582-8,8v16c0,13.255,10.745,24,24,24h16c13.255,0,24-10.745,24-24
+									v-16c0-4.418-3.582-8-8-8c-4.418,0-8-3.582-8-8c0-8.837,7.163-16,16-16h40v-40c0-8.837-7.163-16-16-16c-4.418,0-8,3.582-8,8
+									s-3.582,8-8,8h-16c-13.255,0-24-10.745-24-24v-16c0-13.255,10.745-24,24-24h16c4.418,0,8,3.582,8,8s3.582,8,8,8
+									c8.837,0,16-7.163,16-16v-48C68.053,160,0,228.053,0,312h48C56.837,312,64,319.163,64,328z"/>
+								<path style="fill:#F40E34;" d="M72,372c-6.617,0-12-5.383-12-12v-12.398c9.117-1.859,16-9.945,16-19.602c0-15.438-12.563-28-28-28
+									H12.508C18.281,232.359,72.359,178.281,140,172.508V208c0,0.898-0.297,1.727-0.797,2.398C136.773,202.086,129.086,196,120,196h-16
+									c-19.852,0-36,16.148-36,36v16c0,19.852,16.148,36,36,36h16c9.086,0,16.773-6.086,19.203-14.398c0.5,0.672,0.797,1.5,0.797,2.398v28
+									h-28c-15.438,0-28,12.563-28,28c0,9.656,6.883,17.742,16,19.602V360c0,6.617-5.383,12-12,12H72z"/>
+								<path style="fill:#E7B900;" d="M176,392c4.418,0,8,3.582,8,8s3.582,8,8,8h8c17.673,0,32-14.327,32-32s-14.327-32-32-32h-8
+									c-4.418,0-8,3.582-8,8s-3.582,8-8,8c-13.255,0-24-10.745-24-24v-24h-40c-8.837,0-16,7.163-16,16c0,4.418,3.582,8,8,8
+									c4.418,0,8,3.582,8,8v16c0,13.255-10.745,24-24,24H72c-13.255,0-24-10.745-24-24v-16c0-4.418,3.582-8,8-8s8-3.582,8-8
+									c0-8.837-7.163-16-16-16H0c0,83.947,68.053,152,152,152v-48C152,402.745,162.745,392,176,392z"/>
+								<path style="fill:#FFD422;" d="M140,451.492C72.359,445.719,18.281,391.641,12.508,324H48c0.898,0,1.727,0.297,2.398,0.797
+									C42.086,327.227,36,334.914,36,344v16c0,19.852,16.148,36,36,36h16c19.852,0,36-16.148,36-36v-16
+									c0-9.086-6.086-16.773-14.398-19.203c0.672-0.5,1.5-0.797,2.398-0.797h28v12c0,19.852,16.148,36,36,36
+									c9.656,0,17.742-6.883,19.602-16H200c11.031,0,20,8.969,20,20s-8.969,20-20,20h-4.398c-1.859-9.117-9.945-16-19.602-16
+									c-19.852,0-36,16.148-36,36V451.492z"/>
+								<g class="puzzle-blue">
+									<path style="fill:#1E81CE;" d="M240,288c0-4.418,3.582-8,8-8s8-3.582,8-8v-8c0-17.673-14.327-32-32-32s-32,14.327-32,32v8
+										c0,4.418,3.582,8,8,8s8,3.582,8,8c0,13.255-10.745,24-24,24h-32v24c0,13.255,10.745,24,24,24c4.418,0,8-3.582,8-8s3.582-8,8-8h8
+										c17.673,0,32,14.327,32,32s-14.327,32-32,32h-8c-4.418,0-8-3.582-8-8s-3.582-8-8-8c-13.255,0-24,10.745-24,24v48
+										c83.947,0,152-68.053,152-152h-40C250.745,312,240,301.255,240,288z"/>
+									<path style="fill:#5AAAE7;" d="M164,416c0-5.406,3.594-9.984,8.516-11.484C174.57,413.375,182.523,420,192,420h8
+										c24.258,0,44-19.742,44-44s-19.742-44-44-44h-8c-9.477,0-17.43,6.625-19.484,15.484c-4.922-1.5-8.516-6.078-8.516-11.484v-12h20
+										c19.852,0,36-16.148,36-36c0-9.656-6.883-17.742-16-19.602V264c0-11.031,8.969-20,20-20s20,8.969,20,20v4.398
+										c-9.117,1.859-16,9.945-16,19.602c0,19.852,16.148,36,36,36h27.492C285.719,391.641,231.641,445.719,164,451.492V416z"/>
+								</g>
+								<g class="hand-puzzle">
+									<path style="fill:#5EAC24;" d="M267.022,97.013c-3.119-3.129-3.112-8.194,0.017-11.314s3.136-8.185,0.017-11.314l-11.297-11.331
+										c-9.359-9.387-24.554-9.409-33.941-0.051l-11.331,11.297c-9.387,9.359-9.409,24.554-0.051,33.941l11.297,11.331
+										c3.12,3.129,8.185,3.136,11.314,0.017c3.129-3.12,8.194-3.112,11.314,0.017c6.239,6.258,6.224,16.388-0.034,22.627L216,170.476
+										l28.242,28.327c6.239,6.258,16.37,6.273,22.627,0.034c3.129-3.12,3.136-8.185,0.017-11.314c-3.119-3.129-3.112-8.194,0.017-11.314
+										l11.331-11.297c9.387-9.359,24.583-9.336,33.941,0.051l11.297,11.331c9.359,9.387,9.336,24.583-0.051,33.941l-11.331,11.297
+										c-3.129,3.12-8.194,3.112-11.314-0.017c-3.119-3.129-8.185-3.136-11.314-0.017c-6.258,6.239-6.273,16.37-0.034,22.627l33.89,33.992
+										c59.449-59.271,59.593-155.512,0.322-214.96l-33.992,33.89C283.392,103.286,273.261,103.271,267.022,97.013z"/>
+									<path style="fill:#69C229;" d="M297.93,235.656c-0.758-0.766-1.039-1.617-1.133-2.258c2.93,1.609,6.219,2.469,9.648,2.469
+										c5.32,0,10.336-2.07,14.109-5.828l11.344-11.305c6.805-6.797,10.563-15.828,10.578-25.445c0.008-9.617-3.719-18.656-10.516-25.469
+										l-11.289-11.328c-6.805-6.828-15.859-10.586-25.492-10.586c-9.602,0-18.625,3.734-25.422,10.516l-11.328,11.289
+										c-3.773,3.766-5.867,8.781-5.875,14.125c-0.008,3.422,0.836,6.711,2.438,9.625c-0.648-0.094-1.5-0.375-2.258-1.133L232.969,170.5
+										l19.828-19.766c10.938-10.906,10.961-28.672,0.055-39.602c-3.766-3.789-8.797-5.883-14.164-5.883c-3.969,0-7.766,1.156-11,3.297
+										l-8.75-8.781c-4.672-4.68-4.664-12.297,0.023-16.977l11.328-11.281c2.266-2.258,5.273-3.508,8.477-3.508
+										c3.211,0,6.227,1.258,8.5,3.531l8.75,8.773c-2.156,3.234-3.328,7.047-3.328,11.039c-0.008,5.328,2.063,10.352,5.828,14.133
+										c5.297,5.32,12.336,8.242,19.836,8.242c7.461,0,14.484-2.906,19.773-8.18l25.133-25.055C344.5,105.711,356.047,137.313,356,170.68
+										s-11.688,64.938-33.008,90.109L297.93,235.656z"/>
+									<path style="fill:#FFB398;" d="M256,40l30.64-30.64c6.006-6,14.151-9.367,22.64-9.36H464v112h-24l-24,32h-88v-16
+										c0.032-13.606,8.664-25.704,21.52-30.16c3.358-1.225,6.906-1.848,10.48-1.84l0,0c13.255,0,24-10.745,24-24V56
+										c0-13.255-10.745-24-24-24h-34.72c-8.489-0.007-16.634,3.36-22.64,9.36L280,64L256,40z"/>
+								</g>
+							</svg>
+	    			</div>
+    			</div>
+		    	<div class="col s12 m6 no-padding">
+		    		<div class="content-info">
+						  <span>Para el desarrollo del mencionado evento se requiere convocar a un grupo de empresarios con el objetivo de capacitarlos en la identificación de sus necesidades tecnológicas, tendientes a la automatización y optimización de sus actividades mercantiles; para la solución (prototipo) de dichas necesidades se requiere de la conformación de los team makers (programadores) y de un espacio optimo y adecuado para el desarrollo del evento.</span>
+						</div>
+		    	</div>
+		    </div>
 	    </div>
     </section>
     <section id="participate">
 	  	<div class="container">
-	  		<h2 class="title-section">¿Quienes participan?</h2>
+	  		<h2 class="title-section">¿Quiénes participan?</h2>
+	  		<div class="row">
+		  		<div class="col s12 m6 container-content-info">
+		  			<div class="container-participate enterprise">
+			  			<div class="card-participate">
+			  				<img src="/images/participate/teamwork.svg" class="responsive-img" />	
+		  				</div>
+		  				<div class="card-title-participate">
+		  					<span class="title">Empresas</span>
+		  				</div>
+		  				<div class="card-info-participate">Las empresas requieren soluciones tecnológicas para el potenciamiento de su operatividad, ya sea replantear los modelos de negocios u optimizar procesos de la cadena de valor. Las empresas identificarán las necesidades que limitan sus procesos de transformación digital, y serán expuestas ante los makers para el desarrollo de soluciones tecnológicas.
+		  				</div>
+	  				</div>
+					</div>
+					<div class="col s12 m6 container-content-info">
+						<div class="container-participate developer">
+			  			<div class="card-participate">
+			  				<img src="/images/participate/hacker.svg" class="responsive-img" />
+		  				</div>
+		  				<div class="card-title-participate">
+		  					<span class="title">Desarrolladores - Makers</span>
+							</div>
+							<div class="card-info-participate">Los Makers son agentes generadores de ideas y conocimientos para la resolución de problemas. Son los desarrolladores, programadores de las soluciones a las dificultades presentadas por los empresarios; estos son profesionales o estudiantes, técnicos o tecnólogos que conforman el capital humano. 
+		  				</div>
+						</div>
+					</div>
+				</div>
 	    </div>
     </section>
     <section id="challenges">
@@ -256,8 +362,6 @@
 					    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 					    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
 					    consequat.</span>
-					    <span>ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod
-					    tempor incididunt ut labore et.</span>
 		        </div>
 		      </div>
 		      <div class="judge">
@@ -268,20 +372,6 @@
 					    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 					    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
 					    consequat.</span>
-					    <span>ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod
-					    tempor incididunt ut labore et.</span>
-		        </div>
-		      </div>
-		      <div class="judge">
-		        <img src="/images/judges/cheo.jpg" class="responsive-img" />
-		      	<span class="name">Cheo</span>
-		        <div class="info">
-		          <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-					    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-					    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-					    consequat.</span>
-					    <span>ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod
-					    tempor incididunt ut labore et.</span>
 		        </div>
 		      </div>
 		      <div class="judge">
@@ -292,8 +382,6 @@
 					    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
 					    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
 					    consequat.</span>
-					    <span>ut labore et dolore magna aliqua. Ut enim ad minim veniam olor sit amet, consectetur adipisicing elit, sed do eiusmod
-					    tempor incididunt ut labore et.</span>
 		        </div>
 		      </div>
 		    </div>
@@ -432,11 +520,19 @@
 .title-section {
   font-size: 2rem;
   color: #ffffff;
-  padding: 80px 0px 15px 0px;
+  padding: 40px 0px 15px 0px;
   border-radius: 5px 5px 0 0;
   font-weight: bold;
   text-transform: uppercase;
   border-bottom: 5px solid;
+}
+.subtitle-section {
+  font-size: 1.2rem;
+  color: #ffffff;
+  border-radius: 5px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 30px 0 0px 0;
 }
 .animation-digital-transform {
 	margin: auto;
@@ -478,7 +574,7 @@
 }
 
 .title-time {
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   text-align: center;
   margin: 0;
   text-transform: uppercase;
@@ -521,5 +617,55 @@
 	& .arrow-end {
 		animation: draw_arrow_line-end 1.5s ease-in 0.45s forwards infinite;
 	}
+}
+
+.content-solution-image {
+  width: 200px;
+  margin: auto;
+  margin-bottom: 20px;
+}
+
+.hand-puzzle {
+	animation: moveHandle 5s ease infinite;
+}
+
+.puzzle-blue {
+	transform: translateX(159px) translateY(-2px);
+}
+
+.card-participate {
+  text-align: center;
+  margin: auto;
+  background: #ffffff;
+	& img {
+  	display: block;
+    margin: auto;
+    width: 100px;
+    padding: 1em;
+    box-sizing: content-box;
+  }
+}
+
+.card-title-participate {
+  text-align: center;
+  height: 40px;
+  line-height: 40px;
+  background: #ffd422;
+  color: #071a31;
+  padding: 0 5px;
+  & .title {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+	}
+}
+
+.card-info-participate {
+  padding: .5em;
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+.container-participate {
+    position: relative;
 }
 </style>

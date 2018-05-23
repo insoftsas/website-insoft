@@ -38,10 +38,6 @@
 			padding-right: 6px !important;
 		}
 	}
-	.title-time {
-		margin: 2em 0 !important;
-    font-size: 1rem !important;
-	}
 	#home {
 	  background-position: calc(50% + 530px) center;
 	}
@@ -57,6 +53,9 @@
 	}
 	.title-section {
 		font-size: 1.2rem !important;
+	}
+	.subtitle-section {
+		font-size: 1.1rem !important;
 	}
 }
 @media #{$medium-and-up} {
@@ -82,7 +81,7 @@
 	}
 	.title-time {
 		margin: 2em 0 !important;
-    font-size: 1.2rem !important;
+    font-size: 1rem !important;
 	}
 	section, footer {
 		height: auto;
@@ -90,6 +89,9 @@
 	}
 	.container-objects .object, .container-judges .judge {
 		max-width: initial !important;
+	}
+	.container-objects .object {
+		padding: 1em 0;
 	}
 }
 @media #{$large-and-up} {
