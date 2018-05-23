@@ -1,4 +1,9 @@
-const controller = new ScrollMagic.Controller()
+window.ScrollMagic = require('ScrollMagic');
+require('animation.gsap');
+window.TweenMax = require('TweenMax');
+require('debug.addIndicators')
+
+window.controller = new ScrollMagic.Controller()
                                
 if (window.innerWidth > 993) {
     // tweens

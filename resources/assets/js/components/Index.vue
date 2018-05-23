@@ -338,7 +338,7 @@
 		  				<div class="card-title-participate">
 		  					<span class="title">Desarrolladores - Makers</span>
 							</div>
-							<div class="card-info-participate">Los Makers son agentes generadores de ideas y conocimientos para la resolución de problemas. Son los desarrolladores, programadores de las soluciones a las dificultades presentadas por los empresarios; estos son profesionales o estudiantes, técnicos o tecnólogos que conforman el capital humano. 
+							<div class="card-info-participate">Los makers son agentes generadores de ideas y conocimientos para la resolución de problemas. Son los desarrolladores de las soluciones a las dificultades presentadas por los empresarios; estos son profesionales o estudiantes, técnicos o tecnólogos que conforman el capital humano. 
 		  				</div>
 						</div>
 					</div>
@@ -348,6 +348,76 @@
     <section id="challenges">
 	  	<div class="container">
 	  		<h2 class="title-section">Retos</h2>
+	  		<div class="col s12 container-content-info">
+		  		<div class="content-info margin-default-bottom">
+				    <span>Proponemos los siguientes retos a cumplir para que el evento sea todo un exito.</span>
+			    </div>
+		    </div>
+	  		<div class="col s12 m6 l3">
+		  		<div class="container-challenge">
+		  			<div class="title-number-challenge">
+		  				<div class="bg-number">
+		  					<span class="number-challenge">1</span>
+		  				</div>
+						</div>
+		  			<div class="challenge-icon">
+		  				<div>
+		  					<img src="/images/challenges/car-repair.svg" class="responsive-img" />
+	  					</div>
+	  				</div>
+	  				<div class="title-challenge">Diagnóstico</div>
+	  				<div class="info-challenge">Socialización del proyecto al sector productivo y capacitación en Transformación Productiva y Digital</div>
+	  			</div>
+  			</div>
+  			<div class="col s12 m6 l3">
+	  			<div class="container-challenge">
+	  				<div class="title-number-challenge">
+		  				<div class="bg-number">
+		  					<span class="number-challenge">2</span>
+		  				</div>
+						</div>
+		  			<div class="challenge-icon">
+		  				<div>
+			  				<img src="/images/challenges/user.svg" class="responsive-img" />
+			  			</div>
+	  				</div>
+	  				<div class="title-challenge">Selección</div>
+	  				<div class="info-challenge">Reclutamiento y selección de los Makers, socialización del proyecto y capacitación en prototipado.</div>
+	  			</div>
+  			</div>
+  			<div class="col s12 m6 l3">
+	  			<div class="container-challenge">
+	  				<div class="title-number-challenge">
+		  				<div class="bg-number">
+		  					<span class="number-challenge">3</span>
+		  				</div>
+						</div>
+		  			<div class="challenge-icon">
+		  				<div>
+		  					<img src="/images/challenges/problem.svg" class="responsive-img" />
+		  				</div>
+	  				</div>
+	  				<div class="title-challenge">Necesidades</div>
+	  				<div class="info-challenge">Categorización de necesidades y conformación de Makers Team.</div>
+	  			</div>
+  			</div>
+  			<div class="col s12 m6 l3">
+	  			<div class="container-challenge">
+	  				<div class="title-number-challenge">
+		  				<div class="bg-number">
+		  					<span class="number-challenge">4</span>
+		  				</div>
+						</div>
+		  			<div class="challenge-icon">
+		  				<div>
+			  				<img src="/images/challenges/employee_female.svg" class="responsive-img mini" />
+			  				<img src="/images/challenges/employee_male.svg" class="responsive-img mini" />
+		  				</div>
+	  				</div>
+	  				<div class="title-challenge">Desarrollo</div>
+	  				<div class="info-challenge">Desarrollo tecnológico para solucionar la necesidad planteada por el sector empresarial.</div>
+	  			</div>
+  			</div>
 	    </div>
     </section>
 	  <section id="judges">
@@ -410,10 +480,6 @@
   </div>
 </template>
 <script>
-	window.ScrollMagic = require('ScrollMagic');
-	require('animation.gsap');
-	window.TweenMax = require('TweenMax');
-	require('debug.addIndicators')
   export default {
     data() {
       return {
@@ -646,11 +712,12 @@
   }
 }
 
+// bg #ffd422
 .card-title-participate {
   text-align: center;
   height: 40px;
   line-height: 40px;
-  background: #ffd422;
+  background: #FFF59D;
   color: #071a31;
   padding: 0 5px;
   & .title {

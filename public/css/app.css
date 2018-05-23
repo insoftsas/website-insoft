@@ -9991,6 +9991,103 @@ textarea.materialize-textarea:focus:not([readonly]) {
   margin-bottom: 20px;
 }
 
+.container-challenge {
+  margin-bottom: 20px;
+}
+
+.container-challenge:hover .number-challenge {
+  top: -100%;
+}
+
+.title-challenge {
+  background: #FFF;
+  color: #071a31;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.challenge-icon {
+  position: relative;
+  text-align: center;
+  height: 150px;
+  background: #041323;
+  border: 1px solid #fff59d;
+  border-top: 0;
+  border-bottom: 0;
+}
+
+.challenge-icon div {
+  position: absolute;
+  width: 100%;
+  -webkit-transform: translateY(-50%);
+          transform: translateY(-50%);
+  top: 50%;
+}
+
+.challenge-icon img {
+  width: 100px;
+}
+
+.challenge-icon img.mini {
+  width: 60px;
+}
+
+.info-challenge {
+  text-align: justify;
+  background: #041323;
+  padding: 5px 10px;
+  border: 1px solid #fff59d;
+  border-top: 0;
+}
+
+.margin-default-bottom {
+  margin-bottom: 20px;
+}
+
+.title-number-challenge {
+  background: #FFF59D;
+  font-weight: bold;
+}
+
+.title-challenge {
+  background: #FFF;
+  color: #071a31;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.bg-number {
+  width: 99%;
+  height: 100px;
+  top: 30px;
+  left: 0px;
+  -webkit-transform: skewY(-15deg);
+          transform: skewY(-15deg);
+  color: #041323;
+  position: relative;
+}
+
+.bg-number .number-challenge {
+  position: absolute;
+  font-size: 12rem;
+  -webkit-transform: skewY(15deg) !important;
+  transform: skewY(15deg) !important;
+  top: -70%;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-transition: .3s all;
+  transition: .3s all;
+}
+
 /* Enter and leave animations can use different */
 
 /* durations and timing functions.              */
