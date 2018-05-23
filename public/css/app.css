@@ -9631,6 +9631,15 @@ textarea.materialize-textarea:focus:not([readonly]) {
   position: relative;
 }
 
+.admin_panel > .container {
+  margin-top: 38px;
+}
+
+.admin_panel .card-title {
+  font-size: 3rem;
+  text-align: center;
+}
+
 .navbar-items {
   display: -webkit-box;
   display: -ms-flexbox;
