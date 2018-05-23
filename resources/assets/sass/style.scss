@@ -1,36 +1,83 @@
-section {
+section, footer {
   color: #c5d6da;
   height: 100vh;
   position: relative;
   overflow: hidden;
+  margin-top: 38px;
 }
 
 body {
   background-color: $background-welcome;
-  background-image: linear-gradient($background-welcome, #009688);
   background-size: 100%;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  font-family: "Helvetica Neue", 'Roboto', arial, sans-serif;
 }
 
+// Colors Of all system and inputs
+.mainColor{
+  background-color: $primary-color!important;
+}
+.mainColor-text{
+  color: $primary-color!important;
+}
+input:not([type]):focus:not([readonly]) + label, input[type=text]:not(.browser-default):focus:not([readonly]) + label, input[type=password]:not(.browser-default):focus:not([readonly]) + label, input[type=email]:not(.browser-default):focus:not([readonly]) + label, input[type=url]:not(.browser-default):focus:not([readonly]) + label, input[type=time]:not(.browser-default):focus:not([readonly]) + label, input[type=date]:not(.browser-default):focus:not([readonly]) + label, input[type=datetime]:not(.browser-default):focus:not([readonly]) + label, input[type=datetime-local]:not(.browser-default):focus:not([readonly]) + label, input[type=tel]:not(.browser-default):focus:not([readonly]) + label, input[type=number]:not(.browser-default):focus:not([readonly]) + label, input[type=search]:not(.browser-default):focus:not([readonly]) + label, textarea.materialize-textarea:focus:not([readonly]) + label{
+  color: $primary-color!important;
+}
+input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):focus:not([readonly]), input[type=password]:not(.browser-default):focus:not([readonly]), input[type=email]:not(.browser-default):focus:not([readonly]), input[type=url]:not(.browser-default):focus:not([readonly]), input[type=time]:not(.browser-default):focus:not([readonly]), input[type=date]:not(.browser-default):focus:not([readonly]), input[type=datetime]:not(.browser-default):focus:not([readonly]), input[type=datetime-local]:not(.browser-default):focus:not([readonly]), input[type=tel]:not(.browser-default):focus:not([readonly]), input[type=number]:not(.browser-default):focus:not([readonly]), input[type=search]:not(.browser-default):focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]){
+  border-bottom: 1px solid $primary-color!important;
+  box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* label color */
+.input-field label {
+ color: $primary-color!important;
+}
+/* label focus color */
+.input-field input[type=text]:focus + label {
+ color: $primary-color!important;
+}
+/* label underline focus color */
+.input-field input[type=text]:focus {
+ border-bottom: 1px solid $primary-color!important;
+ box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* valid color */
+.input-field input[type=text].valid {
+ border-bottom: 1px solid $primary-color!important;
+ box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* invalid color */
+.input-field input[type=text].invalid {
+ border-bottom: 1px solid $primary-color!important;
+ box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+ color: $primary-color!important;
+}
+
+.svg-inline--fa{
+  width: 100%!important;
+  text-align: center;
+  vertical-align: middle;
+  top: -2px;
+  position: relative;
+}
 .navbar-items {
   display: flex;
   flex-direction:row;
   flex-wrap:wrap;
   justify-content:center;
-  background: #2e2d2d;
-  border-bottom: 1px solid rgb(43, 43, 43);
   position: fixed;
   width: 100%;
   top: 0;
   left: 0;
   z-index: 10;
+  background: darken($background-welcome, 1);
   & .item {
     padding: .5em 1em;
     font-weight: 300;
     text-transform: uppercase;
-    color: #a4a4a4;
+    color: #d4d4d4;
     cursor: pointer;
     &:hover {
       color: $primary-color;
@@ -46,10 +93,10 @@ body {
       right: 0px;
     }
     &.active {
-      color: $primary-color;
+      color: $primary-color !important;
       &:before {
         content: '';
-        border-left-color: $primary-color;
+        border-left-color: inherit;
         border-left-style: solid;
         border-left-width: 6px;
         padding-left: 7px;
@@ -69,7 +116,7 @@ body {
 .title-main {
   margin: 0;
   padding: 1em;
-  font-weight: 600;
+  font-weight: bold;
   text-transform: uppercase;
   text-align: center;
   color: #fff;
@@ -154,34 +201,48 @@ body {
   background-image: url(../images/teletype-reverse.svg);
   background-position: calc(50% - 1450px) center;
 }
+
+#info {
+  background-repeat: no-repeat;
+  background-image: url(../images/teletype-reverse.svg);
+  background-position: calc(50% - 1450px) center;
+  opacity: 0;
+}
+
+#we-search {
+  background-repeat: no-repeat;
+  background-image: url(../images/teletype-reverse.svg);
+  background-position: calc(50% - 850px) center;
+  opacity: 0;
+}
+
 .r-text {
   color: $primary-color;
 }
-.container-judges, .container-trainers {
+.container-judges, .container-objects {
   display: flex;
   flex-direction:row;
-  flex-wrap:wrap;
-  justify-content:space-between;
-  & .judge {
-    background: #4db2ce;
-    background-image: linear-gradient(#4db2ce, #086a86);
-  }
-  & .trainer {
-    background: #6b413e;
-    background-image: linear-gradient(#6b413e, #311b1a);
-  }
-  & .judge, & .trainer {
-    opacity: 0;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  & .judge, & .object {
     display: inline-block;
     position: relative;
-    padding: 0 1em 1em 1em;
+    padding: 1em;
     border-radius: 5px;
     text-align: center;
-    margin: 25px 20px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
     transition: all .3s ease;
+  }
+}
+
+.container-judges {
+  & .judge {
+    opacity: 0;
+    max-width: 260px;
+    padding: 2em;
+    background: #2b3b4f;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
     &:hover {
-      transform: translateY(20px) scale(1.2);
+      transform: translateY(20px) scale(1.1);
     }
     & .name {
       text-align: center;
@@ -193,8 +254,9 @@ body {
       display: block;
       color: #fff;
     }
-    .profession {
+    .info {
       color: #fff;
+      text-align: justify;
     }
   }
   & img {
@@ -205,13 +267,41 @@ body {
   }
 }
 
+.container-objects {
+  margin-top: 2em;
+  & .object {
+    max-width: 260px;
+  }
+  & img {
+    width: 70px;
+    border-radius: 50%;
+  }
+  & .title-object {
+    display: block;
+    font-size: 1.5rem;
+    border-bottom: 2px solid;
+    margin-bottom: 10px;
+  }
+  & .info {
+    font-size: 1rem;
+    text-align: justify;
+  }
+}
+
 .more-info {
   margin: 22px 0;
-  color: #fff;
   text-align: center;
   font-weight: 600;
   cursor: pointer;
   &:hover {
     text-decoration: underline;
   }
+  & a {
+    color: #fff;
+  }
+}
+
+.circle-middle {
+  transform: rotate(-294deg);
+  transform-origin: 145.362px 162.718px;
 }

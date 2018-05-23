@@ -13,9 +13,10 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/user',  'TokensManagerAPIController@user');
+Route::get('/user/tokens', 'TokensManagerAPIController@index');
+Route::get('/user/tokens/{id}', 'TokensManagerAPIController@show');
+Route::delete('/user/tokens/{id}', 'TokensManagerAPIController@destroy');
 
 
 Route::resource('groups', 'GroupAPIController');

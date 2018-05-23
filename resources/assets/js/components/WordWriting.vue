@@ -51,7 +51,7 @@
         <span>Puede ejecutar los siguientes comandos:</span>
         <span>clear, dev, help, goto [número de la sección]</span>
       </div>
-      <input type="text" :class="{ 'move-input-cmd' : help_show }" class="command-input browser-default" id="terminal-input" v-model="command" @input="formatCommand" @keyup.enter="executeCommand" />
+      <input type="text" spellcheck="false" :class="{ 'move-input-cmd' : help_show }" class="command-input browser-default" id="terminal-input" v-model="command" @input="formatCommand" @keyup.enter="executeCommand" />
     </div>
   </div>
 </template>
@@ -118,12 +118,12 @@
           vm.messageCommand('Estas en la primera sección', 1500)
         }
         else if (c == "$ goto 2" || c == "$goto 2") {
-          vm.$root.goToView('judges')
+          vm.$root.goToView('info')
           vm.command = "$ "
           if (vm.help_show)
             vm.help_show = false
         } else if (c == "$ goto 3" || c == "$goto 3") {
-          vm.$root.goToView('trainers')
+          vm.$root.goToView('judges')
           vm.command = "$ "
           if (vm.help_show)
             vm.help_show = false
@@ -167,6 +167,10 @@
         } else if (c == "$ help" || c == "$help") {
           vm.help_show = true
           vm.command = "$ "
+        } else if (c == "$ ls" || c == "$ls") {
+          if (vm.help_show)
+            vm.help_show = false
+          vm.messageCommand('css favicon.ico fonts images  index.php', 3000)
         } else {
           if (vm.help_show)
             vm.help_show = false

@@ -11,8 +11,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
-
-      protected $appends = ['IsMixedAdmin'];
     /**
      * The attributes that are mass assignable.
      *
