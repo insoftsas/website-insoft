@@ -88666,9 +88666,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   methods: {},
   mounted: function mounted() {
     __webpack_require__(181);
-  },
-  beforeMount: function beforeMount() {
-    window.controller = window.controller.destroy(true);
   }
 });
 
