@@ -3,12 +3,22 @@ require('./bootstrap');
 window.Vue = require('vue');
 
 import VueRouter from 'vue-router';
+import VeeValidate from 'vee-validate';
 import routes from './routes';
 
+import fontawesome from '@fortawesome/fontawesome'
+import fontawesomevue from '@fortawesome/vue-fontawesome'
+import solid from '@fortawesome/fontawesome-free-solid'
+
+fontawesome.library.add(solid)
+
 Vue.use(VueRouter);
+Vue.use(VeeValidate);
+
+Vue.component('font-awesome-icon', fontawesomevue);
 
 Vue.component('main-app', require('./components/App.vue'));
-Vue.component('word-writing', require('./components/WordWriting.vue'));
+Vue.component('word-writing', require('./components/wordWriting.vue'));
 
 Vue.component('login', require('./components/Auth/Login.vue'));
 
@@ -21,17 +31,26 @@ const app = new Vue({
     router,
     data() {
       return {
+        client_id: '2',
+        client_secret: 'SOcWtgo3QmzYnc87wgxxFV1vMjiEAqmGScPjmknZ',
         apiMap: {
           logout: '/logout',
-          login: '/login',
+          login: '/oauth/token',
           user: '/api/user',
         },
         auth: false,
         user: {
 
         },
+        token: '',
         loading: false,
         loaded: false
+      }
+    },
+    watch: {
+      token: function(newToken){
+        localStorage.token = newToken
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + newToken
       }
     },
     methods: {
@@ -51,6 +70,9 @@ const app = new Vue({
         })
         .catch(function(error){
           vm.auth = false;
+          if(error.response.status == 401){
+            vm.token = '';
+          }
         }).then(() => {
           vm.loading = false;
           vm.loaded = true;
@@ -61,14 +83,24 @@ const app = new Vue({
         axios.get(vm.apiMap.logout)
         .then(function(response){
           vm.auth = false;
-          //vm.$router.push("/");
-          window.location.reload();
+          vm.token = '';
+          vm.$router.push("/");
         })
         .catch(function(error){
         });
       }
     },
     mounted() {
-      this.getUser();
+      if(localStorage.token!=undefined){
+        this.token = localStorage.token
+      }else{
+        localStorage.token = ''
+      }
+      axios.defaults.headers.common['Authorization'] = 'Bearer ' + this.token
+      if (this.token != '') {
+        this.getUser();
+      }else{
+        this.loaded = true;
+      }
     }
 });

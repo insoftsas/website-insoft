@@ -1,292 +1,129 @@
 <template>
-  <div class="form">
-          <div class="holder" id="hold">   
-              <input type="email" class="browser-default" id="name" @focus.stop.prevent='isFocused(nameObj)' @blur="isBlur(nameObj)" v-model.lazy:value='nameObj.name' autocomplete="off">
-              <label for="name" :class="nameObj.nameClass">Email</label>
+  <div>
+    <div class="valign-wrapper" style="width:100%;height:100%;position: absolute;">
+      <div class="valign" style="width:100%;">
+          <div class="container">
+             <div class="row">
+                <div class="col s12 m6 offset-m3">
+                   <div id="login_card" class="card" style="opacity:0; transform:scale(0.8);">
+                      <div class="bg" style="z-index: -1;border-radius: 100%; transform: scale(0); background-color: white; opacity: 0; height: 100%;width: 100%; position: absolute;"></div>
+                      <div class="card-content">
+                         <span class="card-title grey-text">Hackathon</span>
+                         <form @submit.prevent="login">
+                            <div class="row">
+                               <div class="input-field col s12">
+                                  <input v-validate="'required|email'" placeholder="example@correo.com" id="email" name="email" v-model="email" type="email" :class="{  'invalid' : errors.first('email') != undefined }">
+                                  <label for="email" class="active">Correo</label>
+                                  <span class="helper-text" :data-error="errors.first('email')"></span>
+                               </div>
+                            </div>
+                            <div class="row">
+                               <div class="input-field col s12">
+                                  <input v-validate="'required'" placeholder="*********" id="password" name="password" v-model="password" type="password" :class="{  'invalid' : errors.first('password') != undefined }">
+                                  <label for="password" class="active">Contraseña</label>
+                                  <span class="helper-text" :data-error="errors.first('password')"></span>
+                               </div>
+                            </div>
+                            <div class="row">
+                                <div class="col s12">
+                                  <button type="submit" class="btn mainColor waves-effect waves-light" id="btn_login">Iniciar sesión</button>
+                                </div>
+                            </div>
+                         </form>
+                      </div>
+                      <div class="divider"></div>
+                      <p class="center-align copyright grey-text">SEGRITH.TECH © 2018</p>
+                   </div>
+                </div>
+             </div>
           </div>
-          <div class="holder">            
-              <input type="password" id="inputText" class="browser-default" @focus='[isFocused(pwObj),enterClass=["enter","opacity"]]' @blur="isBlur(pwObj)" v-model.lazy:value='pwObj.name' v-on:keyup.enter="click">
-              <label for="inputText" :class="pwObj.nameClass" >Contraseña</label>
-              <div class="earser" :style="{left:left}">
-                   <div class="pacman"></div>
-                   <div class="dotsBlocker"></div>
-              </div> 
-          </div>      
-        <svg  preserveAspectRatio="none">   
-            <g :class="pwObj.lineClass" >
-                <line x1="160" y1="150" :x2="holdWidth" y2="150" ></line>
-                <path  d="m 0 150 Q 50 150 160 150" fill="none">
-                   <animate 
-                      attributeName="d" 
-                      from = "M 0 150 Q 50 150 160 150"
-                      to =   "M 0 150 Q 50 150 160 150"
-                      dur="500ms" 
-                      repeatCount="1"
-                      keyTimes="0; 0.4; 0.6; 0.8;0.9; 1"
-                      values= "M 0 150 Q 50 150 160 150;
-                               M 0 150 Q 50 160 160 150;
-                               M 0 150 Q 50 80 160 150;
-                               M 0 150 Q 50 160 160 150;
-                               M 0 150 Q 50 140 160 150;
-                               M 0 150 Q 50 150 160 150;"
-                      begin="start"
-                      id="nameLineA"
-                   />
-                </path>
-            </g>
-            <g :class="nameObj.lineClass">
-                <line x1="160" y1="50" :x2="holdWidth" y2="50" ></line>
-                <path  d="M 0 50 Q 110 50 160 50" fill="none">
-                  <animate 
-                    attributeName="d" 
-                    from = "M 0 50 Q 50 10 160 50"
-                    to =   "M 0 50 Q 50 50 160 50"
-                    dur="500ms" 
-                    repeatCount="1" 
-                    keyTimes="0; 0.4; 0.6; 0.8;0.9; 1"
-                    values= "M 0 50 Q 50 50 160 50;
-                             M 0 50 Q 50 60 160 50;
-                             M 0 50 Q 50 50 160 50;
-                             M 0 50 Q 50 10 160 50;
-                             M 0 50 Q 50 60 160 50;
-                             M 0 50 Q 50 50 160 50;"
-                    begin="start"
-                    id="nameLineB"
-                  />
-                </path>
-            </g>
-        </svg>
-       <div :class="enterClass" @click="click">Enter</div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
   export default {
     data() {
       return {
-        nameObj:{
-          name:"",
-          nameClass:"",
-          lineClass:"lines",
-          lineObj:"nameLineB"
-        },
-        pwObj:{
-          name:"",
-          nameClass:"",
-          lineClass:"lines",
-          lineObj:"nameLineA"
-        },
-        left:"-120%",
-        enterClass:["enter"],
-        holdWidth: 300
+        email: '',
+        password:'',
+        loading: false
       }
     },
     methods: {
-      click: function(){  
-          var vm=this;
-          vm.left=5+"%";
-          axios.post(vm.$root.apiMap.login,{
-            email: vm.nameObj.name,
-            password: vm.pwObj.name
-          })
-          .then(function(response){
-            vm.pwObj.name="";
-            vm.nameObj.name="";
-            vm.resetPacman();
-            //vm.getUser();
-            window.location.reload();
-          })
-          .catch(function(error){
-            vm.resetPacman();
-            vm.isFocused(vm.pwObj);
-          });
-      },
-      resetPacman: function(){
+      login: function(){
         let vm = this
-        vm.left=-120+"%";
-        vm.pwObj.nameClass=[];
-        vm.pwObj.lineClass="lines";
-        vm.nameObj.nameClass=[];
-        vm.enterClass=["enter"];
-      },
-      isFocused:function(obj){
-          obj.nameClass=["focused","filled"]; 
-          obj.lineClass=["lines","lineFilled"];
-          var lineObj = document.getElementById(obj.lineObj);
-          lineObj.beginElement();
-      },
-      isBlur:function(obj){
-          if (obj.name==""){  
-              obj.nameClass=[];
-              obj.lineClass="lines";
-          }else{
-              obj.nameClass=["filled"];
-          }
-          obj.lineClass="lines";
-          this.enterClass=["enter"];
-      },
-      setWidth: function(){
-        this.holdWidth = document.getElementById("hold").offsetWidth
+        vm.loading = true
+        axios.post(vm.$root.apiMap.login,{
+          'grant_type' : 'password',
+          'client_id' : vm.$root.client_id,
+          'client_secret' : vm.$root.client_secret,
+          'username' : vm.email,
+          'password' : vm.password,
+          'scope' : '*'
+        })
+        .then(function (response) {
+          vm.$root.token = response.data.access_token;
+          vm.$root.getUser("/dashboard");
+          vm.$router.push("/dashboard");
+        })
+        .catch(function(error) {
+          if(M.getData(error).message.indexOf("username"))
+          M.toastError(error);
+        })
+        .then(function() {
+          vm.loading = false
+        })
+        return false
       }
     },
     mounted() {
-      window.addEventListener("resize", this.setWidth);
-      this.setWidth()
-      if(this.$root.auth){
-        vm.$router.push("/dashboard");
-      }
+      var loginCard = anime({
+        targets: '#login_card',
+        duration: 1250,
+        easing: 'easeInOutQuart',
+        translateY: 0,
+        opacity: 1,
+        scale: 1,
+        delay: 0
+      });
+      var loginCardBg = anime({
+        targets: '#login_card .bg',
+        opacity: 1,
+        borderRadius: '0%',
+        easing: 'easeInSine',
+        duration: 500,
+        scale: 1,
+        delay: 500,
+        complete: function(){
+          $('input#email').focus();
+          $('.copyright').removeClass('grey-text');
+          $('.card-title').removeClass('grey-text');
+        }
+      });
     }
   }
 </script>
 
 <style lang="scss" scoped>
-$yellow: #F0D022;
-$gry-bg: #111;
-$light-gry: #262626;
-$light-gry-bg: #121212;
-
-@mixin tranision {
-     transition: (all 400ms cubic-bezier(0, 0.4, 0.6, 1) 150ms);
-     -webkit-transition: (all 400ms cubic-bezier(0, 0.4, 0.8, 1) 150ms);
-}
-  svg{ 
+.copyright{
+  font-size: .8rem;
   position: relative;
-  z-index: 10; 
-  pointer-events: none;
-  width:85%; height:400px; 
-  left:24px; top:-160px;
-}
-
-label{
-  @include tranision;
-  transform:(translateY(0px));
-  display: block;
-  width: 90%;height: 40px;
-  line-height: 40px;    
-  cursor: text;
-  font-size: 20px;
-  color: $light-gry;
   z-index: 1;
-  &.filled { transform:(translateY(-20px));color:$light-gry-bg;}
-  &.focused { color: $yellow;
-              transform:(translateY(-30px)); 
-              z-index: 1;
-            }
+  margin: 0px;
+  padding: 1.4rem 0px 1.4rem 0px;
 }
-
-input{
-  @include tranision;
-  width: 90%;height:40px;
-  font-size:20px;
-  background-color: $light-gry-bg;
-  text-align:left;
-  border:0px solid $light-gry-bg;
-  position: relative;
-  z-index: 0;
-  color:$light-gry;
-  transform:(translateX(0px)translateY(42px)); 
+.card-title{
+  font-size: 3rem;
+  text-align: center;
 }
-
-input:focus{
-  outline: 0px;
-  color:$yellow; 
+.btn{
+  width: 100%;
 }
-
-.lines{
-    @include tranision;
-    stroke-width:2;
-    stroke:$light-gry;
+.divider{
+  width: 100%;
 }
-
-.lineGry{ stroke:$light-gry;}
-
-.lineFilled{ stroke:$yellow;}
-
-.holder{
-  width: 85%;height: 80px;
-  margin: 20px auto;
-  background-color: $light-gry-bg;
-  overflow: hidden;
-  z-index: 0;
+#login_card{
+  background-color: #f5f5f5!important;
 }
-
-.form{ 
-  width: 400px;height: 300px;
-  background-color: $light-gry-bg;
-  border:1px solid #0b0b0b;
-  margin: 50px auto;
-  z-index: 0;    
-}
-
-//pacman stuff
-.earser{
-    position: relative;
-    float: left;
-    width: 90%; height: 30px;
-    background: $light-gry-bg;
-    transition:4s all;
-    left:-120%;top:-34px;
-    z-index: 1;  
-}
- .enter{
-  @include tranision;
-   width: 100px; height: 48px;
-   color:$light-gry;
-   border: 2px solid $light-gry;
-   border-radius: 10px;
-   line-height: 48px;
-   text-align: center;
-   position: relative;
-   top:-148%; left:110%;
-   opacity:0;
-   z-index: 200;
- }
- .opacity{
-   top:-164%;
-   opacity:1;
- }
-.pacman{
-  position: relative;
-  left:92%; top:-10px;
-  width: 50px;height: 25px;
-  background-color: $yellow;
-  border-radius:50px 50px 0px 0px;
-  animation: pacmanMouthB 0.2s linear infinite;
-  transform-origin:center bottom;
-  z-index: 2;
-}
-
-.pacman:after{
-  content:"";
-  position: absolute;
-  top:25px;
-  width: 50px;height: 25px;
-  background-color: $yellow;
-  border-radius:0px 0px 50px 50px;
-  animation: pacmanMouthA  0.2s linear infinite;
-  transform-origin:center top;
-  z-index: 2;
-}
-
-.dotsBlocker{
-  width: 150%;height: 30px;
-  background-color: $light-gry-bg;
-  position: relative;
-  left: -87%;
-  top:-25px;
-  transition:3s all;
-  z-index: 1;
-}
-
-@keyframes pacmanMouthA
-{0% { transform: rotate(60deg)scale(1);}
-50% { transform: rotate(0deg)scale(1);}
-100% {transform: rotate(60deg)scale(1);}
-}
-
-@keyframes pacmanMouthB
-{0% { transform: rotate(-30deg)scale(0.5);}
-50% { transform: rotate(0deg)scale(0.5);}
-100% {transform: rotate(-30deg)scale(0.5);}
-}
-
 </style>

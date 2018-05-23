@@ -12,6 +12,55 @@ body {
   background-attachment: fixed;
 }
 
+// Colors Of all system and inputs
+.mainColor{
+  background-color: $primary-color!important;
+}
+.mainColor-text{
+  color: $primary-color!important;
+}
+input:not([type]):focus:not([readonly]) + label, input[type=text]:not(.browser-default):focus:not([readonly]) + label, input[type=password]:not(.browser-default):focus:not([readonly]) + label, input[type=email]:not(.browser-default):focus:not([readonly]) + label, input[type=url]:not(.browser-default):focus:not([readonly]) + label, input[type=time]:not(.browser-default):focus:not([readonly]) + label, input[type=date]:not(.browser-default):focus:not([readonly]) + label, input[type=datetime]:not(.browser-default):focus:not([readonly]) + label, input[type=datetime-local]:not(.browser-default):focus:not([readonly]) + label, input[type=tel]:not(.browser-default):focus:not([readonly]) + label, input[type=number]:not(.browser-default):focus:not([readonly]) + label, input[type=search]:not(.browser-default):focus:not([readonly]) + label, textarea.materialize-textarea:focus:not([readonly]) + label{
+  color: $primary-color!important;
+}
+input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):focus:not([readonly]), input[type=password]:not(.browser-default):focus:not([readonly]), input[type=email]:not(.browser-default):focus:not([readonly]), input[type=url]:not(.browser-default):focus:not([readonly]), input[type=time]:not(.browser-default):focus:not([readonly]), input[type=date]:not(.browser-default):focus:not([readonly]), input[type=datetime]:not(.browser-default):focus:not([readonly]), input[type=datetime-local]:not(.browser-default):focus:not([readonly]), input[type=tel]:not(.browser-default):focus:not([readonly]), input[type=number]:not(.browser-default):focus:not([readonly]), input[type=search]:not(.browser-default):focus:not([readonly]), textarea.materialize-textarea:focus:not([readonly]){
+  border-bottom: 1px solid $primary-color!important;
+  box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* label color */
+.input-field label {
+ color: $primary-color!important;
+}
+/* label focus color */
+.input-field input[type=text]:focus + label {
+ color: $primary-color!important;
+}
+/* label underline focus color */
+.input-field input[type=text]:focus {
+ border-bottom: 1px solid $primary-color!important;
+ box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* valid color */
+.input-field input[type=text].valid {
+ border-bottom: 1px solid $primary-color!important;
+ box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* invalid color */
+.input-field input[type=text].invalid {
+ border-bottom: 1px solid $primary-color!important;
+ box-shadow: 0 1px 0 0 $primary-color!important;
+}
+/* icon prefix focus color */
+.input-field .prefix.active {
+ color: $primary-color!important;
+}
+
+.svg-inline--fa{
+  width: 100%!important;
+  text-align: center;
+  vertical-align: middle;
+  top: -2px;
+  position: relative;
+}
 .navbar-items {
   display: flex;
   flex-direction:row;
