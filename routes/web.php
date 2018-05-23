@@ -1,5 +1,5 @@
 <?php
-
+use Illuminate\Console\Command;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -13,4 +13,8 @@
 
 Route::get('/', function () {
     return view('welcome');
+});
+Route::get('artisan', function () {
+    $exit=Artisan::call("passport:install");
+    return $exit;
 });

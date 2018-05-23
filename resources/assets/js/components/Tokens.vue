@@ -106,8 +106,6 @@
                     }else{
                       vm.tokens[index].last_access.location = loc.city + ", " + loc.country
                     }
-                } else if (!isValid(this.response) && this.status == 0) {
-                    vm.tokens[index].last_access.location = "Ubicacion desconocida"
                 } else {
                     vm.tokens[index].last_access.location = "Ubicacion desconocida"
                 }
