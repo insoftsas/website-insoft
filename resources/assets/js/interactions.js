@@ -19,7 +19,7 @@ if (window.innerWidth > 993) {
                           TweenMax.to("#title-section-two", 0.5, { opacity: 1.75 }),
                           TweenMax.to(".judge", 0.2, { opacity: 1 }),
                           TweenMax.to("#open-menu-icon", 0.5, { fill: '#ffd152' }),
-                          TweenMax.staggerFromTo(".judge", 0.5, {top: 200}, {top: -81, ease: Back.ease}, 0),
+                          TweenMax.staggerFromTo(".judge", 0.5, {top: 200}, {top: -60, ease: Back.ease}, 0),
                           TweenMax.to("#judges", 0.5, { backgroundPositionX: 'calc(50% - 53px)', backgroundPositionY: 'center' })
                         ])
 
@@ -27,9 +27,17 @@ if (window.innerWidth > 993) {
                         .add([
                           TweenMax.to("#we-search", 0.2, { opacity: 1 }),
                           TweenMax.to("#we-search", 0.5, { backgroundPositionX: 'calc(50% + 20px)', backgroundPositionY: 'center' })
-                    ])                        
-
-    
+                    ])
+    const tween_5 = new TimelineMax()
+                        .add([
+                          TweenMax.to("#participate", 0.2, { opacity: 1 }),
+                          TweenMax.to("#participate", 0.5, { backgroundPositionX: 'calc(50% - 964px)', backgroundPositionY: 'center' }),
+                    ])
+    const tween_6 = new TimelineMax()
+                        .add([
+                            TweenMax.staggerFromTo(".enterprise", 2, {right: '120%'}, {right: 0, ease: Back.ease}, 0),
+                            TweenMax.staggerFromTo(".developer", 2, {left: '120%'}, {left: 0, ease: Back.ease}, 0)
+                    ])
                    
     // scenes
     const scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight })
@@ -49,8 +57,17 @@ if (window.innerWidth > 993) {
     const scene_4 = new ScrollMagic.Scene({ triggerElement: "#we-search", duration: document.getElementById('we-search').offsetHeight})
                                  .setTween(tween_4)
                                  .addTo(controller)
-                                 .addIndicators()                                 
-    
+                                 .addIndicators()   
+
+    const scene_5 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: document.getElementById('participate').offsetHeight})
+                                 .setTween(tween_5)
+                                 .addTo(controller)
+                                 .addIndicators()
+
+    const scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: (document.getElementById('participate').offsetHeight - 300) })
+                                 .setTween(tween_6)
+                                 .addTo(controller)
+                                 .addIndicators()                                   
 
     // nav items activate
     const nav_0 = new ScrollMagic.Scene({ triggerElement: "#home", duration: document.getElementById('home').offsetHeight})
