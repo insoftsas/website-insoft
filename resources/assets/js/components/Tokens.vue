@@ -32,7 +32,7 @@
                       </a>
                       <div>
                         <p class="title_os">{{typeOfDevice(token)}}{{token.last_access.user_agent.os.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="'IP: '+token.last_access.ip">{{token.last_access.location}}</span></p>
-                        <p>{{token.last_access.user_agent.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="moment(token.last_access.time).format('LLLL')">{{moment(token.last_access.time).fromNow()}}</span></p>
+                        <p>{{token.last_access.user_agent.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="moment(token.last_access.time).format('LLLL')">{{moment(token.last_access.time).fromNow()}}</span><span v-if="token.revoked || token.current"> · <span class="help-text-token" :class="{'red-text':token.revoked,'green-text':token.current}" v-html="token.revoked?'Sesión cerrada':'Sesión actual'"></span></span></p>
                       </div>
                     </td>
                     <td><a class="btn-floating tooltipped red waves-effect waves-light" :class="{'disabled': token.revoked}" :disabled="token.revoked" data-position="bottom" data-tooltip="Cerrar sesión" @click="deleteToken(i)"><font-awesome-icon icon="times" /></a></td>
@@ -80,7 +80,6 @@
               let location = "Cargando...";
               Vue.set(vm.tokens[k].last_access, 'location', location);
               vm.getLocation(k);
-              console.log(vm.tokens[k].last_access.user_agent.device);
             })
             setTimeout(function(){
               $('.tooltipped').tooltip();
@@ -96,24 +95,21 @@
       },
       getLocation: function (index) {
         let vm = this
-        let request = new XMLHttpRequest();
-        request.onreadystatechange = function() {
-            if (request.readyState === 4) {
-                if (request.status === 200) {
-                    let loc = JSON.parse(request.responseText);
-                    if(loc.city == undefined || loc.country == undefined){
-                      vm.tokens[index].last_access.location = "Ubicacion desconocida"
-                    }else{
-                      vm.tokens[index].last_access.location = loc.city + ", " + loc.country
-                    }
-                } else {
-                    vm.tokens[index].last_access.location = "Ubicacion desconocida"
-                }
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() { 
+            if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+              let loc = JSON.parse(xmlHttp.responseText);
+              if(loc.cityName == '-' || loc.regionName == '-' || loc.countryName == '-'){
+                vm.tokens[index].last_access.location = "Ubicacion desconocida"
+              }else{
+                vm.tokens[index].last_access.location = loc.cityName + ", " + loc.regionName + ', ' + loc.countryName
+              }
+            }else if(xmlHttp.readyState == 4){
+              vm.tokens[index].last_access.location = "Ubicacion desconocida"
             }
-        };
-        request.open("GET", 'http://ip-api.com/json/'+vm.tokens[index].last_access.ip, true);
-        //request.open("GET", 'http://ip-api.com/json/', true);
-        request.send(null);
+        }
+        xmlHttp.open("GET", 'https://api.ipinfodb.com/v3/ip-city/?key=5f8ec84ab05a9abe78fae13fd314b2d88a3b2f7c4efab1efc8f6c50e11b1e1a0&format=json&ip='+vm.tokens[index].last_access.ip, true); // true for asynchronous 
+        xmlHttp.send(null);
       },
       deleteToken: function(index) {
         let vm = this
@@ -174,6 +170,9 @@
         color: rgb(73, 80, 87);
       }
     }
+ }
+ .help-text-token{
+  font-size: 12px;
  }
  .logo_os{
     font-size: 40px;

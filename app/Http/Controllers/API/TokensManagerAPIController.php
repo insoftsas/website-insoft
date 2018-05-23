@@ -13,9 +13,20 @@ class TokensManagerAPIController extends AppBaseController
         $this->middleware('auth:api');
     }
 
-	public function index()
+	public function index(Request $request)
 	{
-		return $this->sendResponse(auth()->user()->tokens->toArray(), 'Tokens retrieved successfully');	
+		$jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $request->header('authorization')));
+        $token = (new \Lcobucci\JWT\Parser())->parse($jwt);
+
+		$toks = auth()->user()->tokens;
+		foreach ($toks as $key => $value) {
+			if($token->getHeader("jti") == $toks[$key]->id){
+				$toks[$key]->current = true;
+			}else{
+				$toks[$key]->current = false;
+			}
+		}
+		return $this->sendResponse($toks->toArray(), 'Tokens retrieved successfully');	
 	}
 
 	public function user()
@@ -31,6 +42,15 @@ class TokensManagerAPIController extends AppBaseController
 		}
 
         return $this->sendResponse($token, 'Token retrieved successfully');	
+	}
+
+	public function logout(Request $request)
+	{	
+		$jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $request->header('authorization')));
+        $token = (new \Lcobucci\JWT\Parser())->parse($jwt);
+        $usToken = auth()->user()->tokens->find($token->getHeader("jti"));
+        $usToken->revoke();
+        return $this->sendResponse($token, 'Logged Out');	
 	}
 
 	public function destroy($id)

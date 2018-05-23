@@ -40,10 +40,11 @@ const app = new Vue({
         client_id: '2',
         client_secret: 'XSfChGYCNUFq0OuAeyIMroOOMLpqGDQvLK6vsMpi',
         apiMap: {
-          logout: '/logout',
+          logout: '/api/user/logout',
           login: '/oauth/token',
           user: '/api/user',
           makers: '/api/makers',
+          groups: '/api/groups',
           tokens: '/api/user/tokens',
           enterprises: '/api/enterprises',
         },

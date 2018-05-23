@@ -26,7 +26,7 @@
                             </div>
                             <div class="row">
                                 <div class="col s12">
-                                  <button type="submit" class="btn mainColor waves-effect waves-light" id="btn_login">Iniciar sesión</button>
+                                  <button type="submit" :class="{'disabled': loading}" :disabled="loading" class="btn mainColor waves-effect waves-light" id="btn_login">Iniciar sesión</button>
                                 </div>
                             </div>
                          </form>
