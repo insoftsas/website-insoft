@@ -109,11 +109,11 @@ if (window.innerWidth > 993) {
 
     
 
-    const nav_6 = new ScrollMagic.Scene({ triggerElement: "#prices", duration: document.getElementById('prices').offsetHeight})
+    const nav_6 = new ScrollMagic.Scene({ triggerElement: "#awards", duration: document.getElementById('awards').offsetHeight})
                                  //.setTween(tween_3)
                                  .addTo(controller)
                                  .addIndicators()
-                                 .setClassToggle("#price-item", 'active')
+                                 .setClassToggle("#award-item", 'active')
 
     const nav_7 = new ScrollMagic.Scene({ triggerElement: "#inscriptions", duration: document.getElementById('inscriptions').offsetHeight})
                                  //.setTween(tween_3)
