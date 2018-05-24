@@ -29,7 +29,6 @@
                       <a v-else class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
                         <font-awesome-icon class="logo_os os_x" :icon="['fab', 'question']"/></a>
                       </a>
-
                       <div>
                         <p class="title_os">{{typeOfDevice(token)}}{{token.last_access.user_agent.os.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="'IP: '+token.last_access.ip">{{token.last_access.location}}</span></p>
                         <p>
@@ -76,8 +75,13 @@
     methods: {
       typeOfDevice: function(token){
         let os = token.last_access.user_agent.os.family
-        if(os == 'Windows' || os == 'Mac OS X'){
-          return 'PC '
+        let dev = token.last_access.user_agent.device.family
+        if(dev == 'Other'){
+          if(os == 'Windows' || os == 'Mac OS X'){
+            return 'PC · '
+          }
+        }else{
+          return dev + ' · '
         }
       },
       moment: function(time) {
