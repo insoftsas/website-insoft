@@ -20,8 +20,8 @@ class GetCurrentUserToken
             $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $request->header('authorization')));
             if( $jwt != '' && $jwt != null){
                 $token = (new \Lcobucci\JWT\Parser())->parse($jwt);
-                if( $token != null){
-                    $usToken = auth()->user()->tokens->find($token->getHeader("jti"));
+                if( $token != null && auth()->guard("api")->check()){
+                    $usToken = auth()->guard("api")->user()->tokens->find($token->getHeader("jti"));
                     if($usToken != null){
                         $obj = (object) array(
                             'user_agent' => $request->header('user-agent')??'none',
