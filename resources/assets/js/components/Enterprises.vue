@@ -9,7 +9,11 @@
               <div class="indeterminate"></div>
             </div>
             <div class="card-content">
-              <span class="card-title">Empresas</span>
+              <div class="row">
+                <div class="col s12">
+                  <span class="card-title">Empresas</span>
+                </div>
+              </div>
               <div class="row">
                 <div class="col s12">
                   <table class="striped highlight" id="enterprises">
