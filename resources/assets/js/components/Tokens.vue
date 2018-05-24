@@ -30,24 +30,26 @@
                         <font-awesome-icon class="logo_os os_x" :icon="['fab', 'question']"/></a>
                       </a>
 
-                      <a v-if="token.last_access.user_agent.family == 'Chrome' || token.last_access.user_agent.family == 'Chrome Mobile' " class="logo_nav_cont">
-                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'chrome']"/></a>
-                      </a>
-
-                      <a v-if="token.last_access.user_agent.family == 'Safari' || token.last_access.user_agent.family == 'Mobile Safari'" class="logo_nav_cont">
-                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'safari']"/></a>
-                      </a>
-
-                      <a v-if="token.last_access.user_agent.family == 'Firefox'" class="logo_nav_cont">
-                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'firefox']"/></a>
-                      </a>
-
-                      <a v-if="token.last_access.user_agent.family == 'Opera'" class="logo_nav_cont">
-                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'opera']"/></a>
-                      </a>
                       <div>
                         <p class="title_os">{{typeOfDevice(token)}}{{token.last_access.user_agent.os.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="'IP: '+token.last_access.ip">{{token.last_access.location}}</span></p>
-                        <p>{{token.last_access.user_agent.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="moment(token.last_access.time).format('LLLL')">{{moment(token.last_access.time).fromNow()}}</span><span v-if="token.revoked || token.current"> · <span class="help-text-token" :class="{'red-text':token.revoked,'green-text':token.current}" v-html="token.revoked?'Sesión cerrada':'Sesión actual'"></span></span></p>
+                        <p>
+                          <a v-if="token.last_access.user_agent.family == 'Chrome' || token.last_access.user_agent.family == 'Chrome Mobile' " class="logo_nav_cont">
+                            <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'chrome']"/></a>
+                          </a>
+
+                          <a v-else-if="token.last_access.user_agent.family == 'Safari' || token.last_access.user_agent.family == 'Mobile Safari'" class="logo_nav_cont">
+                            <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'safari']"/></a>
+                          </a>
+
+                          <a v-else-if="token.last_access.user_agent.family == 'Firefox'" class="logo_nav_cont">
+                            <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'firefox']"/></a>
+                          </a>
+
+                          <a v-else-if="token.last_access.user_agent.family == 'Opera'" class="logo_nav_cont">
+                            <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'opera']"/></a>
+                          </a>
+                          {{token.last_access.user_agent.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="moment(token.last_access.time).format('LLLL')">{{moment(token.last_access.time).fromNow()}}</span><span v-if="token.revoked || token.current"> · <span class="help-text-token" :class="{'red-text':token.revoked,'green-text':token.current}" v-html="token.revoked?'Sesión cerrada':'Sesión actual'"></span></span>
+                        </p>
                       </div>
                     </td>
                     <td><a class="btn-floating tooltipped red waves-effect waves-light" :class="{'disabled': token.revoked}" :disabled="token.revoked" data-position="bottom" data-tooltip="Cerrar sesión" @click="deleteToken(i)"><font-awesome-icon icon="times" /></a></td>
@@ -176,9 +178,6 @@
   }
  }
  .logo_nav_cont{
-    position:absolute;
-    left: 42px;
-    bottom: 14px;
     & .logo_nav{
 
       &.chrome{
