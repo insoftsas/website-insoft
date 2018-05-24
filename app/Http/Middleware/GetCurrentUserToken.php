@@ -16,13 +16,13 @@ class GetCurrentUserToken
      */
     public function handle($request, Closure $next)
     {
-        if( $request->header('authorization') != null){
+        if( !is_null($request->header('authorization')) ){
             $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $request->header('authorization')));
-            if( $jwt != '' && $jwt != null){
+            if( $jwt != '' && !is_null($jwt) && $jwt != 'Bearer'){
                 $token = (new \Lcobucci\JWT\Parser())->parse($jwt);
-                if( $token != null && auth()->guard("api")->check()){
+                if( !is_null($token) && auth()->guard("api")->check()){
                     $usToken = auth()->guard("api")->user()->tokens->find($token->getHeader("jti"));
-                    if($usToken != null){
+                    if( !is_null($usToken) ){
                         $obj = (object) array(
                             'user_agent' => $request->header('user-agent')??'none',
                             'ip' => $request->ip(),
