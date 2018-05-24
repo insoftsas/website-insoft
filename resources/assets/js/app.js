@@ -26,6 +26,7 @@ Vue.component('font-awesome-icon', fontawesomevue);
 Vue.component('main-app', require('./components/App.vue'));
 Vue.component('word-writing', require('./components/wordWriting.vue'));
 Vue.component('menu-admin', require('./components/MenuAdmin.vue'));
+Vue.component('inscription', require('./components/Inscription.vue'));
 
 const router = new VueRouter({
     routes

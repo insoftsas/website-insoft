@@ -581,6 +581,7 @@
 			<section id="inscriptions">
 		  	<div class="container">
 		  		<h2 class="title-section">Inscripción</h2>
+		  		<inscription></inscription>
 		    </div>
 	    </section>
 	    <section id="conctact">

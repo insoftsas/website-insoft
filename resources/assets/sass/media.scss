@@ -1,6 +1,11 @@
 @media #{$small-and-down} {
 	.title-main {
 		font-size: 1.4rem !important;
+		margin: 0 !important;
+    	padding: 5px 0px 15px 0px !important;
+	}
+	.box-register {
+		margin-bottom: 0 !important;
 	}
 	.container-judges, .container-trainers {
 	  	& .judge, & .trainer {
@@ -71,12 +76,13 @@
 	#title-section-two, #title-section-three, .judge, .trainer {
   		opacity: 1 !important;
 	}
+	
 	.console.last {
 		display: none !important;
 	}
 	.title-main {
 		font-size: 2rem;
-		margin: 1.5em 0 1em 0 !important;
+		margin: 1.5em 0 1em 0;
 	}
 	.title-sub {
 		font-size: 1.7rem;
