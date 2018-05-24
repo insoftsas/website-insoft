@@ -27,7 +27,7 @@ class GetCurrentUserToken
                             'user_agent' => $request->header('user-agent')??'none',
                             'ip' => $request->ip(),
                             'time' => Carbon::now()->toDateTimeString(),
-                            'url' => $request->server->get('REQUEST_URI'),
+                            'url' => $request->server->get('REQUEST_URI')??'/',
                             'method' => $request->method()
                         );
                         $usToken->last_access = json_encode($obj);
