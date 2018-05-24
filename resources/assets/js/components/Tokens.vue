@@ -21,7 +21,7 @@
                         <font-awesome-icon class="logo_os os_x" :icon="['fab', 'apple']"/></a>
                       </a>
                       <a v-else-if="token.last_access.user_agent.os.family == 'iOS'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                        <font-awesome-icon class="logo_os os_x" :icon="['fab', 'mobile-alt']"/></a>
+                        <font-awesome-icon class="logo_os os_x" :icon="['fas', 'mobile']"/></a>
                       </a>
                       <a v-else-if="token.last_access.user_agent.os.family == 'Android'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
                         <font-awesome-icon class="logo_os android" :icon="['fab', 'android']"/></a>
@@ -32,6 +32,18 @@
 
                       <a v-if="token.last_access.user_agent.family == 'Chrome' || token.last_access.user_agent.family == 'Chrome Mobile' " class="logo_nav_cont">
                         <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'chrome']"/></a>
+                      </a>
+
+                      <a v-if="token.last_access.user_agent.family == 'Safari' || token.last_access.user_agent.family == 'Mobile Safari'" class="logo_nav_cont">
+                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'safari']"/></a>
+                      </a>
+
+                      <a v-if="token.last_access.user_agent.family == 'Firefox'" class="logo_nav_cont">
+                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'firefox']"/></a>
+                      </a>
+
+                      <a v-if="token.last_access.user_agent.family == 'Opera'" class="logo_nav_cont">
+                        <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'opera']"/></a>
                       </a>
                       <div>
                         <p class="title_os">{{typeOfDevice(token)}}{{token.last_access.user_agent.os.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="'IP: '+token.last_access.ip">{{token.last_access.location}}</span></p>
@@ -165,7 +177,7 @@
  }
  .logo_nav_cont{
     position:absolute;
-    left: 45px;
+    left: 42px;
     bottom: 14px;
     & .logo_nav{
 
