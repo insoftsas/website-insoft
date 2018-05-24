@@ -61,7 +61,11 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   top: -2px;
   position: relative;
 }
-
+.loaders_panels{
+  position: absolute;
+  top: -7px;
+  height: 10px;
+}
 .admin_panel {
   & > .container{
     margin-top: 38px;

@@ -5,6 +5,9 @@
       <div class="row">
         <div class="col s12">
           <div class="card" id="tokens_card" style="opacity:0; transform: translateY(100px) scale(0.8);">
+            <div class="progress loaders_panels" v-if="loading">
+              <div class="indeterminate"></div>
+            </div>
             <div class="card-content">
               <span class="card-title">Dónde iniciaste sesión</span>
               <table class="striped highlight" id="sessions">
