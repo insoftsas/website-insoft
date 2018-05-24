@@ -7,6 +7,15 @@
           <div class="card">
             <div class="card-content">
               <span class="card-title">Grupos</span>
+              <table class="striped highlight" id="sessions">
+                <tbody>
+                  <tr v-for="(group,i) in groups" :key="i">
+                    <td>
+                      {{JSON.stringify(group)}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

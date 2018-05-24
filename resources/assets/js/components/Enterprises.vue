@@ -7,6 +7,15 @@
           <div class="card">
             <div class="card-content">
               <span class="card-title">Empresas</span>
+              <table class="striped highlight" id="sessions">
+                <tbody>
+                  <tr v-for="(enterprise,i) in enterprises" :key="i">
+                    <td>
+                      {{JSON.stringify(enterprise)}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

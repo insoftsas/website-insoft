@@ -7,6 +7,15 @@
           <div class="card">
             <div class="card-content">
               <span class="card-title">Makers</span>
+              <table class="striped highlight" id="sessions">
+                <tbody>
+                  <tr v-for="(maker,i) in makers" :key="i">
+                    <td>
+                      {{JSON.stringify(maker)}}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
