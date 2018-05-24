@@ -5,17 +5,24 @@
       <div class="row">
         <div class="col s12" id="groups_card" style="opacity:0; transform: translateY(100px) scale(0.8);">
           <div class="card">
+            <div class="progress loaders_panels" v-if="loading">
+              <div class="indeterminate"></div>
+            </div>
             <div class="card-content">
               <span class="card-title">Grupos</span>
-              <table class="striped highlight" id="sessions">
-                <tbody>
-                  <tr v-for="(group,i) in groups" :key="i">
-                    <td>
-                      {{JSON.stringify(group)}}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="row">
+                <div class="col s12">
+                  <table class="striped highlight" id="groups">
+                    <tbody>
+                      <tr v-for="(group,i) in groups" :key="i">
+                        <td>
+                          {{JSON.stringify(group)}}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>

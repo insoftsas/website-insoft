@@ -5,17 +5,24 @@
       <div class="row">
         <div class="col s12" id="enterprises_card" style="opacity:0; transform: translateY(100px) scale(0.8);">
           <div class="card">
+            <div class="progress loaders_panels" v-if="loading">
+              <div class="indeterminate"></div>
+            </div>
             <div class="card-content">
               <span class="card-title">Empresas</span>
-              <table class="striped highlight" id="sessions">
-                <tbody>
-                  <tr v-for="(enterprise,i) in enterprises" :key="i">
-                    <td>
-                      {{JSON.stringify(enterprise)}}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <div class="row">
+                <div class="col s12">
+                  <table class="striped highlight" id="enterprises">
+                    <tbody>
+                      <tr v-for="(enterprise,i) in enterprises" :key="i">
+                        <td>
+                          {{JSON.stringify(enterprise)}}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
