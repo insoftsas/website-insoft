@@ -15,8 +15,8 @@
                   <tr v-for="(token,i) in tokens" :key="i">
                     <td>
                       <div class="div_width">
-                        <a v-if="token.last_access.user_agent.os.family == 'Windows'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                          <font-awesome-icon class="logo_os windows" :icon="['fab', 'windows']"/></a>
+                        <a v-if="token.last_access.user_agent.os.family == 'Windows' || token.last_access.user_agent.os.family == 'Windows Phone'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                          <font-awesome-icon class="logo_os windows" :class="{'w_phone' : token.last_access.user_agent.os.family == 'Windows Phone'}" :icon="['fab', 'windows']"/></a>
                         </a>
                         <a v-else-if="token.last_access.user_agent.os.family == 'Mac OS X'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
                           <font-awesome-icon class="logo_os os_x" :icon="['fab', 'apple']"/></a>
@@ -27,8 +27,11 @@
                         <a v-else-if="token.last_access.user_agent.os.family == 'Android'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
                           <font-awesome-icon class="logo_os android" :icon="['fab', 'android']"/></a>
                         </a>
+                        <a v-else-if="token.last_access.user_agent.os.family == 'BlackBerry OS' || token.last_access.user_agent.os.family == 'BlackBerry Tablet OS'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                          <font-awesome-icon class="logo_os blackberry" :icon="['fab', 'blackberry']"/></a>
+                        </a>
                         <a v-else class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                          <font-awesome-icon class="logo_os os_x" :icon="['fab', 'question']"/></a>
+                          <font-awesome-icon class="logo_os os_x" :icon="['fas', 'question']"/></a>
                         </a>
                       </div>
                       <div class="div_width">
@@ -39,15 +42,27 @@
                           </a>
 
                           <a v-else-if="token.last_access.user_agent.family == 'Safari' || token.last_access.user_agent.family == 'Mobile Safari'" class="logo_nav_cont">
-                            <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'safari']"/></a>
+                            <font-awesome-icon class="logo_nav safari" :icon="['fab', 'safari']"/></a>
                           </a>
 
                           <a v-else-if="token.last_access.user_agent.family == 'Firefox'" class="logo_nav_cont">
-                            <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'firefox']"/></a>
+                            <font-awesome-icon class="logo_nav firefox" :icon="['fab', 'firefox']"/></a>
                           </a>
 
                           <a v-else-if="token.last_access.user_agent.family == 'Opera'" class="logo_nav_cont">
-                            <font-awesome-icon class="logo_nav chrome" :icon="['fab', 'opera']"/></a>
+                            <font-awesome-icon class="logo_nav opera" :icon="['fab', 'opera']"/></a>
+                          </a>
+
+                          <a v-else-if="token.last_access.user_agent.family == 'Edge' || token.last_access.user_agent.family == 'Edge Mobile'" class="logo_nav_cont">
+                            <font-awesome-icon class="logo_nav edge" :icon="['fab', 'edge']"/></a>
+                          </a>
+
+                          <a v-else-if="token.last_access.user_agent.family == 'IE'" class="logo_nav_cont">
+                            <font-awesome-icon class="logo_nav ie" :icon="['fab', 'internet-explorer']"/></a>
+                          </a>
+
+                          <a v-else class="logo_nav_cont">
+                            <font-awesome-icon class="logo_nav default" :icon="['fas', 'globe']"/></a>
                           </a>
                           {{token.last_access.user_agent.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="moment(token.last_access.time).format('LLLL')">{{moment(token.last_access.time).fromNow()}}</span><span v-if="token.revoked || token.current"> · <span class="help-text-token" :class="{'red-text':token.revoked,'green-text':token.current}" v-html="token.revoked?'Sesión cerrada':'Sesión actual'"></span></span>
                         </p>
@@ -208,6 +223,24 @@
       &.chrome{
         color: rgb(73, 80, 87);
       }
+      &.ie{
+        color: rgb(30,187,238);
+      }
+      &.safari{
+        color: rgb(10,189,234);
+      }
+      &.firefox{
+        color: rgb(255,128,6);
+      }
+      &.opera{
+        color: rgb(255,27,45);
+      }
+      &.edge{
+        color: rgb(0,120,215);
+      }
+      &.default{
+        color: rgb(73,80,87);
+      }
     }
  }
  .help-text-token{
@@ -219,12 +252,18 @@
     margin: 0px 10px 0px 10px;
     &.windows{
       color: rgb(0,173,239);
+      &.w_phone{
+        color: rgb(104,33,121)!important;
+      }
     }
     &.os_x{
       color: rgb(73, 80, 87);
     }
     &.android{
       color: rgb(164,198,57);
+    }
+    &.blackberry{
+      color: black;
     }
   }
 </style>

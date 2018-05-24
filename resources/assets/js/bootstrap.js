@@ -3,6 +3,7 @@ window._ = require('lodash');
 window.Popper = require('popper.js').default;
 window.moment = require('moment');
 window.useragent = require('useragent');
+require('es6-promise').polyfill();
 
 moment.locale('es')
 try {
