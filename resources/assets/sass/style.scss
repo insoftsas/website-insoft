@@ -11,7 +11,6 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
-
 // Colors Of all system and inputs
 .mainColor{
   background-color: $primary-color!important;
@@ -68,12 +67,15 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
 }
 .admin_panel {
   & > .container{
-    margin-top: 38px;
+    //margin-top: 38px;
   }
   & .card-title{
     font-size: 3rem;
     text-align: center;
   }
+}
+.admin_panel .navbar-items{
+  position: relative!important;
 }
 .navbar-items {
   display: flex;

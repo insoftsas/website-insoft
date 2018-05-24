@@ -14,22 +14,24 @@
                 <tbody>
                   <tr v-for="(token,i) in tokens" :key="i">
                     <td>
-                      <a v-if="token.last_access.user_agent.os.family == 'Windows'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                        <font-awesome-icon class="logo_os windows" :icon="['fab', 'windows']"/></a>
-                      </a>
-                      <a v-else-if="token.last_access.user_agent.os.family == 'Mac OS X'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                        <font-awesome-icon class="logo_os os_x" :icon="['fab', 'apple']"/></a>
-                      </a>
-                      <a v-else-if="token.last_access.user_agent.os.family == 'iOS'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                        <font-awesome-icon class="logo_os os_x" :icon="['fas', 'mobile']"/></a>
-                      </a>
-                      <a v-else-if="token.last_access.user_agent.os.family == 'Android'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                        <font-awesome-icon class="logo_os android" :icon="['fab', 'android']"/></a>
-                      </a>
-                      <a v-else class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
-                        <font-awesome-icon class="logo_os os_x" :icon="['fab', 'question']"/></a>
-                      </a>
-                      <div>
+                      <div class="div_width">
+                        <a v-if="token.last_access.user_agent.os.family == 'Windows'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                          <font-awesome-icon class="logo_os windows" :icon="['fab', 'windows']"/></a>
+                        </a>
+                        <a v-else-if="token.last_access.user_agent.os.family == 'Mac OS X'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                          <font-awesome-icon class="logo_os os_x" :icon="['fab', 'apple']"/></a>
+                        </a>
+                        <a v-else-if="token.last_access.user_agent.os.family == 'iOS'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                          <font-awesome-icon class="logo_os os_x" :icon="['fas', 'mobile']"/></a>
+                        </a>
+                        <a v-else-if="token.last_access.user_agent.os.family == 'Android'" class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                          <font-awesome-icon class="logo_os android" :icon="['fab', 'android']"/></a>
+                        </a>
+                        <a v-else class="tooltipped" data-position="top" :data-tooltip="token.last_access.user_agent.os.toString() ">
+                          <font-awesome-icon class="logo_os os_x" :icon="['fab', 'question']"/></a>
+                        </a>
+                      </div>
+                      <div class="div_width">
                         <p class="title_os">{{typeOfDevice(token)}}{{token.last_access.user_agent.os.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="'IP: '+token.last_access.ip">{{token.last_access.location}}</span></p>
                         <p>
                           <a v-if="token.last_access.user_agent.family == 'Chrome' || token.last_access.user_agent.family == 'Chrome Mobile' " class="logo_nav_cont">
@@ -50,8 +52,13 @@
                           {{token.last_access.user_agent.family}} · <span  class="tooltipped" data-position="top" :data-tooltip="moment(token.last_access.time).format('LLLL')">{{moment(token.last_access.time).fromNow()}}</span><span v-if="token.revoked || token.current"> · <span class="help-text-token" :class="{'red-text':token.revoked,'green-text':token.current}" v-html="token.revoked?'Sesión cerrada':'Sesión actual'"></span></span>
                         </p>
                       </div>
+                      <div class="hide-on-large-only div_width">
+                        <a class="waves-effect waves-light btn red" :class="{'disabled': token.revoked}" @click="deleteToken(i)" :disabled="token.revoked"><font-awesome-icon icon="times" /> Cerrar sesión</a>
+                      </div>
                     </td>
-                    <td><a class="btn-floating tooltipped red waves-effect waves-light" :class="{'disabled': token.revoked}" :disabled="token.revoked" data-position="bottom" data-tooltip="Cerrar sesión" @click="deleteToken(i)"><font-awesome-icon icon="times" /></a></td>
+                    <td class="hide-on-med-and-down">
+                      <a class="btn-floating tooltipped red waves-effect waves-light" :class="{'disabled': token.revoked}" :disabled="token.revoked" data-position="bottom" data-tooltip="Cerrar sesión" @click="deleteToken(i)"><font-awesome-icon icon="times" /></a>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -168,6 +175,20 @@
 </script>
 
 <style lang="scss" scoped>
+
+    
+    @media only screen and (max-width: 992px) {
+      .div_width{
+        margin-bottom: 12px;
+        text-align: center;
+        width: 100%;
+        & > svg{
+          width: 100%;
+          font-size: 50px;
+        }
+      }
+    }
+
  .btn-floating.tooltipped{
   font-size: 20px;
  }
@@ -193,6 +214,7 @@
   font-size: 12px;
  }
  .logo_os{
+    width: 55px;
     font-size: 40px;
     margin: 0px 10px 0px 10px;
     &.windows{
