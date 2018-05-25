@@ -9637,10 +9637,6 @@ textarea.materialize-textarea:focus:not([readonly]) {
   height: 10px;
 }
 
-.admin_panel > .container {
-  margin-top: 38px;
-}
-
 .admin_panel .card-title {
   font-size: 3rem;
   text-align: center;
@@ -9655,6 +9651,10 @@ textarea.materialize-textarea:focus:not([readonly]) {
   width: -moz-max-content;
   width: max-content;
   display: none;
+}
+
+.admin_panel .navbar-items {
+  position: relative !important;
 }
 
 .navbar-items {
