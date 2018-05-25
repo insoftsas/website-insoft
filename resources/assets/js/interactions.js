@@ -52,8 +52,8 @@ let scrollIndex = class scroll {
                             ])
             let tween_6 = new TimelineMax()
                                 .add([
-                                    TweenMax.staggerFromTo(".enterprise", 2, {right: '120%'}, {right: 0, ease: Back.ease}, 0),
-                                    TweenMax.staggerFromTo(".developer", 2, {left: '120%'}, {left: 0, ease: Back.ease}, 0)
+                                    TweenMax.staggerFromTo(".enterprise", 0.5, {right: '120%'}, {right: 0, ease: Back.ease}, 0),
+                                    TweenMax.staggerFromTo(".developer", 0.5, {left: '120%'}, {left: 0, ease: Back.ease}, 0)
                             ])
 
             let scene_1 = new ScrollMagic.Scene({ offset: -1, duration: document.getElementById('home').offsetHeight })
@@ -75,7 +75,7 @@ let scrollIndex = class scroll {
                                          .setTween(tween_5)
                                          .addTo(controller)
 
-            let scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate", duration: (document.getElementById('participate').offsetHeight - 300) })
+            let scene_6 = new ScrollMagic.Scene({ triggerElement: "#participate" })
                                          .setTween(tween_6)
                                          .addTo(controller)                           
 

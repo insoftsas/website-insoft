@@ -119,7 +119,14 @@
 	}
 }
 @media #{$large-and-up} {
-// styles for large screens and up
+	.place-award {
+	 	&.second {
+	    	margin-top: 3em;
+	  	}
+	  	&.third {
+	    	margin-top: 6em;
+	  	}
+	}
 }
 @media #{$extra-large-and-up} {
 // styles for extra large screens and up
