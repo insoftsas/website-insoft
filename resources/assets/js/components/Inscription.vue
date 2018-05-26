@@ -94,13 +94,13 @@
               <span class="text-info-ins">Selecciona como quieres inscribirte</span>
             </div>
             <div class="containter-question col s12 m4 center">
-              <button @click="indivualRegister" class="btn-select-ins" :class="{ 'disabled' : makers_data.new_group == 1 || add_to_group == true }">Indididual</button>
+              <button type="button" @click.prevent="indivualRegister" class="btn-select-ins" :class="{ 'disabled' : makers_data.new_group == 1 || add_to_group == true }">Indididual</button>
             </div>
             <div class="containter-question col s12 m4 center">
-              <button @click="newGroup" class="btn-select-ins" :class="{ 'disabled' : makers_data.new_group == 0 || add_to_group == true }">Grupal</button>
+              <button type="button" @click.prevent="newGroup" class="btn-select-ins" :class="{ 'disabled' : makers_data.new_group == 0 || add_to_group == true }">Grupal</button>
             </div>
             <div class="containter-question col s12 m4 center">
-              <button @click="addToGroup" class="btn-select-ins" :class="{ 'disabled' : makers_data.new_group == 1 || add_to_group == false }">Ya tengo grupo</button>
+              <button type="button" @click.prevent="addToGroup" class="btn-select-ins" :class="{ 'disabled' : makers_data.new_group == 1 || add_to_group == false }">Unirme a un grupo</button>
             </div>
           </div>
           <header>Datos personales</header>
@@ -226,7 +226,7 @@
           </div>
           <div class="col s12 body-form">
             <div class="containter-question col s12">
-              <p>
+              <p class="terms-check">
                 <label>
                   <input type="checkbox" v-model="makers_data.terms" class="filled-in" />
                   <span>Acepto los terminos y condiciones</span>
@@ -234,7 +234,7 @@
               </p>
             </div>
             <div class="containter-question col s12 center">
-              <button @click.prevent="sendMaker" :disabled="!makers_data.terms">Enviar</button>
+              <button type="submit" @click.prevent="sendMaker" :disabled="!makers_data.terms">Enviar</button>
             </div>
           </div>
         </form>
@@ -258,7 +258,7 @@
           cellphone: null,
           razon_social_propietario: null,
           representante_legal: null,
-          sector_productivo: '', 
+          sector_productivo: '',
           rut: null,
           terms: false
         },
@@ -444,12 +444,12 @@
             if (error.response.data.message == 'Codigo de grupo no encontrado') {
               vm.code_not_found = true
               vm.error_separated = error.response.data.message
-              if (vm.birt_date_fail) 
+              if (vm.birt_date_fail)
                 vm.birt_date_fail = !vm.birt_date_fail
             } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
               vm.birt_date_fail = true
               vm.error = error.response.data.message
-              if (vm.code_not_found) 
+              if (vm.code_not_found)
                 vm.code_not_found = !vm.code_not_found
             } else {
               const e = error.response.data.errors
@@ -460,12 +460,19 @@
       },
     },
     mounted() {
-    
+
     }
   }
 </script>
 
 <style lang="scss" scoped>
+  .terms-check {
+    margin: 0;
+    & [type="checkbox"].filled-in:checked + span:not(.lever):after {
+      border: 2px solid #2196f3;
+      background-color: #2196f3;
+    }
+  }
   .info-inscription {
     font-size: 1.3rem;
   }
@@ -489,7 +496,6 @@
       }
     }
   }
-
   .form-inscription {
     & header {
       background: #2196f3;
@@ -499,12 +505,10 @@
       border-radius: 2px 2px 0 0;
     }
   }
-
   .body-form {
     background: #fff;
     padding: .5em 1em;
   }
-
   .input-hack {
     border-radius: 2px;
     border: 1px solid #ccc;
