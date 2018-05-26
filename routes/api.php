@@ -25,3 +25,7 @@ Route::resource('groups', 'GroupAPIController');
 Route::resource('makers', 'MakerAPIController');
 
 Route::resource('enterprises', 'EnterpriseAPIController');
+
+Route::get('/states', 'CentralAPIController@states');
+
+Route::post('/cities', 'CentralAPIController@getCities');

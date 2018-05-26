@@ -36,15 +36,16 @@ class CreateMakerAPIRequest extends APIRequest
             'bird_date'         => 'required|date',
             'city_id'           => 'required|numeric|exists:cities,id',
             'email'             => 'required|email|unique:makers,email',
-            'phone'             => '',
+            'phone'             => 'required',
             'level'             => 'required|string',
-            'semester'          => 'required_if:level,Estudiante|string',
+            'semester'          => 'required_if:level,Estudiante',
             'area'              => 'required|string',
             'career'            => 'required|string',
             'skills'            => 'required|string',
             'bio'               => '',
             'file_document'     => 'mimes:jpeg,bmp,png,pdf',
             'file_certificate'  => 'mimes:jpeg,bmp,png,pdf',
+            'terms'             => 'required',
         ];
 
         switch (request()->doc_type) {

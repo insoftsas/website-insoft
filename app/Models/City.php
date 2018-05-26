@@ -8,7 +8,9 @@ class City extends Model
 {
     public $table = 'cities';
 
-    protected $appends = ['stateName'];
+    protected $appends = [];
+
+    protected $hidden = ['state_id'];
 
     public $fillable = [
         'name',
