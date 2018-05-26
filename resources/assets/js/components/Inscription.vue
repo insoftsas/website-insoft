@@ -22,25 +22,25 @@
         <form v-if="form_to_show == 1" class="form-inscription">
           <header>Formulario de preinscripción de empresas</header>
           <div class="col s12 body-form">
-            <div class="containter-question col s12">
-              <label>Razón social o propietario *</label>
-              <input type="text" v-model="enterprises_data.razon_social_propietario" required class="browser-default input-hack" />
+            <div class="containter-question col s12 razon_social_propietario">
+              <label>Razón social o propietario * <span class="red-text" v-if="error.razon_social_propietario != null || error == undefined">{{ error.razon_social_propietario[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.razon_social_propietario" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12 m6">
-              <label>NIT *</label>
-              <input type="text" v-model="enterprises_data.nit" required class="browser-default input-hack" />
+            <div class="containter-question col s12 m6 nit">
+              <label>NIT * <span class="red-text" v-if="error.nit != null || error == undefined">{{ error.nit[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.nit" required :disabled="completed_registration" class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12 m6">
-              <label>Representante legal *</label>
-              <input type="text" v-model="enterprises_data.representante_legal" required class="browser-default input-hack" />
+            <div class="containter-question col s12 m6 representante_legal">
+              <label>Representante legal * <span class="red-text" v-if="error.representante_legal != null || error == undefined">{{ error.representante_legal[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.representante_legal" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12 m6">
-              <label>Actividad Comercial *</label>
-              <input type="text" v-model="enterprises_data.actividad_comercial" required class="browser-default input-hack" />
+            <div class="containter-question col s12 m6 actividad_comercial">
+              <label>Actividad Comercial * <span class="red-text" v-if="error.actividad_comercial != null || error == undefined">{{ error.actividad_comercial[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.actividad_comercial" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12 m6">
-              <label>Sector Productivo *</label>
-              <select class="browser-default" v-model="enterprises_data.sector_productivo">
+            <div class="containter-question col s12 m6 sector_productivo">
+              <label>Sector Productivo * <span class="red-text" v-if="error.sector_productivo != null || error == undefined">{{ error.sector_productivo[0] }}</span></label>
+              <select class="browser-default" :disabled="completed_registration" v-model="enterprises_data.sector_productivo">
                 <option selected disabled value="">Seleccione una opción</option>
                 <option value="Agencias inmobiliarias">Agencias inmobiliarias</option>
                 <option value="Hoteles y agencias turísticas">Hoteles y agencias turísticas</option>
@@ -50,40 +50,37 @@
                 <option value="Industrias culturales y creativas">Industrias culturales y creativas</option>
               </select>
             </div>
-            <div class="containter-question col s12 m6">
-              <label>Municipio *</label>
-              <input type="text" v-model="enterprises_data.city_id" required class="browser-default input-hack" />
+            <div class="containter-question col s12 m6 city_id">
+              <label>Municipio * <span class="red-text" v-if="error.city_id != null || error == undefined">{{ error.city_id[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.city_id" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12 m6">
-              <label>Barrio *</label>
-              <input type="text" v-model="enterprises_data.neigboard" required class="browser-default input-hack" />
+            <div class="containter-question col s12 m6 neigboard">
+              <label>Barrio * <span class="red-text" v-if="error.neigboard != null || error == undefined">{{ error.neigboard[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.neigboard" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12">
-              <label>Dirección *</label>
-              <input type="text" v-model="enterprises_data.address" required class="browser-default input-hack" />
+            <div class="containter-question col s12 m6 phone">
+              <label>Teléfono/Celular * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
+              <input type="number" v-model="enterprises_data.phone" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12 m6">
-              <label>Teléfono fijo *</label>
-              <input type="number" v-model="enterprises_data.phone" required class="browser-default input-hack" />
+            <div class="containter-question col s12 m6 address">
+              <label>Dirección * <span class="red-text" v-if="error.address != null || error == undefined">{{ error.address[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.address" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
-            <div class="containter-question col s12 m6">
-              <label>Celular *</label>
-              <input type="number" v-model="enterprises_data.cellphone" required class="browser-default input-hack" />
-            </div>
-            <div class="containter-question col s12">
-              <label>Correo electrónico *</label>
-              <input type="text" v-model="enterprises_data.email" required class="browser-default input-hack" />
+            <div class="containter-question col s12 email">
+              <label>Correo electrónico * <span class="red-text" v-if="error.email != null || error == undefined">{{ error.email[0] }}</span></label>
+              <input type="text" v-model="enterprises_data.email" :disabled="completed_registration" required class="browser-default input-hack" />
             </div>
             <div class="containter-question col s12">
-              <p>
+              <p class="terms-check">
                 <label>
-                  <input type="checkbox" v-model="enterprises_data.terms" required class="filled-in" />
+                  <input type="checkbox" v-model="enterprises_data.terms" :disabled="completed_registration" required class="filled-in" />
                   <span>Acepto los terminos y condiciones</span>
                 </label>
               </p>
             </div>
             <div class="containter-question col s12 center">
-              <button @click.prevent="sendEnterprise" :disabled="!enterprises_data.terms">Enviar</button>
+              <div v-if="completed_registration" class="completed">Inscripción completada</div>
+              <button v-else @click.prevent="sendEnterprise" :disabled="!enterprises_data.terms || loading">{{ !loading ? 'Enviar' : 'Enviando...' }}</button>
             </div>
           </div>
         </form>
@@ -175,7 +172,7 @@
               <input type="email" v-model="makers_data.email" class="browser-default input-hack" />
             </div>
             <div class="containter-question col s12 m6 phone">
-              <label>Teléfono * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
+              <label>Teléfono/Celular * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
               <input type="number" v-model="makers_data.phone" class="browser-default input-hack" />
             </div>
             <div class="containter-question col s12 m6 level">
@@ -255,7 +252,6 @@
           neigboard: null,
           nit: null,
           phone: null,
-          cellphone: null,
           razon_social_propietario: null,
           representante_legal: null,
           sector_productivo: '',
@@ -287,6 +283,13 @@
         },
         add_to_group: false,
         error: {
+          razon_social_propietario: null,
+          nit: null,
+          representante_legal: null,
+          actividad_comercial: null,
+          sector_productivo: null,
+          neigboard: null,
+          address: null,
           first_name: null,
           last_name: null,
           doc_type: null,
@@ -309,10 +312,43 @@
           bio: null
         },
         code_not_found: false,
-        birt_date_fail: false
+        birt_date_fail: false,
+        completed_registration: false,
+        loading: false
       }
     },
     methods: {
+      resetErrorValues: function () {
+        this.error = {
+          razon_social_propietario: null,
+          nit: null,
+          representante_legal: null,
+          actividad_comercial: null,
+          sector_productivo: null,
+          neigboard: null,
+          address: null,
+          first_name: null,
+          last_name: null,
+          doc_type: null,
+          document: null,
+          genere: null,
+          age: null,
+          bird_date: null,
+          country: null,
+          departament_id: null,
+          city_id: null,
+          email: null,
+          phone: null,
+          level: null,
+          semester: null,
+          career: null,
+          skills: null,
+          terms: null,
+          area: null,
+          new_group: null,
+          bio: null
+        }
+      },
       showEnterpriseForm: function () {
         this.form_to_show = 1
       },
@@ -341,12 +377,21 @@
         this.add_to_group = true
       },
       sendEnterprise: function () {
+        let vm = this
+        vm.loading = !vm.loading
         axios.post('/api/enterprises', this.enterprises_data)
           .then(function (response) {
-            console.log(response);
+            vm.loading = !vm.loading
+            console.log(response)
+            vm.completed_registration = true
+            vm.resetErrorValues()
           })
           .catch(function (error) {
-            console.log(error);
+            vm.loading = !vm.loading
+            vm.completed_registration = false
+            const e = error.response.data.errors
+            vm.error = e
+            vm.checkError(e)
           })
       },
       setDate: function () {
@@ -354,13 +399,32 @@
         vm.makers_data.bird_date = document.getElementById('bird_date').value
       },
       goToChange: function (c) {
-        console.log(c)
         document.getElementsByClassName(c)[0].scrollIntoView({behavior: 'smooth'})
       },
       checkError: function (e) {
         let vm = this
-        console.log(e[0])
-        switch (e[0]) {
+        switch (e[Object.keys(e)[0]]) {
+          case e.razon_social_propietario:
+            vm.goToChange('razon_social_propietario')
+          break
+          case e.nit:
+            vm.goToChange('nit')
+          break
+          case e.representante_legal:
+            vm.goToChange('representante_legal')
+          break
+          case e.actividad_comercial:
+            vm.goToChange('actividad_comercial')
+          break
+          case e.sector_productivo:
+            vm.goToChange('sector_productivo')
+          break
+          case e.neigboard:
+            vm.goToChange('neigboard')
+          break
+          case e.address:
+            vm.goToChange('address')
+          break
           case e.first_name:
             vm.goToChange('first_name')
           break
@@ -425,6 +489,7 @@
       },
       sendMaker: function () {
         let vm = this
+        vm.loading = !vm.loading
         if (vm.add_to_group && (vm.makers_data.group_code == null || vm.makers_data.group_code == '')) {
           vm.code_not_found = true
           vm.error_separated = "Debe introducir el codigo que le asignaron a su grupo para continuar"
@@ -434,13 +499,16 @@
         }
         axios.post('/api/makers', this.makers_data)
           .then(function (response) {
-            console.log(response)
+            vm.loading = !vm.loading
+            vm.completed_registration = true
             vm.error_separated = null
-            vm.error = null
+            vm.resetErrorValues()
             vm.code_not_found = false
             vm.vm.birt_date_fail = false
           })
           .catch(function (error) {
+            vm.loading = !vm.loading
+            vm.completed_registration = false
             if (error.response.data.message == 'Codigo de grupo no encontrado') {
               vm.code_not_found = true
               vm.error_separated = error.response.data.message
@@ -502,7 +570,6 @@
       color: #fff;
       font-weight: bold;
       padding: .2em 1em;
-      border-radius: 2px 2px 0 0;
     }
   }
   .body-form {
@@ -540,6 +607,14 @@
       &:focus {
         border: 1px solid #2196f3 !important;
       }
+      &:disabled {
+        background-color: #ebebe4;
+      }
+    }
+    & textarea {
+      &:disabled {
+        background-color: #ebebe4;
+      }
     }
     & button {
       border: 0;
@@ -571,5 +646,12 @@
       background-color: transparent !important;
       color: #dddddd !important;
     }
+  }
+  .completed {
+    background-color: #21f36d;
+    color: #fff;
+    font-weight: bold;
+    padding: .2em 1em;
+    border-radius: 0;
   }
 </style>
