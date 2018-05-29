@@ -38,8 +38,8 @@ const app = new Vue({
     data() {
       return {
         scrollMagicClass: null,
-        client_id: '2',
-        client_secret: 'URoPMdXkjWn1EvpPTd8X96p6T4aVQLyNO594smPt',
+        client_id: process.env.MIX_OAUTH_CLIENT_ID,
+        client_secret: process.env.MIX_OAUTH_CLIENT_KEY,
         apiMap: {
           logout: '/api/user/logout',
           login: '/oauth/token',
