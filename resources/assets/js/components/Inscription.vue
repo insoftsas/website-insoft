@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col s12">
         <div class="bg-inscription"></div>
-        <div class="title-description-inscription" :class="{ 'minify-margin-title' : form_to_show != 0, 'minify-margin-title' : has_select_dev }">{{ title }}</div>
+        <div class="title-description-inscription" :class="{ 'minify-margin-title' : form_to_show != 0, 'minify-margin-title' : has_select_dev, 'minify-margin-title' : form_to_show == 1 }">{{ title }}</div>
         <div v-if="form_to_show == 0" class="roles-container">
           <div class="col s12 m6 l4 offset-l2">
             <div class="select-rol business-select" @click="showEnterpriseForm">Empresario</div>
@@ -13,7 +13,7 @@
           </div>
         </div>
         <div v-else class="container-forms">
-          <header class="col s12 header-steps no-padding" v-if="has_select_dev || form_to_show == 1" :class="{'fadeAfter' : has_select_dev}">
+          <header class="col s12 header-steps no-padding" v-if="has_select_dev || form_to_show == 1" :class="{'fadeAfter' : has_select_dev, 'fadeInAfter' : form_to_show == 1}">
             <div class="col no-padding" :class="{ 's12' : form_to_show == 1, 's6' : form_to_show == 2 }">
               <div class="step first" :class="{ 'end' : form_to_show == 1 }">Datos personales</div>
             </div>
@@ -21,7 +21,7 @@
               <div class="step end second container-steps">Datos del grupo</div>
             </div>
           </header>
-          <div class="col s12 no-padding form-enterprise" v-if="form_to_show == 1">
+          <div class="col s12 no-padding form-enterprise" v-if="form_to_show == 1" :class="{'fadeInAfter' : form_to_show == 1}">
             <form class="form-inscription">
               <div class="col s12 body-form">
                 <div class="containter-question col s12 razon_social_propietario">
@@ -641,6 +641,9 @@
     margin: 2em 0 !important;
   }
   .container-forms {
+    animation: fadeInAfter .5s ease;
+  }
+  .fadeInAfter {
     animation: fadeInAfter .5s ease;
   }
   .header-steps {
