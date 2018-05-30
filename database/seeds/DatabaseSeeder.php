@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(AssignedRolesTableSeeder::class);
         $this->call(StatesTableSeeder::class);
         $this->call(CitiesTableSeeder::class);
+        //DB::table('oauth_clients')
     }
 }
