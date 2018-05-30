@@ -7,14 +7,23 @@
 	.box-register {
 		margin-bottom: 0 !important;
 	}
-	.container-judges, .container-trainers {
-	  	& .judge, & .trainer {
-	  		width: 100%;
-	    	margin-bottom: calc(25px + 20px);
-		}
+	.title-description-inscription {
+		margin: 2em 0 !important;
+		font-size: 1.3rem !important;
 	}
 	.card-title-participate .title {
 		font-size: 1.1rem !important;
+	}
+	.select-rol {
+		width: 100% !important;
+		line-height: 68px !important;
+		height: 68px !important;
+		border-radius: 3px !important;
+		margin: auto 0 20px auto !important;
+		box-shadow: none !important;
+		&:hover {
+			box-shadow: none !important;
+		}
 	}
 	.button-register {
 		&:first-of-type {
@@ -39,19 +48,15 @@
 	}
 	.write-mode {
 		font-size: 1rem !important;
+		& #word {
+			margin-right: 6px !important;
+		}
 	}
 	.console {
 		margin-top: 5em !important;
 		& .word-text {
 			padding-right: 6px !important;
 		}
-	}
-	#home {
-	  background-position: calc(50% + 530px) center;
-	}
-	
-	#judges {
-	  background-position: calc(50% - 530px) center;
 	}
 	.container-content-info {
 		font-size: 1.1rem !important;
@@ -68,15 +73,21 @@
 	.price-award {
 		font-size: 2.3rem !important;
 	}
+	.container-image-transdigital {
+		width: 300px !important;
+		margin-bottom: 20px !important;
+	}
+	.btn-inscription-container {
+		margin: 38px 0 !important;
+	}
 }
 @media #{$medium-and-up} {
 // styles for medium screens and larger
 }
 @media #{$medium-and-down} {
-	#title-section-two, #title-section-three, .judge, .trainer {
-  		opacity: 1 !important;
+	.help-actions {
+		display: none !important;
 	}
-	
 	.console.last {
 		display: none !important;
 	}
@@ -90,9 +101,8 @@
 	}
 	.title-section {
 		font-size: 1.3rem !important;
-		padding: 8px 0 !important;
-    	margin: 15px 0px;
-    	&.special-margin {
+		padding: 8px !important;
+    &.special-margin {
 			margin-bottom: 100px;
 		}
 	}
@@ -108,25 +118,15 @@
 		opacity: 1 !important;
 		margin-top: 0 !important;
 	}
-	.container-objects .object, .container-judges .judge {
-		max-width: initial !important;
-	}
 	.container-objects .object {
-		padding: 1em 0;
+		max-width: initial !important;
 	}
 	.price-award {
 		font-size: 2.3rem !important;
 	}
 }
 @media #{$large-and-up} {
-	.place-award {
-	 	&.second {
-	    	margin-top: 3em;
-	  	}
-	  	&.third {
-	    	margin-top: 6em;
-	  	}
-	}
+	
 }
 @media #{$extra-large-and-up} {
 // styles for extra large screens and up

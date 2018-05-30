@@ -38,4 +38,7 @@
     top: 50%;
     transform: translate(-50%,-50%);
  }
+ .row {
+   margin-bottom: 0;
+ }
 </style>

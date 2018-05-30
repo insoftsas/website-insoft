@@ -27,7 +27,14 @@ Vue.component('main-app', require('./components/App.vue'));
 Vue.component('word-writing', require('./components/wordWriting.vue'));
 Vue.component('menu-admin', require('./components/MenuAdmin.vue'));
 Vue.component('inscription', require('./components/Inscription.vue'));
-
+// sections components
+Vue.component('home-section', require('./components/Sections/Home.vue'));
+Vue.component('info-section', require('./components/Sections/Info.vue'));
+Vue.component('participate-section', require('./components/Sections/Participate.vue'));
+Vue.component('we-search-section', require('./components/Sections/WeSearch.vue'));
+Vue.component('schedule-section', require('./components/Sections/Schedule.vue'));
+Vue.component('awards-section', require('./components/Sections/Awards.vue'));
+Vue.component('contact-section', require('./components/Sections/Contact.vue'));
 const router = new VueRouter({
     routes
 });
