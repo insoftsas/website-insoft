@@ -44,6 +44,7 @@ const app = new Vue({
     router,
     data() {
       return {
+        show_mobile_menu: false,
         scrollMagicClass: null,
         client_id: process.env.MIX_OAUTH_CLIENT_ID,
         client_secret: process.env.MIX_OAUTH_CLIENT_KEY,
@@ -69,11 +70,21 @@ const app = new Vue({
       token: function(newToken){
         localStorage.token = newToken
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + newToken
+      },
+      show_mobile_menu: function () {
+        if (this.show_mobile_menu)
+          document.getElementById('body-app').style.overflow = 'hidden'
+        else
+          document.getElementById('body-app').style.overflow = 'initial'
       }
     },
     methods: {
+      showMenu: function () {
+        this.show_mobile_menu = !this.show_mobile_menu
+      },
       goToView: function (id) {
         document.getElementById(id).scrollIntoView({block: 'start', behavior: 'smooth'})
+        this.show_mobile_menu = false
       },
       getUser: function (){
         var vm=this;
