@@ -55,12 +55,8 @@
         let vm = this
         vm.loading = true
         axios.post(vm.$root.apiMap.login,{
-          'grant_type' : 'password',
-          'client_id' : vm.$root.client_id,
-          'client_secret' : vm.$root.client_secret,
           'username' : vm.email,
-          'password' : vm.password,
-          'scope' : '*'
+          'password' : vm.password
         })
         .then(function (response) {
           vm.$root.token = response.data.access_token;

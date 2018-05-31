@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateEnterpriseAPIRequest;
 use App\Http\Requests\API\UpdateEnterpriseAPIRequest;
+use App\Models\Group;
+use App\Models\Maker;
 use App\Models\Enterprise;
 use App\Repositories\EnterpriseRepository;
 use Illuminate\Http\Request;
@@ -56,6 +58,13 @@ class EnterpriseAPIController extends AppBaseController
     {
         $input = $request->all();
 
+        if (Maker::where('email',$input['email'])->count() != 0)
+        {
+            return $this->sendError('Ya existe un maker registrado con este correo.');
+        }else if(Enterprise::where('email',$input['email'])->count() != 0){
+            return $this->sendError('Ya existe una empresa registrada con este correo.');
+        }
+        
         $enterprises = $this->enterpriseRepository->create($input);
 
         return $this->sendResponse($enterprises->toArray(), 'Enterprise saved successfully');

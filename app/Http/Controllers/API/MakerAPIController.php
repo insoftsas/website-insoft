@@ -7,6 +7,7 @@ use App\Http\Requests\API\CreateMakerAPIRequest;
 use App\Http\Requests\API\UpdateMakerAPIRequest;
 use App\Models\Group;
 use App\Models\Maker;
+use App\Models\Enterprise;
 use App\Repositories\MakerRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -58,12 +59,13 @@ class MakerAPIController extends AppBaseController
     public function store(CreateMakerAPIRequest $request)
     {
         $input = $request->only(['first_name', 'last_name', 'doc_type', 'document', 'genere', 'bird_date', 'city_id', 'email', 'phone', 'level', 'semester', 'area', 'career', 'skills', 'bio', 'file_document', 'file_certificate']);
-        /*
-        if ($age<16 || $age>30)
+
+        if (Maker::where('email',$input['email'])->count() != 0)
         {
-            return $this->sendError('La edad permitida para el evento es de 16-30 años de edad');
+            return $this->sendError('Ya existe un maker registrado con este correo.');
+        }else if(Enterprise::where('email',$input['email'])->count() != 0){
+            return $this->sendError('Ya existe una empresa registrada con este correo.');
         }
-        */
         
         if ($request->new_group == 1) 
         {

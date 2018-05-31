@@ -12,7 +12,35 @@ class TokensManagerAPIController extends AppBaseController
     {
         $this->middleware('auth:api');
     }
-
+    public function login(Request $request)
+    {
+    	try {
+            $http = new Client([ 'verify' => false, 'headers' => ['Accept' => 'application/json'] ]);
+            $url =  env('APP_URL') . '/api/oauth/token';
+            $response = $http->post($url, [
+                'form_params' => [
+                    'grant_type' => 'password',
+                    'client_id' => env('PASSWORD_CLIENT_ID'),
+                    'client_secret' => env('PASSWORD_CLIENT_SECRET'),
+                    'username' => $request->get('email'),
+                    'password' => $request->get('password'),
+                    'scope' => '*',
+                ]
+            ]);
+            $contents = (string) $response->getBody();
+            $json = json_decode($contents, true);
+            return response()->json([
+                'data' => $json,
+                'message' => 'User logged successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'invalid_credentials',
+                //'message' => "{$e->getCode()}: {$e->getMessage()}"
+                'message' => "{$e->getMessage()}"
+            ], 401);
+        }
+    }
 	public function index(Request $request)
 	{
         $token = $request->user()->token();
