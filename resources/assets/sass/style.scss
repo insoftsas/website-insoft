@@ -9,10 +9,29 @@ section, footer {
 body {
   background-color: #f9f9f9;
 }
-
+.leader_span{
+    font-size: 80%;
+    margin-left: 5px;
+    position: relative;
+    top: -7px;
+    color: #0aafa9;
+}
 .bg-special-border {
   background: #fff;
   border: 1px solid #ececec;
+}
+.waves-effect.waves-blue .waves-ripple {
+   /* The alpha value allows the text and background color
+   of the button to still show through. */
+    background-color: rgba(#019a95, 0.65);
+  }
+.btn-flat.circle{
+    border-radius: 100%;
+    width: 36px;
+    text-align: center;
+    padding: 0px;
+    height: 36px;
+    font-size: 1.5rem;
 }
 // Colors Of all system and inputs
 .mainColor{
@@ -250,6 +269,15 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   height: 100vh;
   background-position: center;
   background-position-y: -1px;
+}
+.bg_panel{
+  position: fixed;
+  z-index: -1;
+  height: 100vh;
+  width: 100vw;
+  background-image: url(../images/bg.png);
+  background-size: cover;
+  background-position: center;
 }
 
 .r-text {

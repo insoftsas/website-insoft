@@ -33,4 +33,9 @@ class GroupRepository extends BaseRepository
     {
         return Group::class;
     }
+    
+    public function allRelations()
+    {
+        return $this->model->with(['makers','leader'])->get();
+    }
 }

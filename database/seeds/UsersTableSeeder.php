@@ -40,6 +40,34 @@ class UsersTableSeeder extends Seeder
           'password' => '$2y$10$JfmjOeK8NbJVdfKGysiyhOY.d6wC1q3gItCKTlVhhPw2oTfhP8NsG',
           'created_at' => date("Y-m-d H:i:s"),
           'updated_at' => date("Y-m-d H:i:s"),
+        ],
+        [
+          'name' => 'Alvaro Sepulveda',
+          'email' => 'salgadopalomo@yahoo.es',
+          'password' => '$2y$10$2vLcHeWB4Y1BAX.Zn5DjgufMZT2no5Jd4KtwxAXajpnjvda8n0D12',
+          'created_at' => date("Y-m-d H:i:s"),
+          'updated_at' => date("Y-m-d H:i:s"),
+        ],
+        [
+          'name' => 'Ceidy Ortiz',
+          'email' => 'ortizoquendo-1991@hotmail.com',
+          'password' => '$2y$10$mRvq7E5H6zSa/slvaccozeXxf4n8E.XTj2hZlzxWrjZIivuYDq21a',
+          'created_at' => date("Y-m-d H:i:s"),
+          'updated_at' => date("Y-m-d H:i:s"),
+        ],
+        [
+          'name' => 'Yajaira Alvarez',
+          'email' => 'yrap2009@hotmail.es',
+          'password' => '$2y$10$KEWwvSAZ5uv44LBn2W7K1O12ptR5D0wms2bivJuu4YMnIvMJRqJSi',
+          'created_at' => date("Y-m-d H:i:s"),
+          'updated_at' => date("Y-m-d H:i:s"),
+        ],
+        [
+          'name' => 'Paola Polo',
+          'email' => 'paopolo105@gmail.com',
+          'password' => '$2y$10$ae9vWrPrW4RsSTQi01MfB.ruBxcimGA1cWiZqlN3zkIU5D3YS8wvy',
+          'created_at' => date("Y-m-d H:i:s"),
+          'updated_at' => date("Y-m-d H:i:s"),
         ]
 
       ]);

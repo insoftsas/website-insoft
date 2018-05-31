@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 
 
 class Enterprise extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Notifiable;
 
     public $table = 'enterprises';
     

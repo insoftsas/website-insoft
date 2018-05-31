@@ -35,7 +35,7 @@ class CreateEnterpriseAPIRequest extends APIRequest
             'neigboard'                => 'required|string',
             'address'                  => 'required|string',
             'phone'                    => 'required|string',
-            'email'                    => 'required|email|unique:enterprises,email',
+            'email'                    => 'required|email',
             'file_rut'                 => 'mimes:jpeg,bmp,png,pdf'
         ];
 

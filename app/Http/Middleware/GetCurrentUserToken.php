@@ -16,29 +16,17 @@ class GetCurrentUserToken
      */
     public function handle($request, Closure $next)
     {
-        if( !is_null($request->header('authorization')) && auth()->guard("api")->check()){
-
-            $jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $request->header('authorization')));
-            
-            if( $jwt != '' && !is_null($jwt) && $jwt != 'Bearer'){
-
-                $token = (new \Lcobucci\JWT\Parser())->parse($jwt);
-
-                if( !is_null($token)){
-                    $usToken = auth()->guard("api")->user()->tokens->find($token->getHeader("jti"));
-                    if( !is_null($usToken) ){
-                        $obj = (object) array(
-                            'user_agent' => $request->header('user-agent')??'none',
-                            'ip' => $request->ip(),
-                            'time' => Carbon::now()->toDateTimeString(),
-                            'url' => $request->server->get('REQUEST_URI')??'/',
-                            'method' => $request->method()
-                        );
-                        $usToken->last_access = json_encode($obj);
-                        $usToken->save();
-                    }
-                }
-            }
+        if(auth()->guard("api")->check()){
+            $token = $request->user()->token();
+            $obj = (object) array(
+                'user_agent' => $request->header('user-agent')??'none',
+                'ip' => $request->ip(),
+                'time' => Carbon::now()->toDateTimeString(),
+                'url' => $request->server->get('REQUEST_URI')??'/',
+                'method' => $request->method()
+            );
+            $token->last_access = json_encode($obj);
+            $token->save();
         }
         return $next($request);
     }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="home">
     <div class="valign-wrapper" style="width:100%;height:100%;position: absolute;">
       <div class="valign" style="width:100%;">
           <div class="container">

@@ -27,7 +27,7 @@ class MakerAPIController extends AppBaseController
     public function __construct(MakerRepository $makerRepo)
     {
         $this->middleware('auth:api')->except('store');
-        $this->middleware('roles:root')->except('store');
+        $this->middleware('roles:root')->except(['store','update']);
         $this->makerRepository = $makerRepo;
     }
 
@@ -42,7 +42,7 @@ class MakerAPIController extends AppBaseController
     {
         $this->makerRepository->pushCriteria(new RequestCriteria($request));
         $this->makerRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $makers = $this->makerRepository->all();
+        $makers = $this->makerRepository->allRelations();
 
         return $this->sendResponse($makers->toArray(), 'Makers retrieved successfully');
     }
@@ -58,8 +58,13 @@ class MakerAPIController extends AppBaseController
     public function store(CreateMakerAPIRequest $request)
     {
         $input = $request->only(['first_name', 'last_name', 'doc_type', 'document', 'genere', 'bird_date', 'city_id', 'email', 'phone', 'level', 'semester', 'area', 'career', 'skills', 'bio', 'file_document', 'file_certificate']);
-
-
+        /*
+        if ($age<16 || $age>30)
+        {
+            return $this->sendError('La edad permitida para el evento es de 16-30 años de edad');
+        }
+        */
+        
         if ($request->new_group == 1) 
         {
             $group = Group::where('name', $request->group_name)->first();
@@ -156,7 +161,6 @@ class MakerAPIController extends AppBaseController
         if (empty($maker)) {
             return $this->sendError('Maker not found');
         }
-
         $maker = $this->makerRepository->update($input, $id);
 
         return $this->sendResponse($maker->toArray(), 'Maker updated successfully');

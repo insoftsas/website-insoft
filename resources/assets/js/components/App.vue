@@ -1,5 +1,6 @@
 <template>
   <div class="row">
+    <div :class="{'bg_panel' : $route.name != 'Index' && $route.name != 'Inscription'}"></div>
 	  <router-view v-if="$root.loaded"></router-view>
       <div class="MainLoader"  v-else>
         <div class="preloader-wrapper big active">

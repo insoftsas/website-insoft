@@ -18,9 +18,36 @@
                 <div class="col s12">
                   <table class="striped highlight" id="groups">
                     <tbody>
+                      <tr>
+                          <th>Codigo</th>
+                          <th>Nombre</th>
+                          <th>Integrantes</th>
+                          <th>Creado</th>
+                          <th></th>
+                      </tr>
                       <tr v-for="(group,i) in groups" :key="i">
                         <td>
-                          {{JSON.stringify(group)}}
+                          {{group.code}}
+                        </td>
+                        <td>
+                          {{group.name}}
+                        </td>
+                        <td>
+                          <p v-for="(maker,im) in group.makers">{{maker.first_name + ' ' + maker.last_name}}<span class="leader_span" v-if="maker.id == group.leader_id">Lider</span></p>
+                        </td>
+                        <td>
+                          {{group.created_at}}
+                        </td>
+                        <td>
+                          <a class="waves-effect waves-blue circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'eye']"/>
+                          </a>
+                          <a class="waves-effect waves-blue circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'edit']"/>
+                          </a>
+                          <a class="waves-effect waves-red circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'trash']"/>
+                          </a>
                         </td>
                       </tr>
                     </tbody>

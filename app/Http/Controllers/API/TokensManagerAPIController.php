@@ -15,12 +15,12 @@ class TokensManagerAPIController extends AppBaseController
 
 	public function index(Request $request)
 	{
-		$jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $request->header('authorization')));
-        $token = (new \Lcobucci\JWT\Parser())->parse($jwt);
+        $token = $request->user()->token();
 
 		$toks = auth()->user()->tokens;
+
 		foreach ($toks as $key => $value) {
-			if($token->getHeader("jti") == $toks[$key]->id){
+			if($token->id == $toks[$key]->id){
 				$toks[$key]->current = true;
 			}else{
 				$toks[$key]->current = false;
@@ -46,11 +46,9 @@ class TokensManagerAPIController extends AppBaseController
 
 	public function logout(Request $request)
 	{	
-		$jwt = trim(preg_replace('/^(?:\s+)?Bearer\s/', '', $request->header('authorization')));
-        $token = (new \Lcobucci\JWT\Parser())->parse($jwt);
-        $usToken = auth()->user()->tokens->find($token->getHeader("jti"));
+        $usToken = $request->user()->token();
         $usToken->revoke();
-        return $this->sendResponse($token, 'Logged Out');	
+        return $this->sendResponse($usToken, 'Logged Out');	
 	}
 
 	public function destroy($id)
