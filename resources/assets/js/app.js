@@ -106,6 +106,7 @@ const app = new Vue({
           vm.$router.push("/");
         })
         .catch(function(error){
+          M.toast({html:"Hubo un error al cerrar la sesión"},6000);
         });
       }
     },

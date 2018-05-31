@@ -42,7 +42,7 @@ class MakerAPIController extends AppBaseController
     {
         $this->makerRepository->pushCriteria(new RequestCriteria($request));
         $this->makerRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $makers = $this->makerRepository->all();
+        $makers = $this->makerRepository->allRelations();
 
         return $this->sendResponse($makers->toArray(), 'Makers retrieved successfully');
     }

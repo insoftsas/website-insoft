@@ -39,7 +39,7 @@ class GroupAPIController extends AppBaseController
     {
         $this->groupRepository->pushCriteria(new RequestCriteria($request));
         $this->groupRepository->pushCriteria(new LimitOffsetCriteria($request));
-        $groups = $this->groupRepository->all();
+        $groups = $this->groupRepository->allRelations();
 
         return $this->sendResponse($groups->toArray(), 'Groups retrieved successfully');
     }

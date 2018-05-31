@@ -102,7 +102,7 @@
           <div class="col s12 no-padding form-enterprise" v-else>
             <div v-if="form_to_show == 2 & !has_select_dev" class="roles-container">
               <div class="col s12 m4">
-                <div class="select-rol business-select" @click="indivualRegister">Indididualmente</div>
+                <div class="select-rol business-select" @click="indivualRegister">Individualmente</div>
               </div>
               <div class="col s12 m4">
                 <div class="select-rol dev-select" @click="newGroup">Grupalmente</div>

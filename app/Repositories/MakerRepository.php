@@ -47,4 +47,9 @@ class MakerRepository extends BaseRepository
     {
         return Maker::class;
     }
+    
+    public function allRelations()
+    {
+        return $this->model->with(['city','group'])->get();
+    }
 }
