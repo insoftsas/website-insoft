@@ -12,7 +12,7 @@
             </div>
             <div class="col s12 m6">
               <div class="content-info">
-                <h3 class="title-time">¡Es hora de <span class="sub">transformar</span> tu empresa!</h3>
+                <h3 class="title-time" id="trigger-nav-mobile">¡Es hora de <span class="sub">transformar</span> tu empresa!</h3>
                 <div class="animation-digital-transform">
                   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                      viewBox="0 0 656 273" style="enable-background:new 0 0 656 573.3;" xml:space="preserve">

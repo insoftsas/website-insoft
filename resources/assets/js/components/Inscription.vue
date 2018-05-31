@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col s12">
         <div class="bg-inscription"></div>
-        <div class="title-description-inscription" :class="{ 'minify-margin-title' : form_to_show != 0, 'minify-margin-title' : has_select_dev, 'minify-margin-title' : form_to_show == 1 }">{{ title }}</div>
+        <div class="title-description-inscription" :class="{ 'minify-margin-title' : has_select_dev && form_to_show == 2 || form_to_show == 1 }">{{ title }}</div>
         <div v-if="form_to_show == 0" class="roles-container">
           <div class="col s12 m6 l4 offset-l2">
             <div class="select-rol business-select" @click="showEnterpriseForm">Empresario</div>
@@ -12,14 +12,9 @@
             <div class="select-rol dev-select" @click="showMakerForm">Dev - Maker</div>
           </div>
         </div>
-        <div v-else class="container-forms">
+        <div v-else class="col s12 no-padding container-forms" :class="{ 'shadow' : form_to_show == 1 || (form_to_show == 2 && has_select_dev ) }">
           <header class="col s12 header-steps no-padding" v-if="has_select_dev || form_to_show == 1" :class="{'fadeAfter' : has_select_dev, 'fadeInAfter' : form_to_show == 1}">
-            <div class="col no-padding" :class="{ 's12' : form_to_show == 1, 's6' : form_to_show == 2 }">
-              <div class="step first" :class="{ 'end' : form_to_show == 1 }">Datos personales</div>
-            </div>
-            <div class="col s6 no-padding" v-if="form_to_show == 2">
-              <div class="step end second container-steps">Datos del grupo</div>
-            </div>
+            <div class="step first">Datos personales</div>
           </header>
           <div class="col s12 no-padding form-enterprise" v-if="form_to_show == 1" :class="{'fadeInAfter' : form_to_show == 1}">
             <form class="form-inscription">
@@ -54,6 +49,12 @@
                 </div>
               </div>
               <div class="col s12 body-form">
+                <div class="containter-question col s12 country">
+                  <label>País * <span class="red-text" v-if="error.country != null || error == undefined">{{ error.country[0] }}</span></label>
+                  <select class="browser-default" disabled v-model="enterprises_data.country">
+                    <option selected disabled value="Colombia">Colombia</option>
+                  </select>
+                </div>
                 <div class="containter-question col s12 m6 departament_id">
                   <label>Departamento * <span class="red-text" v-if="error.departament_id != null || error == undefined">{{ error.departament_id[0] }}</span></label>
                   <select class="browser-default" :disabled="completed_registration" @change="getCities(1)" v-model="enterprises_data.departament_id">
@@ -63,7 +64,7 @@
                 </div>
                 <div class="containter-question col s12 m6 city_id">
                   <label>Ciudad * <span class="red-text" v-if="error.city_id != null || error == undefined">{{ error.city_id[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" v-model="enterprises_data.city_id">
+                  <select class="browser-default" :disabled="completed_registration || enterprises_data.departament_id == ''" v-model="enterprises_data.city_id">
                     <option selected disabled value="">Seleccione su ciudad</option>
                     <option :value="city.id" v-for="(city, index) in cities">{{ city.name }}</option>
                   </select>
@@ -84,7 +85,7 @@
                   <label>Correo electrónico * <span class="red-text" v-if="error.email != null || error == undefined">{{ error.email[0] }}</span></label>
                   <input type="text" v-model="enterprises_data.email" :disabled="completed_registration" required class="browser-default input-hack" />
                 </div>
-                <div class="containter-question col s12">
+                <div class="containter-question col s12" v-if="!completed_registration">
                   <p class="terms-check">
                     <label>
                       <input type="checkbox" v-model="enterprises_data.terms" :disabled="completed_registration" required class="filled-in" />
@@ -92,7 +93,7 @@
                     </label>
                   </p>
                 </div>
-                <div class="containter-question col s12 center">
+                <div class="containter-question col s12 center completed-successfully">
                   <div v-if="completed_registration" class="completed">Inscripción completada</div>
                   <button v-else @click.prevent="sendEnterprise" :disabled="!enterprises_data.terms || loading">{{ !loading ? 'Enviar' : 'Enviando...' }}</button>
                 </div>
@@ -115,15 +116,15 @@
               <div class="col s12 body-form">
                 <div class="containter-question col s12 m6 first_name">
                   <label>Nombres * <span class="red-text" v-if="error.first_name != null || error == undefined">{{ error.first_name[0] }}</span></label>
-                  <input type="text" v-model="makers_data.first_name" class="browser-default input-hack" />
+                  <input type="text" v-model="makers_data.first_name" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 m6 last_name">
                   <label>Apellidos * <span class="red-text" v-if="error.last_name != null || error == undefined">{{ error.last_name[0] }}</span></label>
-                  <input type="text" v-model="makers_data.last_name" class="browser-default input-hack" />
+                  <input type="text" v-model="makers_data.last_name" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 m6 doc_type">
                   <label>Tipo de Identificación * <span class="red-text" v-if="error.doc_type != null || error == undefined">{{ error.doc_type[0] }}</span></label>
-                  <select class="browser-default" v-model="makers_data.doc_type">
+                  <select class="browser-default" :disabled="completed_registration" v-model="makers_data.doc_type">
                     <option selected disabled value="">Seleccione su tipo de identificación</option>
                     <option value="TI">Tarjeta de identidad</option>
                     <option value="CC">Cédula de ciudadanía</option>
@@ -132,11 +133,11 @@
                 </div>
                 <div class="containter-question col s12 m6 document">
                   <label>Número de identificación * <span class="red-text" v-if="error.document != null || error == undefined">{{ error.document[0] }}</span></label>
-                  <input type="number" v-model="makers_data.document" class="browser-default input-hack" />
+                  <input type="number" v-model="makers_data.document" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 genere">
                   <label>Genero * <span class="red-text" v-if="error.genere != null || error == undefined">{{ error.genere[0] }}</span></label>
-                  <select class="browser-default" v-model="makers_data.genere">
+                  <select class="browser-default" :disabled="completed_registration" v-model="makers_data.genere">
                     <option selected disabled value="">Seleccione su género</option>
                     <option value="M">Masculino</option>
                     <option value="F">Femenino</option>
@@ -146,15 +147,15 @@
                 </div>
                 <div class="containter-question col s12 m6 age">
                   <label>Edad (16-30 años)<span class="red-text" v-if="error.age != null || error == undefined">{{ error.age[0] }}</span></label>
-                  <input type="number" v-model="makers_data.age" class="browser-default input-hack" />
+                  <input type="number" v-model="makers_data.age" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 m6 bird_date">
                   <label>Fecha de nacimiento * <span class="red-text" v-if="error.bird_date != null || error == undefined">{{ error.bird_date[0] }}</span><span class="red-text" v-if="birt_date_fail">{{ error }}</span></label>
-                  <input type="text" id="bird_date" @change="setDate" v-model="makers_data.bird_date" class="datepicker browser-default input-hack" />
+                  <input type="text" id="bird_date" :disabled="completed_registration" @change="setDate" v-model="makers_data.bird_date" class="datepicker browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 country">
                   <label>País * <span class="red-text" v-if="error.country != null || error == undefined">{{ error.country[0] }}</span></label>
-                  <select class="browser-default" v-model="makers_data.country">
+                  <select class="browser-default" :disabled="completed_registration" disabled v-model="makers_data.country">
                     <option selected disabled value="Colombia">Colombia</option>
                   </select>
                 </div>
@@ -167,22 +168,22 @@
                 </div>
                 <div class="containter-question col s12 m6 city_id">
                   <label>Ciudad * <span class="red-text" v-if="error.city_id != null || error == undefined">{{ error.city_id[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" v-model="makers_data.city_id">
+                  <select class="browser-default" :disabled="completed_registration || makers_data.departament_id == ''" v-model="makers_data.city_id">
                     <option selected disabled value="">Seleccione su ciudad</option>
                     <option :value="city.id" v-for="(city, index) in cities">{{ city.name }}</option>
                   </select>
                 </div>
                 <div class="containter-question col s12 m6 email">
                   <label>Correo electrónico * <span class="red-text" v-if="error.email != null || error == undefined">{{ error.email[0] }}</span></label>
-                  <input type="email" v-model="makers_data.email" class="browser-default input-hack" />
+                  <input type="email" v-model="makers_data.email" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 m6 phone">
                   <label>Teléfono/Celular * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
-                  <input type="number" v-model="makers_data.phone" class="browser-default input-hack" />
+                  <input type="number" v-model="makers_data.phone" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 m6 level">
                   <label>Nivel académico * <span class="red-text" v-if="error.level != null || error == undefined">{{ error.level[0] }}</span></label>
-                  <select class="browser-default" v-model="makers_data.level">
+                  <select class="browser-default" :disabled="completed_registration" v-model="makers_data.level">
                     <option selected disabled value="">Seleccione su nivel</option>
                     <option value="Estudiante">Estudiante</option>
                     <option value="Profesional">Profesional</option>
@@ -192,41 +193,44 @@
                 </div>
                 <div class="containter-question col s12 m6 semester" v-if="makers_data.level == 'Estudiante'">
                   <label>Semestre que está cursando * <span class="red-text" v-if="error.semester != null || error == undefined">{{ error.semester[0] }}</span></label>
-                  <input type="number" v-model="makers_data.semester" class="browser-default input-hack" />
+                  <input type="number" v-model="makers_data.semester" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 m6 career">
                   <label>Carrera * <span class="red-text" v-if="error.career != null || error == undefined">{{ error.career[0] }}</span></label>
-                  <input type="text" v-model="makers_data.career" class="browser-default input-hack" />
+                  <input type="text" v-model="makers_data.career" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 m6 area">
                   <label>Area * <span class="red-text" v-if="error.area != null || error == undefined">{{ error.area[0] }}</span></label>
-                  <input type="text" v-model="makers_data.area" class="browser-default input-hack" />
+                  <input type="text" v-model="makers_data.area" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
                 <div class="containter-question col s12 skills">
                   <label>Habilidades * <span class="red-text" v-if="error.skills != null || error == undefined">{{ error.skills[0] }}</span></label>
-                  <textarea v-model="makers_data.skills" class="browser-default input-hack"></textarea>
+                  <textarea v-model="makers_data.skills" :disabled="completed_registration" class="browser-default input-hack"></textarea>
                 </div>
                 <div class="containter-question col s12 bio">
                   <label>Biografia <span class="red-text" v-if="error.bio != null || error == undefined">{{ error.bio[0] }}</span></label>
-                  <textarea v-model="makers_data.bio" class="browser-default input-hack"></textarea>
+                  <textarea v-model="makers_data.bio" :disabled="completed_registration" class="browser-default input-hack"></textarea>
                 </div>
               </div>
+              <header class="col s12 header-steps no-padding" v-if="makers_data.new_group == 1 || add_to_group == true">
+                <div class="step end">Datos del grupo</div>
+              </header>
               <div class="col s12 body-form" v-if="makers_data.new_group == 1 || add_to_group == true">
-                <div class="containter-question col s12" v-if="makers_data.new_group == 1 && add_to_group == false">
+                <div class="containter-question col s12 group_name" v-if="makers_data.new_group == 1 && add_to_group == false">
                   <label>Nombre del grupo * <span class="red-text" v-if="error.group_name != null || error == undefined">{{ error.group_name[0] }}</span></label>
-                  <input type="text" v-model="makers_data.group_name" class="browser-default input-hack" />
+                  <input type="text" v-model="makers_data.group_name" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
-                <div class="containter-question col s12" v-if="makers_data.new_group == 1 && add_to_group == false">
+                <div class="containter-question col s12 group_description" v-if="makers_data.new_group == 1 && add_to_group == false">
                   <label>Descripción del grupo * <span class="red-text" v-if="error.group_description != null || error == undefined">{{ error.group_description[0] }}</span></label>
-                  <textarea v-model="makers_data.group_description" class="browser-default input-hack"></textarea>
+                  <textarea v-model="makers_data.group_description" :disabled="completed_registration" class="browser-default input-hack"></textarea>
                 </div>
-                <div class="containter-question col s12" v-if="makers_data.new_group == 0 && add_to_group == true">
+                <div class="containter-question col s12 group_code" v-if="makers_data.new_group == 0 && add_to_group == true">
                   <label>Código del grupo * <span class="red-text" v-if="error.group_code != null || error == undefined">{{ error.group_code[0] }}</span><span class="red-text" v-if="code_not_found">{{ error_separated }}</span></label>
-                  <input type="text" v-model="makers_data.group_code" class="browser-default input-hack" />
+                  <input type="text" v-model="makers_data.group_code" :disabled="completed_registration" class="browser-default input-hack" />
                 </div>
               </div>
               <div class="col s12 body-form">
-                <div class="containter-question col s12">
+                <div class="containter-question col s12" v-if="!completed_registration">
                   <p class="terms-check">
                     <label>
                       <input type="checkbox" v-model="makers_data.terms" class="filled-in" />
@@ -234,17 +238,28 @@
                     </label>
                   </p>
                 </div>
-                <div class="containter-question col s12 center">
-                  <div v-if="code_not_found || completed_registration" :class="{ 'completed' : completed_registration, 'error' : code_not_found }">{{ completed_registration ? 'Inscripción completada' : 'El codigo no existe' }}</div>
+                <div class="containter-question col s12 center completed-successfully">
+                  <div v-if="code_not_found || completed_registration || group_exist" :class="{ 'completed' : completed_registration, 'error' : code_not_found || group_exist }">
+                    <span v-if="completed_registration">Inscripción completada</span>
+                    <span v-else-if="code_not_found">{{ error }}</span>
+                    <span v-else-if="group_exist">{{ error }}</span>
+                  </div>
                   <button v-else type="submit" @click.prevent="sendMaker" :disabled="!makers_data.terms">Enviar</button>
+                </div>
+                <div class="col s12" v-if="completed_registration">
+                  <div class="code-container">
+                    <div class="share-code">¡Comparte este codigo a tus amigos para que se unan a tu grupo!</div>
+                    <div class="group-code">{{ group_code }}</div>
+                  </div>
                 </div>
               </div>
             </form>
           </div>
         </div>
         <div class="help-actions">
-          <div @click="changeRol" class="help-btn change" v-if="form_to_show != 0">¿Este no es tu rol?</div>
           <router-link to="/"><div class="help-btn home">Volver al inicio</div></router-link>
+          <div @click="changeRol" class="help-btn change" v-if="form_to_show != 0">¿Este no es tu rol?</div>
+          <div @click="changeRol" class="help-btn new" v-if="completed_registration">+ Nueva inscripción</div>
         </div>
         <div class="col s12">
           <div class="copy">© 2018 Innovemp</div>
@@ -261,6 +276,7 @@
         enterprises_data: {
           actividad_comercial: null,
           address: null,
+          country: 'Colombia',
           departament_id: '',
           city_id: '',
           email: null,
@@ -336,7 +352,9 @@
         cities: [
           { id: null, name: null}
         ],
-        has_select_dev: false
+        has_select_dev: false,
+        group_code: null,
+        group_exist: false
       }
     },
     computed: {
@@ -347,10 +365,19 @@
           case 1:
             return 'Inscripción para empresarios'
           case 2:
-            if (!this.has_select_dev)
+            if (!this.has_select_dev) {
               return '¿Cómo deseas inscribirte?'
-            else
+            } else {
+              var options = {
+                format: 'yyyy-mm-dd',
+                yearRange: 37,
+              }
+              Vue.nextTick()
+                .then(function () {
+                  $('.datepicker').datepicker(options)
+                })
               return 'Inscripción para desarrolladores o makers'
+            }
           default:
             break
         }
@@ -360,6 +387,49 @@
       changeRol: function () {
         this.form_to_show = 0
         this.has_select_dev = false
+        this.completed_registration = false
+        this.clearInputs()
+      },
+      clearInputs: function () {
+        this.enterprises_data = {
+          actividad_comercial: null,
+          address: null,
+          country: 'Colombia',
+          departament_id: '',
+          city_id: '',
+          email: null,
+          neigboard: null,
+          nit: null,
+          phone: null,
+          razon_social_propietario: null,
+          representante_legal: null,
+          sector_productivo: '',
+          rut: null,
+          terms: false
+        }
+        this.makers_data = {
+          first_name: null,
+          last_name: null,
+          doc_type: '',
+          document: null,
+          genere: '',
+          age: null,
+          bird_date: null,
+          country: 'Colombia',
+          departament_id: '',
+          city_id: '',
+          email: null,
+          phone: null,
+          level: '',
+          semester: '',
+          career: null,
+          skills: null,
+          terms: null,
+          area: null,
+          new_group: 0,
+          bio: null,
+          group_code: null
+        }
       },
       resetErrorValues: function () {
         this.error = {
@@ -389,7 +459,10 @@
           terms: null,
           area: null,
           new_group: null,
-          bio: null
+          bio: null,
+          group_code: null,
+          group_name: null,
+          group_description: null
         }
       },
       showEnterpriseForm: function () {
@@ -397,15 +470,6 @@
       },
       showMakerForm: function () {
         this.form_to_show = 2
-        var options = {
-          format: 'yyyy-mm-dd',
-          selectMonths: true, // Creates a dropdown to control month
-          selectYears: 20,
-        }
-        Vue.nextTick()
-          .then(function () {
-            $('.datepicker').datepicker(options)
-          })
       },
       indivualRegister: function () {
         this.makers_data.new_group = 0
@@ -428,9 +492,9 @@
         axios.post('/api/enterprises', this.enterprises_data)
           .then(function (response) {
             vm.loading = !vm.loading
-            console.log(response)
             vm.completed_registration = true
             vm.resetErrorValues()
+            vm.goToChange('completed-successfully')
           })
           .catch(function (error) {
             vm.loading = !vm.loading
@@ -528,6 +592,15 @@
           case e.new_group:
             vm.goToChange('new_group')
           break
+          case e.group_description:
+            vm.goToChange('group_description')
+          break
+          case e.group_name:
+            vm.goToChange('group_name')
+          break
+          case e.group_name:
+            vm.goToChange('group_code')
+          break
           case e.bio:
             vm.goToChange('bio')
           break
@@ -545,19 +618,23 @@
         }
         axios.post('/api/makers', this.makers_data)
           .then(function (response) {
+            if (response.data.data.code) {
+              vm.group_code = response.data.data.code
+            }
             vm.loading = !vm.loading
             vm.completed_registration = true
             vm.error_separated = null
             vm.resetErrorValues()
+            vm.goToChange('completed-successfully')
             vm.code_not_found = false
-            vm.vm.birt_date_fail = false
+            vm.birt_date_fail = false
           })
           .catch(function (error) {
             vm.loading = !vm.loading
             vm.completed_registration = false
             if (error.response.data.message == 'Codigo de grupo no encontrado') {
               vm.code_not_found = true
-              vm.error_separated = error.response.data.message
+              vm.error = error.response.data.message
               if (vm.birt_date_fail)
                 vm.birt_date_fail = !vm.birt_date_fail
             } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
@@ -565,6 +642,9 @@
               vm.error = error.response.data.message
               if (vm.code_not_found)
                 vm.code_not_found = !vm.code_not_found
+            } else if (error.response.data.message == 'Su grupo ya se encuentra registrado en nuestro sistema') {
+              vm.group_exist = true
+              vm.error = error.response.data.message
             } else {
               const e = error.response.data.errors
               vm.error = e
@@ -591,17 +671,20 @@
           .catch(function (error) {
             console.log(error)
           })
+      },
+      getStates: function () {
+        let vm = this
+        axios.get('/api/states')
+          .then(function (response) {
+            vm.states = response.data.data
+          })
+          .catch(function (error) {
+            vm.getStates()
+          })
       }
     },
     mounted() {
-      let vm = this
-      axios.get('/api/states')
-        .then(function (response) {
-          vm.states = response.data.data
-        })
-        .catch(function (error) {
-          console.log(error)
-        })
+      this.getStates()
       setTimeout(function () {
         $('.dropdown-trigger').dropdown();
       }, 100)
@@ -610,6 +693,19 @@
 </script>
 
 <style lang="scss" scoped>
+  .code-container {
+    text-align: center;
+    font-weight: bold;
+  }
+  .group-code {
+    width: max-content;
+    margin: 13px auto;
+    padding: 1px 21px;
+    color: #ffffff;
+    background: #218ade;
+    font-size: 1.5rem;
+    border-radius: 2px;
+  }
   .copy {
       text-align: center;
       margin-top: 8em;
@@ -626,12 +722,16 @@
     border-radius: 2px;
     border: 1px solid;
     cursor: pointer;
-    min-width: 160px;
+    min-width: 165px;
+    animation: fadeInAfter .5s ease;
     &.change {
-      bottom: 50px;
+      bottom: 120px;
     }
     &.home {
-      bottom: 90px;
+      bottom: 155px;
+    }
+    &.new {
+      bottom: 85px;
     }
     &:hover {
       text-decoration: underline;
@@ -643,54 +743,32 @@
   .container-forms {
     animation: fadeInAfter .5s ease;
   }
+  .shadow {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .25);
+    animation: fadeShadow 1s ease;
+  }
   .fadeInAfter {
     animation: fadeInAfter .5s ease;
   }
   .header-steps {
-    opacity: 1;
-    background: #fff;
-    border-radius: 3px 3px 0 0;
+    background: #2196f3;
+    color: #fff;
+    font-weight: bold;
+    height: 35px;
+    line-height: 25px;
     & .step {
       width: 100%;
-      padding: 5px 20px 5px 10px;
+      padding: 5px 28px;
       font-weight: bold;
       position: relative;
       color: #fff;
       display: inline-block;
+      background: #2196f3;
+      border-bottom: 4px solid #218ade;
       &.first {
-        background: #2196f3;
-        z-index: 4;
         border-radius: 3px 0 0px 0;
-        &:after {
-          border-color: transparent transparent transparent #2196f3;
-        }
-      }
-      &.second {
-        background: #218ade;
-        padding-left: 28px;
-        &:after {
-          border-color: transparent transparent transparent #218ade;
-        }
-      }
-      &.end {
-        padding-left: 28px;
-        &:after {
-          content: none;
-        }
-      }
-      &:after {
-        content: '';
-        position: absolute;
-        height: 100%;
-        border-style: solid;
-        border-width: 15px 15px 15px;
-        top: 0;
-        right: -29px;
       }
     }
-  }
-  .container-steps {
-    z-index: 3;
   }
   .fadeAfter {
     animation: fadeInAfter .5s ease;
@@ -772,17 +850,6 @@
       }
     }
   }
-  .form-inscription {
-    border-top: 4px solid #218ade;
-    & header {
-      background: #2196f3;
-      color: #fff;
-      font-weight: bold;
-      padding: 0 1em;
-      height: 40px;
-      line-height: 40px;
-    }
-  }
   .body-form {
     background: #fff;
     padding: .5em 1em;
@@ -859,10 +926,11 @@
     }
   }
   .completed {
-    background-color: #21f36d;
-    color: #fff;
+    background-color: #0fdc59;
+    color: #ffffff;
     font-weight: bold;
     padding: .2em 1em;
     border-radius: 0;
+    font-size: 1.3rem;
   }
 </style>

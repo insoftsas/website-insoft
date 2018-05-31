@@ -118,7 +118,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   top: 0;
   left: 0;
   z-index: 10;
-  // background: darken($background-welcome, 1);
+  background: linear-gradient(135deg, #0c468f, #019a95);
   & .item {
     padding: .5em 1em;
     font-weight: 300;
@@ -180,7 +180,6 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
       }
     }
   }
-  background: linear-gradient(135deg, #0c468f, #019a95);
 }
 
 .title-main {
@@ -269,6 +268,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   background-size: cover;
   height: 100vh;
   background-position: center;
+  background-position-y: -1px;
 }
 .bg_panel{
   position: fixed;
@@ -441,6 +441,6 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
     user-select: none;
     -webkit-transition: .3s all;
     transition: .3s all;
-    z-index: 4;
+    z-index: 1;
   }
 }

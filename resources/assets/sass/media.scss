@@ -74,7 +74,7 @@
 		font-size: 2.3rem !important;
 	}
 	.container-image-transdigital {
-		width: 300px !important;
+		width: 250px !important;
 		margin-bottom: 20px !important;
 	}
 	.btn-inscription-container {
@@ -85,6 +85,9 @@
 // styles for medium screens and larger
 }
 @media #{$medium-and-down} {
+	.main-template {
+	 margin-top: 56px;
+	}
 	.help-actions {
 		display: none !important;
 	}
@@ -102,6 +105,7 @@
 	.title-section {
 		font-size: 1.3rem !important;
 		padding: 8px !important;
+		background-position: center !important;
     &.special-margin {
 			margin-bottom: 100px;
 		}
@@ -116,7 +120,7 @@
 	section, footer {
 		height: auto;
 		opacity: 1 !important;
-		margin-top: 0 !important;
+		padding-top: 56px !important;
 	}
 	.container-objects .object {
 		max-width: initial !important;
@@ -124,10 +128,22 @@
 	.price-award {
 		font-size: 2.3rem !important;
 	}
+	#conctact {
+		background-position-y: 0 !important;
+	}
 }
 @media #{$large-and-up} {
-	
+
 }
 @media #{$extra-large-and-up} {
 // styles for extra large screens and up
+}
+
+@media only screen and (min-width: 1440px) and (min-height: 2960px) and (orientation: portrait)  {
+  .container-image-transdigital {
+		width: 1060px !important;
+	}
+	.navbar-items {
+		display: none !important
+	}
 }

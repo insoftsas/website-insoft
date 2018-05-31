@@ -9,7 +9,6 @@
             <span>Correo: hackhaton@innovemp.co</span>
           </div>
         </div>
-        
       </div>
     </div>
   </section>
