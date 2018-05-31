@@ -103,13 +103,13 @@
           <div class="col s12 no-padding form-enterprise" v-else>
             <div v-if="form_to_show == 2 & !has_select_dev" class="roles-container">
               <div class="col s12 m4">
-                <div class="select-rol business-select" @click="indivualRegister">Indididualmente</div>
+                <div class="select-rol business-select" @click="indivualRegister">Individualmente<div class="text-help">Solo podras participar tu.</div></div>
               </div>
               <div class="col s12 m4">
-                <div class="select-rol dev-select" @click="newGroup">Grupalmente</div>
+                <div class="select-rol dev-select" @click="newGroup">Grupalmente<div class="text-help">Crea tu grupo y comparte el codígo generado con tus amigos para que se unan contigo.</div></div>
               </div>
               <div class="col s12 m4">
-                <div class="select-rol dev-select" @click="addToGroup">Ya tengo grupo</div>
+                <div class="select-rol dev-select" @click="addToGroup">Ya tengo grupo<div class="text-help">Ingresa el codígo de tu grupo para hacer parte de el.</div></div>
               </div>
             </div>
             <form v-if="has_select_dev" class="form-inscription" :class="{'fadeAfter' : has_select_dev}">
@@ -693,6 +693,20 @@
 </script>
 
 <style lang="scss" scoped>
+  .text-help {
+    position: absolute;
+    min-width: 300px;
+    height: 40px;
+    line-height: 20px;
+    bottom: -60px;
+    font-size: .9rem;
+    font-weight: 400;
+    text-transform: initial;
+    color: #fff;
+    left: 50%;
+    transform: translateX(-50%);
+    visibility: hidden;
+  }
   .code-container {
     text-align: center;
     font-weight: bold;
@@ -731,6 +745,9 @@
       bottom: 155px;
     }
     &.new {
+      bottom: 85px;
+    }
+    &.help {
       bottom: 85px;
     }
     &:hover {
@@ -793,8 +810,12 @@
       transition: all .3s ease;
       text-transform: uppercase;
       cursor: pointer;
+      position: relative;
       &:hover {
         box-shadow: inset 0 0 0 10px #18648e, 0 0 0 8px #FFF;
+        & .text-help {
+          visibility: visible;
+        }
       }
     }
   }
