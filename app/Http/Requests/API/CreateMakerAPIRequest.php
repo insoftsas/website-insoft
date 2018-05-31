@@ -35,7 +35,7 @@ class CreateMakerAPIRequest extends APIRequest
             'genere'            => 'required|string',
             'bird_date'         => 'required|date',
             'city_id'           => 'required|numeric|exists:cities,id',
-            'email'             => 'required|email|unique:makers,email',
+            'email'             => 'required|email',
             'phone'             => 'required',
             'level'             => 'required|string',
             'semester'          => 'required_if:level,Estudiante',

@@ -29,3 +29,6 @@ Route::resource('enterprises', 'EnterpriseAPIController');
 Route::get('/states', 'CentralAPIController@states');
 
 Route::post('/cities', 'CentralAPIController@getCities');
+
+
+Route::resource('users', 'UserAPIController');

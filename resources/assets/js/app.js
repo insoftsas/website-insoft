@@ -33,6 +33,7 @@ Vue.component('info-section', require('./components/Sections/Info.vue'));
 Vue.component('participate-section', require('./components/Sections/Participate.vue'));
 Vue.component('we-search-section', require('./components/Sections/WeSearch.vue'));
 Vue.component('schedule-section', require('./components/Sections/Schedule.vue'));
+Vue.component('schedule-map', require('./components/Sections/ScheduleMap.vue'));
 Vue.component('awards-section', require('./components/Sections/Awards.vue'));
 Vue.component('contact-section', require('./components/Sections/Contact.vue'));
 const router = new VueRouter({

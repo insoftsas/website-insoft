@@ -6,7 +6,12 @@
         <div class="col s12" id="dashboard_card" style="opacity:0; transform: translateY(100px) scale(0.8);">
           <div class="card">
             <div class="card-content">
-              <span class="card-title">Dashboard</span>
+              <div class="row">
+                <span class="card-title special-margin">Dashboard</span>
+                <div class="col s12">
+                  <schedule-map></schedule-map>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -55,7 +60,8 @@
     }
   }
 </script>
-
 <style lang="scss" scoped>
-
+.special-margin {
+  margin-bottom: 70px!important;
+}
 </style>
