@@ -10,15 +10,15 @@ use Illuminate\Notifications\Messages\MailMessage;
 class WelcomeEnterpriseNotification extends Notification
 {
     use Queueable;
-
+    private $password;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($password)
     {
-        //
+        $this->password = $password;
     }
 
     /**
@@ -43,9 +43,12 @@ class WelcomeEnterpriseNotification extends Notification
         return (new MailMessage)
                     ->subject(config('app.name').' | Inscripción Completada')
                     ->greeting('Hola!')
-                    ->line('Tu inscripción se ha completado correctamente, .')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+                    ->line('Su inscripción como empresario se ha completado correctamente, a continuación se le provee el usuario y contraseña para acceder a la aplicación, proximamente estaremos notificandote sobre las fases del evento.')
+                    ->line('Correo: '.$notifiable->email)
+                    ->line('Contraseña: '.$this->password)
+                    ->action('Iniciar sesion', url('/').'#/login')
+                    ->line('Gracias por hacer parte de la Hackathon Montería!')
+                    ->salutation(config('app.name'));
     }
 
     /**

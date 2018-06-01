@@ -7,6 +7,7 @@ use App\Http\Requests\API\CreateMakerAPIRequest;
 use App\Http\Requests\API\UpdateMakerAPIRequest;
 use App\Models\Group;
 use App\Models\Maker;
+use App\User;
 use App\Models\Enterprise;
 use App\Repositories\MakerRepository;
 use Carbon\Carbon;
@@ -14,7 +15,9 @@ use Illuminate\Http\Request;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
-
+use App\Notifications\WelcomeGroupNotification;
+use App\Notifications\WelcomeMakerGroupNotification;
+use App\Notifications\WelcomeMakerNotification;
 /**
  * Class MakerController
  * @package App\Http\Controllers\API
@@ -65,6 +68,8 @@ class MakerAPIController extends AppBaseController
             return $this->sendError('Ya existe un maker registrado con este correo.');
         }else if(Enterprise::where('email',$input['email'])->count() != 0){
             return $this->sendError('Ya existe una empresa registrada con este correo.');
+        }else if(User::where('email',$input['email'])->count() != 0){
+            return $this->sendError('Ya existe un usuario registrado con este correo.');
         }
         
         if ($request->new_group == 1) 
@@ -86,7 +91,11 @@ class MakerAPIController extends AppBaseController
                 if (empty($group)) {
                     return $this->sendError('Codigo de grupo no encontrado');
                 } else {
-                    $input['group_id'] = $group->id;
+                    if($group->makers()->count() >= 4){
+                        return $this->sendError('Este grupo ya tiene el maximo de participantes');
+                    }else{
+                        $input['group_id'] = $group->id;
+                    }
                 }
                 //falta validacion de cantidad de participantes en cada grupo
             }
@@ -102,6 +111,8 @@ class MakerAPIController extends AppBaseController
 
         $maker = $this->makerRepository->create($input);
 
+        
+        
         $result = [];
 
         if ($request->new_group == 1) 
@@ -120,6 +131,23 @@ class MakerAPIController extends AppBaseController
             
         }
 
+        $password_gen = str_random(8);
+
+        $user = User::create([
+            'name' => $maker->first_name.' '.$maker->last_name,
+            'email' => $maker->email,
+            'password' =>  $password_gen
+        ]);
+
+        if (empty($request->group_code) && $request->new_group != 1) {
+            $user->notify(new WelcomeMakerNotification($password_gen));
+        }else{
+            if($request->new_group == 1){
+                $user->notify(new WelcomeGroupNotification($password_gen,$groupCreated));
+            }else{
+                $user->notify(new WelcomeMakerGroupNotification($password_gen,$group));
+            }
+        }
 
         return $this->sendResponse($result, 'Maker Registrado correctamente');
     }
@@ -163,6 +191,11 @@ class MakerAPIController extends AppBaseController
         if (empty($maker)) {
             return $this->sendError('Maker not found');
         }
+
+        if(!auth()->user()->isMixAdmin() && auth()->user()->email !=  $maker->email){
+            return $this->sendError('Maker not found');
+        }
+        
         $maker = $this->makerRepository->update($input, $id);
 
         return $this->sendResponse($maker->toArray(), 'Maker updated successfully');

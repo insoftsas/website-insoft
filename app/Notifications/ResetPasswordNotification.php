@@ -48,7 +48,7 @@ class ResetPasswordNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject('Forsk | Solicitud de restablecimiento de contraseña')
+            ->subject(config('app.name').' | Solicitud de restablecimiento de contraseña')
             ->greeting('Hola ')
             ->line('Recibes este email porque se solicitó un restablecimiento de contraseña para tu cuenta.')
             ->action('Restablecer contraseña', url(route('password.reset', $this->token, false)))
