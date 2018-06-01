@@ -18,7 +18,7 @@ Route::get('/user/tokens', 'TokensManagerAPIController@index');
 Route::get('/user/tokens/{id}', 'TokensManagerAPIController@show');
 Route::delete('/user/tokens/{id}', 'TokensManagerAPIController@destroy');
 Route::get('/user/logout', 'TokensManagerAPIController@logout');
-
+Route::post('/login','TokensManagerAPIController@login');
 
 Route::resource('groups', 'GroupAPIController');
 
