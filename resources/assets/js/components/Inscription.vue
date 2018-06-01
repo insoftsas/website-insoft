@@ -244,7 +244,7 @@
                     <span v-else-if="code_not_found">{{ error }}</span>
                     <span v-else-if="group_exist">{{ error }}</span>
                   </div>
-                  <button v-else type="submit" @click.prevent="sendMaker" :disabled="!makers_data.terms">Enviar</button>
+                  <button v-else @click.prevent="sendMaker" :disabled="!makers_data.terms || loading">{{ !loading ? 'Enviar' : 'Enviando...' }}</button>
                 </div>
                 <div class="col s12" v-if="completed_registration">
                   <div class="code-container">
@@ -488,20 +488,28 @@
       },
       sendEnterprise: function () {
         let vm = this
-        vm.loading = !vm.loading
+        vm.loading = true
         axios.post('/api/enterprises', this.enterprises_data)
           .then(function (response) {
-            vm.loading = !vm.loading
+            vm.loading = false
             vm.completed_registration = true
             vm.resetErrorValues()
             vm.goToChange('completed-successfully')
           })
           .catch(function (error) {
-            vm.loading = !vm.loading
+            vm.loading = false
             vm.completed_registration = false
-            const e = error.response.data.errors
-            vm.error = e
-            vm.checkError(e)
+            if(error.response != undefined){
+              if(error.response.data != undefined){
+                if(error.response.data.errors != undefined){
+                  const e = error.response.data.errors
+                  vm.error = e
+                  vm.checkError(e)
+                }else if(error.response.data.message != undefined){
+                  M.toast({html: error.response.data.message});
+                }
+              }
+            }
           })
       },
       setDate: function () {
@@ -608,7 +616,7 @@
       },
       sendMaker: function () {
         let vm = this
-        vm.loading = !vm.loading
+        vm.loading = true
         if (vm.add_to_group && (vm.makers_data.group_code == null || vm.makers_data.group_code == '')) {
           vm.code_not_found = true
           vm.error_separated = "Debe introducir el codigo que le asignaron a su grupo para continuar"
@@ -621,7 +629,7 @@
             if (response.data.data.code) {
               vm.group_code = response.data.data.code
             }
-            vm.loading = !vm.loading
+            vm.loading = false
             vm.completed_registration = true
             vm.error_separated = null
             vm.resetErrorValues()
@@ -630,25 +638,34 @@
             vm.birt_date_fail = false
           })
           .catch(function (error) {
-            vm.loading = !vm.loading
+            vm.loading = false
             vm.completed_registration = false
-            if (error.response.data.message == 'Codigo de grupo no encontrado') {
-              vm.code_not_found = true
-              vm.error = error.response.data.message
-              if (vm.birt_date_fail)
-                vm.birt_date_fail = !vm.birt_date_fail
-            } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
-              vm.birt_date_fail = true
-              vm.error = error.response.data.message
-              if (vm.code_not_found)
-                vm.code_not_found = !vm.code_not_found
-            } else if (error.response.data.message == 'Su grupo ya se encuentra registrado en nuestro sistema') {
-              vm.group_exist = true
-              vm.error = error.response.data.message
-            } else {
-              const e = error.response.data.errors
-              vm.error = e
-              vm.checkError(e)
+            if(error.response != undefined){
+              if(error.response.data != undefined){
+                if(error.response.data.errors != undefined){
+                  const e = error.response.data.errors
+                  vm.error = e
+                  vm.checkError(e)
+                }else if(error.response.data.message != undefined){
+                  if (error.response.data.message == 'Codigo de grupo no encontrado') {
+                    vm.code_not_found = true
+                    vm.error = error.response.data.message
+                    if (vm.birt_date_fail)
+                      vm.birt_date_fail = !vm.birt_date_fail
+                  } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
+                    vm.birt_date_fail = true
+                    vm.error = error.response.data.message
+                    if (vm.code_not_found)
+                      vm.code_not_found = !vm.code_not_found
+                  } else if (error.response.data.message == 'Su grupo ya se encuentra registrado en nuestro sistema') {
+                    vm.group_exist = true
+                    vm.error = error.response.data.message
+                  }else{
+                    M.toast({html: error.response.data.message});
+                    vm.error = error.response.data.message
+                  }
+                }
+              }
             }
           })
       },
