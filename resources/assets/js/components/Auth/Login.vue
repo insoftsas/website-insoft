@@ -59,7 +59,7 @@
           'password' : vm.password
         })
         .then(function (response) {
-          vm.$root.token = response.data.access_token;
+          vm.$root.token = response.data.data.access_token;
           setTimeout(function () {
             vm.$root.getUser();
             vm.$router.push("/dashboard");
