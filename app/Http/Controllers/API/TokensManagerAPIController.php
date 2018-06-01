@@ -36,11 +36,19 @@ class TokensManagerAPIController extends AppBaseController
             ]);
         } catch (\Exception $e) {
             $json = json_decode($e->getResponse()->getBody()->getContents(), true);
-            return response()->json([
-                'error' => 'invalid_credentials',
-                //'message' => "{$e->getCode()}: {$e->getMessage()}"
-                'message' => "{$json['hint']}"
-            ], 401);
+            if(isset($json['hint'])){
+                return response()->json([
+                    'error' => 'invalid_credentials',
+                    //'message' => "{$e->getCode()}: {$e->getMessage()}"
+                    'message' => "{$json['hint']}"
+                ], 401);
+            }else{
+                return response()->json([
+                    'error' => 'invalid_credentials',
+                    //'message' => "{$e->getCode()}: {$e->getMessage()}"
+                    'message' => "Usuario incorrecto"
+                ], 401);
+            }
         }
     }
 	public function index(Request $request)
