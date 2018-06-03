@@ -18,10 +18,3 @@ Route::get('artisan', function () {
     $exit=Artisan::call("passport:install");
     return $exit;
 });
-Route::get('t', function () {
-	$us = \App\User::find(3)->tokens[1];
-	dd(  );
-    if ( property_exists( json_decode($us->last_access) , "location") ) {
-
-    }
-});
