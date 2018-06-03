@@ -64,4 +64,24 @@
 .special-margin {
   margin-bottom: 70px!important;
 }
+@media screen and (max-width: 753px){
+  .special-margin{
+    margin-bottom: 100px !important;
+  }
+}
+@media screen and (max-width: 645px){
+  .special-margin{
+    margin-bottom: 120px !important;
+  }
+}
+@media screen and (max-width: 450px){
+  .special-margin{
+    margin-bottom: 150px !important;
+  }
+}
+@media screen and (max-width: 410px){
+  .special-margin{
+    margin-bottom: 220px !important;
+  }
+}
 </style>

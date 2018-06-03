@@ -82,6 +82,23 @@ class TokensManagerAPIController extends AppBaseController
         return $this->sendResponse($token, 'Token retrieved successfully');	
 	}
 
+    public function update($id, Request $request)
+    {
+        $token = auth()->user()->tokens->find($id);
+        if($token==null){
+            return $this->sendError('Token not found');
+        }
+        $obj = (object) array(
+            'location' => $request->get('location'),
+            'ip' => $request->get('ip')
+        );
+        $last = json_decode($token->last_access);
+        $last->locate = $obj;
+        $token->last_access = json_encode($last);
+        $token->save();
+        return $this->sendResponse($token, 'Token updated successfully'); 
+    }
+
 	public function logout(Request $request)
 	{	
         $usToken = $request->user()->token();

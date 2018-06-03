@@ -55,6 +55,7 @@ const app = new Vue({
           user: '/api/user',
           makers: '/api/makers',
           groups: '/api/groups',
+          users: '/api/users',
           tokens: '/api/user/tokens',
           enterprises: '/api/enterprises',
         },
