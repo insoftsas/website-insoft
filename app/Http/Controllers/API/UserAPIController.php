@@ -78,7 +78,7 @@ class UserAPIController extends AppBaseController
             return $this->sendError('User not found');
         }
 
-        return $this->sendResponse($user->toArray(), 'User retrieved successfully');
+        return $this->sendResponse($user->append(['IsEnterprise','IsMaker'])->toArray(), 'User retrieved successfully');
     }
 
     /**

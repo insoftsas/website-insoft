@@ -39,9 +39,9 @@
                           {{ maker.created_at }}
                         </td>
                         <td>
-                          <a class="waves-effect waves-blue circle btn-flat">
+                          <router-link :to="'/makers/' + maker.id" class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'eye']"/>
-                          </a>
+                          </router-link>
                           <a class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </a>

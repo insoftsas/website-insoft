@@ -39,9 +39,7 @@
                           {{group.created_at}}
                         </td>
                         <td>
-                          <a class="waves-effect waves-blue circle btn-flat">
-                            <font-awesome-icon :icon="['fas', 'eye']"/>
-                          </a>
+                          <router-link :to="'/groups/' + group.id" class="waves-effect waves-blue circle btn-flat"><font-awesome-icon :icon="['fas', 'eye']"/></router-link>
                           <a class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </a>

@@ -25,23 +25,23 @@
                           <th>Roles</th>
                           <th></th>
                       </tr>
-                      <tr v-for="(maker,i) in users" :key="i">
+                      <tr v-for="(user,i) in users" :key="i">
                         <td>
-                          {{ maker.id }}
+                          {{ user.id }}
                         </td>
                         <td>
-                          {{ maker.name }}
+                          {{ user.name }}
                         </td>
                         <td>
-                          {{ maker.email }}
+                          {{ user.email }}
                         </td>
                         <td>
-                          {{ maker.created_at }}
+                          {{ user.created_at }}
                         </td>
                         <td>
-                          <a class="waves-effect waves-blue circle btn-flat">
+                          <router-link :to="'/users/' + user.id" class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'eye']"/>
-                          </a>
+                          </router-link>
                           <a class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </a>
