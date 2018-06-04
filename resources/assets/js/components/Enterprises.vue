@@ -18,9 +18,37 @@
                 <div class="col s12">
                   <table class="striped highlight" id="enterprises">
                     <tbody>
+                      <tr>
+                          <th>NIT</th>
+                          <th>Razon Soc.</th>
+                          <th>Activ. / Sect.</th>
+                          <th>Creado</th>
+                          <th></th>
+                      </tr>
                       <tr v-for="(enterprise,i) in enterprises" :key="i">
                         <td>
-                          {{JSON.stringify(enterprise)}}
+                          {{ enterprise.nit }}
+                        </td>
+                        <td>
+                          {{ enterprise.razon_social_propietario }}
+                        </td>
+                        <td>
+                          <p>{{ enterprise.actividad_comercial }}</p>
+                          <p>{{ enterprise.sector_productivo }}</p>
+                        </td>
+                        <td>
+                          {{ enterprise.created_at }}
+                        </td>
+                        <td>
+                          <a class="waves-effect waves-blue circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'eye']"/>
+                          </a>
+                          <a class="waves-effect waves-blue circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'edit']"/>
+                          </a>
+                          <a class="waves-effect waves-red circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'trash']"/>
+                          </a>
                         </td>
                       </tr>
                     </tbody>

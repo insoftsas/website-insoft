@@ -265,7 +265,7 @@
                       <span v-if="group_exist">{{ error }}</span>
                       <span v-if="code_empty">{{ error_separated }}</span>
                     </div>
-                    <button type="submit" @click.prevent="sendMaker" :disabled="!makers_data.terms || completed_registration">Enviar</button>
+                    <button type="submit" @click.prevent="sendMaker" :disabled="!makers_data.terms || completed_registration || loading">{{ !loading ? 'Enviar' : 'Enviando...' }}</button>
                   </div>
                   <div class="col s12" v-if="completed_registration && makers_data.new_group == 1 && add_to_group == false">
                     <div class="code-container">
@@ -518,20 +518,28 @@
       },
       sendEnterprise: function () {
         let vm = this
-        vm.loading = !vm.loading
+        vm.loading = true
         axios.post('/api/enterprises', this.enterprises_data)
           .then(function (response) {
-            vm.loading = !vm.loading
+            vm.loading = false
             vm.completed_registration = true
             vm.resetErrorValues()
             vm.goToChange('completed-successfully')
           })
           .catch(function (error) {
-            vm.loading = !vm.loading
+            vm.loading = false
             vm.completed_registration = false
-            const e = error.response.data.errors
-            vm.error = e
-            vm.checkError(e)
+            if(error.response != undefined){
+              if(error.response.data != undefined){
+                if(error.response.data.errors != undefined){
+                  const e = error.response.data.errors
+                  vm.error = e
+                  vm.checkError(e)
+                }else if(error.response.data.message != undefined){
+                  M.toast({html: error.response.data.message});
+                }
+              }
+            }
           })
       },
       setDate: function () {
@@ -638,7 +646,7 @@
       },
       sendMaker: function () {
         let vm = this
-        vm.loading = !vm.loading
+        vm.loading = true
         if (vm.add_to_group && (vm.makers_data.group_code == null || vm.makers_data.group_code == '')) {
           vm.code_empty = true
           vm.error_separated = "Debe introducir el codigo que le asignaron a su grupo para continuar"
@@ -694,6 +702,53 @@
               }
             })
         }
+<<<<<<< HEAD
+=======
+        axios.post('/api/makers', this.makers_data)
+          .then(function (response) {
+            if (response.data.data.code) {
+              vm.group_code = response.data.data.code
+            }
+            vm.loading = false
+            vm.completed_registration = true
+            vm.error_separated = null
+            vm.resetErrorValues()
+            vm.goToChange('completed-successfully')
+            vm.code_not_found = false
+            vm.birt_date_fail = false
+          })
+          .catch(function (error) {
+            vm.loading = false
+            vm.completed_registration = false
+            if(error.response != undefined){
+              if(error.response.data != undefined){
+                if(error.response.data.errors != undefined){
+                  const e = error.response.data.errors
+                  vm.error = e
+                  vm.checkError(e)
+                }else if(error.response.data.message != undefined){
+                  if (error.response.data.message == 'Codigo de grupo no encontrado') {
+                    vm.code_not_found = true
+                    vm.error = error.response.data.message
+                    if (vm.birt_date_fail)
+                      vm.birt_date_fail = !vm.birt_date_fail
+                  } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
+                    vm.birt_date_fail = true
+                    vm.error = error.response.data.message
+                    if (vm.code_not_found)
+                      vm.code_not_found = !vm.code_not_found
+                  } else if (error.response.data.message == 'Su grupo ya se encuentra registrado en nuestro sistema') {
+                    vm.group_exist = true
+                    vm.error = error.response.data.message
+                  }else{
+                    M.toast({html: error.response.data.message});
+                    vm.error = error.response.data.message
+                  }
+                }
+              }
+            }
+          })
+>>>>>>> 39ff35b3e5e02bf2356fb14bda61d903e4b71ccd
       },
       getCities: function (t) {
         let vm = this

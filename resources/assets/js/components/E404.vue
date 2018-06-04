@@ -2,7 +2,7 @@
   <div>
     <div class="navbar-items">
       <router-link to="/" v-if="!$root.auth" class="item"><span>Inicio</span></router-link>
-      <router-link to="/dashboard" class="item"><span>Dashboard</span></router-link>
+      <router-link to="/dashboard" v-else class="item"><span>Dashboard</span></router-link>
     </div>
 	  <h1 class="text_404">La pagina que está buscando no existe</h1>
 	</div>

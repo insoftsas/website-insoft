@@ -122,7 +122,15 @@
               Vue.set(vm.tokens[k].last_access, 'user_agent', user_agent);
               let location = "Cargando...";
               Vue.set(vm.tokens[k].last_access, 'location', location);
-              vm.getLocation(k);
+              if(vm.tokens[k].last_access.locate != undefined){
+                if(vm.tokens[k].last_access.ip == vm.tokens[k].last_access.locate.ip){
+                  vm.tokens[k].last_access.location = vm.tokens[k].last_access.locate.location;
+                }else{
+                  vm.getLocation(k);
+                }
+              }else{
+                vm.getLocation(k);
+              }
             })
             setTimeout(function(){
               $('.tooltipped').tooltip();
@@ -146,6 +154,15 @@
                 vm.tokens[index].last_access.location = "Ubicacion desconocida"
               }else{
                 vm.tokens[index].last_access.location = loc.cityName + ", " + loc.regionName + ', ' + loc.countryName
+                axios.post(vm.$root.apiMap.tokens + '/' + vm.tokens[index].id,
+                {
+                  location: vm.tokens[index].last_access.location,
+                  ip: vm.tokens[index].last_access.ip
+                })
+                .then(response => {
+                })
+                .catch(error =>{
+                })
               }
             }else if(xmlHttp.readyState == 4){
               vm.tokens[index].last_access.location = "Ubicacion desconocida"

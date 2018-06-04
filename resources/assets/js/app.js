@@ -63,10 +63,11 @@ const app = new Vue({
         client_secret: process.env.MIX_OAUTH_CLIENT_KEY,
         apiMap: {
           logout: '/api/user/logout',
-          login: '/oauth/token',
+          login: '/api/login',
           user: '/api/user',
           makers: '/api/makers',
           groups: '/api/groups',
+          users: '/api/users',
           tokens: '/api/user/tokens',
           enterprises: '/api/enterprises',
         },

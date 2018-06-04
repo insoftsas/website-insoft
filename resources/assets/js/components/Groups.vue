@@ -33,7 +33,7 @@
                           {{group.name}}
                         </td>
                         <td>
-                          <p v-for="(maker,im) in group.makers">{{maker.first_name + ' ' + maker.last_name}}<span class="leader_span" v-if="maker.id == group.leader_id">Lider</span></p>
+                          <p v-for="(maker,im) in group.makers">{{maker.FullName}}<span class="leader_span" v-if="maker.id == group.leader_id">Lider</span></p>
                         </td>
                         <td>
                           {{group.created_at}}

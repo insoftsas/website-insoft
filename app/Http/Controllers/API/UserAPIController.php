@@ -24,6 +24,7 @@ class UserAPIController extends AppBaseController
 
     public function __construct(UserRepository $userRepo)
     {
+        $this->middleware(['auth:api','roles:root']);
         $this->userRepository = $userRepo;
     }
 

@@ -12,7 +12,8 @@ class Maker extends Model
 
     public $table = 'makers';
     
-
+    protected $appends = ['FullName'];
+    
     protected $dates = ['deleted_at'];
 
 
@@ -86,4 +87,8 @@ class Maker extends Model
         return $this->belongsTo('App\Models\Group');
     }
     
+    public function getFullNameAttribute()
+    {
+        return $this->first_name.' '.$this->last_name;
+    }
 }

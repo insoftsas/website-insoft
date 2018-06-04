@@ -4,6 +4,9 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Requests\API\CreateEnterpriseAPIRequest;
 use App\Http\Requests\API\UpdateEnterpriseAPIRequest;
+use App\Models\Group;
+use App\Models\Maker;
+use App\User;
 use App\Models\Enterprise;
 use App\Repositories\EnterpriseRepository;
 use Illuminate\Http\Request;
@@ -11,6 +14,7 @@ use App\Http\Controllers\AppBaseController;
 use InfyOm\Generator\Criteria\LimitOffsetCriteria;
 use Prettus\Repository\Criteria\RequestCriteria;
 use Response;
+use App\Notifications\WelcomeEnterpriseNotification;
 
 /**
  * Class EnterpriseController
@@ -24,7 +28,8 @@ class EnterpriseAPIController extends AppBaseController
 
     public function __construct(EnterpriseRepository $enterpriseRepo)
     {
-        $this->middleware(['auth:api','roles:root'])->except('store');
+        $this->middleware('auth:api')->except('store');
+        $this->middleware('roles:root')->except(['store','update']);
         $this->enterpriseRepository = $enterpriseRepo;
     }
 
@@ -56,8 +61,26 @@ class EnterpriseAPIController extends AppBaseController
     {
         $input = $request->all();
 
-        $enterprises = $this->enterpriseRepository->create($input);
+        if (Maker::where('email',$input['email'])->count() != 0)
+        {
+            return $this->sendError('Ya existe un maker registrado con este correo.');
+        }else if(Enterprise::where('email',$input['email'])->count() != 0){
+            return $this->sendError('Ya existe una empresa registrada con este correo.');
+        }else if(User::where('email',$input['email'])->count() != 0){
+            return $this->sendError('Ya existe un usuario registrado con este correo.');
+        }
 
+        $enterprises = $this->enterpriseRepository->create($input);
+        
+        $password_gen = str_random(8);
+
+        $user = User::create([
+            'name' => $enterprises->first_name.' '.$enterprises->last_name,
+            'email' => $enterprises->email,
+            'password' =>  $password_gen
+        ]);
+        $user->notify(new WelcomeEnterpriseNotification($password_gen));
+        
         return $this->sendResponse($enterprises->toArray(), 'Enterprise saved successfully');
     }
 
@@ -100,7 +123,11 @@ class EnterpriseAPIController extends AppBaseController
         if (empty($enterprise)) {
             return $this->sendError('Enterprise not found');
         }
-
+        
+        if(!auth()->user()->isMixAdmin() && auth()->user()->email !=  $enterprise->email){
+            return $this->sendError('Enterprise not found');
+        }
+        
         $enterprise = $this->enterpriseRepository->update($input, $id);
 
         return $this->sendResponse($enterprise->toArray(), 'Enterprise updated successfully');

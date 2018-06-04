@@ -18,9 +18,36 @@
                 <div class="col s12">
                   <table class="striped highlight" id="makers">
                     <tbody>
+                      <tr>
+                          <th>Doc.</th>
+                          <th>Nombre</th>
+                          <th>Inscripción</th>
+                          <th>Creado</th>
+                          <th></th>
+                      </tr>
                       <tr v-for="(maker,i) in makers" :key="i">
                         <td>
-                          {{JSON.stringify(maker)}}
+                          {{ maker.doc_type + ' ' + maker.document }}
+                        </td>
+                        <td>
+                          {{ maker.FullName }}
+                        </td>
+                        <td>
+                          {{ maker.group_id == null ? 'Individual' : 'Grupal' }}
+                        </td>
+                        <td>
+                          {{ maker.created_at }}
+                        </td>
+                        <td>
+                          <a class="waves-effect waves-blue circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'eye']"/>
+                          </a>
+                          <a class="waves-effect waves-blue circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'edit']"/>
+                          </a>
+                          <a class="waves-effect waves-red circle btn-flat">
+                            <font-awesome-icon :icon="['fas', 'trash']"/>
+                          </a>
                         </td>
                       </tr>
                     </tbody>
