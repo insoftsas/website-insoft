@@ -14,13 +14,15 @@
             <resize-observer @notify="handleResize" id="slash">&nbsp;</resize-observer>
           </span>
         </span>
-        <div class="btn-inscription-container">
-          <router-link to="/inscription">Inscribirme</router-link>
-        </div>
-        <div class="more-info" @click="$root.goToView('info')">
-          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 490.688 490.688" style="enable-background:new 0 0 490.688 490.688;" xml:space="preserve">
-            <path d="M245.213,373.415c-2.831,0.005-5.548-1.115-7.552-3.115L2.994,135.633c-4.093-4.237-3.975-10.99,0.262-15.083  c4.134-3.992,10.687-3.992,14.82,0l227.136,227.115l227.115-227.136c4.093-4.237,10.845-4.354,15.083-0.262  c4.237,4.093,4.354,10.845,0.262,15.083c-0.086,0.089-0.173,0.176-0.262,0.262L252.744,370.279  C250.748,372.281,248.039,373.408,245.213,373.415z"/>
-          </svg>
+        <div class="trigger-main">
+          <div class="btn-inscription-container">
+            <router-link to="/inscription">Inscribirme</router-link>
+          </div>
+          <div class="more-info" @click="$root.goToView('info')">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 490.688 490.688" style="enable-background:new 0 0 490.688 490.688;" xml:space="preserve">
+              <path d="M245.213,373.415c-2.831,0.005-5.548-1.115-7.552-3.115L2.994,135.633c-4.093-4.237-3.975-10.99,0.262-15.083  c4.134-3.992,10.687-3.992,14.82,0l227.136,227.115l227.115-227.136c4.093-4.237,10.845-4.354,15.083-0.262  c4.237,4.093,4.354,10.845,0.262,15.083c-0.086,0.089-0.173,0.176-0.262,0.262L252.744,370.279  C250.748,372.281,248.039,373.408,245.213,373.415z"/>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
@@ -74,10 +76,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+  .trigger-main {
+    position: relative;
+  }
   .container {
     animation: fadeInAfter .5s ease;
   }
   .more-info {
+    position: relative;
     cursor: pointer;
     width: 35px;
     margin: auto;
@@ -98,8 +104,9 @@ export default {
   .btn-inscription-container {
     text-align: center;
     margin: 112px 0 57px 0;
+    position: relative;
     & a {
-      color: #005d91;
+      color: #3c7fb9;
       font-weight: bold;
       width: max-content;
       padding: 5px 50px;
@@ -113,6 +120,7 @@ export default {
   .container-image-transdigital {
     width: 400px;
     margin: auto;
+    position: relative;
   }
   .slash {
     position: absolute;
@@ -127,12 +135,13 @@ export default {
     animation: parpadeo 1s step-end infinite;
   }
   .write-mode {
+    position: relative;
     font-weight: 400;
     font-size: 2.4rem;
     margin: auto;
     display: block;
     padding: 0 10px;
-    background: #004a65; //#024f6b
+    background: #2a5b83;//#004a65; //#024f6b
     width: max-content;
     color: #fff;
     border-radius: 2px;
@@ -152,7 +161,7 @@ export default {
       width: 0;
       height: 100%;
       outline: none;
-      background-color: #004a65;
+      background-color: #2a5b83;
       box-sizing: border-box;
       -webkit-box-sizing: border-box;
       animation: escribiendo 1s steps(12, end) infinite alternate;

@@ -1,268 +1,291 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col s12">
-        <div class="bg-inscription"></div>
-        <div class="title-description-inscription" :class="{ 'minify-margin-title' : has_select_dev && form_to_show == 2 || form_to_show == 1 }">{{ title }}</div>
-        <div v-if="form_to_show == 0" class="roles-container">
-          <div class="col s12 m6 l4 offset-l2">
-            <div class="select-rol business-select" @click="showEnterpriseForm">Empresario</div>
-          </div>
-          <div class="col s12 m6 l4">
-            <div class="select-rol dev-select" @click="showMakerForm">Dev - Maker</div>
-          </div>
-        </div>
-        <div v-else class="col s12 no-padding container-forms" :class="{ 'shadow' : form_to_show == 1 || (form_to_show == 2 && has_select_dev ) }">
-          <header class="col s12 header-steps no-padding" v-if="has_select_dev || form_to_show == 1" :class="{'fadeAfter' : has_select_dev, 'fadeInAfter' : form_to_show == 1}">
-            <div class="step first">Datos personales</div>
-          </header>
-          <div class="col s12 no-padding form-enterprise" v-if="form_to_show == 1" :class="{'fadeInAfter' : form_to_show == 1}">
-            <form class="form-inscription">
-              <div class="col s12 body-form">
-                <div class="containter-question col s12 razon_social_propietario">
-                  <label>Razón social o propietario * <span class="red-text" v-if="error.razon_social_propietario != null || error == undefined">{{ error.razon_social_propietario[0] }}</span></label>
-                  <input type="text" v-model="enterprises_data.razon_social_propietario" :disabled="completed_registration" required class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 nit">
-                  <label>NIT * <span class="red-text" v-if="error.nit != null || error == undefined">{{ error.nit[0] }}</span></label>
-                  <input type="text" v-model="enterprises_data.nit" required :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 representante_legal">
-                  <label>Representante legal * <span class="red-text" v-if="error.representante_legal != null || error == undefined">{{ error.representante_legal[0] }}</span></label>
-                  <input type="text" v-model="enterprises_data.representante_legal" :disabled="completed_registration" required class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 actividad_comercial">
-                  <label>Actividad Comercial * <span class="red-text" v-if="error.actividad_comercial != null || error == undefined">{{ error.actividad_comercial[0] }}</span></label>
-                  <input type="text" v-model="enterprises_data.actividad_comercial" :disabled="completed_registration" required class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 sector_productivo">
-                  <label>Sector Productivo * <span class="red-text" v-if="error.sector_productivo != null || error == undefined">{{ error.sector_productivo[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" v-model="enterprises_data.sector_productivo">
-                    <option selected disabled value="">Seleccione una opción</option>
-                    <option value="Agencias inmobiliarias">Agencias inmobiliarias</option>
-                    <option value="Hoteles y agencias turísticas">Hoteles y agencias turísticas</option>
-                    <option value="Constructoras">Constructoras</option>
-                    <option value="Restaurantes">Restaurantes</option>
-                    <option value="Servicios jurídicos y contables">Servicios jurídicos y contables</option>
-                    <option value="Industrias culturales y creativas">Industrias culturales y creativas</option>
-                  </select>
-                </div>
-              </div>
-              <div class="col s12 body-form">
-                <div class="containter-question col s12 country">
-                  <label>País * <span class="red-text" v-if="error.country != null || error == undefined">{{ error.country[0] }}</span></label>
-                  <select class="browser-default" disabled v-model="enterprises_data.country">
-                    <option selected disabled value="Colombia">Colombia</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 departament_id">
-                  <label>Departamento * <span class="red-text" v-if="error.departament_id != null || error == undefined">{{ error.departament_id[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" @change="getCities(1)" v-model="enterprises_data.departament_id">
-                    <option selected disabled value="">Seleccione su departamento</option>
-                    <option :value="state.id" v-for="(state, index) in states">{{ state.name }}</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 city_id">
-                  <label>Ciudad * <span class="red-text" v-if="error.city_id != null || error == undefined">{{ error.city_id[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration || enterprises_data.departament_id == ''" v-model="enterprises_data.city_id">
-                    <option selected disabled value="">Seleccione su ciudad</option>
-                    <option :value="city.id" v-for="(city, index) in cities">{{ city.name }}</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 neigboard">
-                  <label>Barrio * <span class="red-text" v-if="error.neigboard != null || error == undefined">{{ error.neigboard[0] }}</span></label>
-                  <input type="text" v-model="enterprises_data.neigboard" :disabled="completed_registration" required class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 phone">
-                  <label>Teléfono/Celular * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
-                  <input type="number" v-model="enterprises_data.phone" :disabled="completed_registration" required class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 address">
-                  <label>Dirección * <span class="red-text" v-if="error.address != null || error == undefined">{{ error.address[0] }}</span></label>
-                  <input type="text" v-model="enterprises_data.address" :disabled="completed_registration" required class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 email">
-                  <label>Correo electrónico * <span class="red-text" v-if="error.email != null || error == undefined">{{ error.email[0] }}</span></label>
-                  <input type="text" v-model="enterprises_data.email" :disabled="completed_registration" required class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12" v-if="!completed_registration">
-                  <p class="terms-check">
-                    <label>
-                      <input type="checkbox" v-model="enterprises_data.terms" :disabled="completed_registration" required class="filled-in" />
-                      <span>Acepto los terminos y condiciones</span>
-                    </label>
-                  </p>
-                </div>
-                <div class="containter-question col s12 center completed-successfully">
-                  <div v-if="completed_registration" class="completed">Inscripción completada</div>
-                  <button v-else @click.prevent="sendEnterprise" :disabled="!enterprises_data.terms || loading">{{ !loading ? 'Enviar' : 'Enviando...' }}</button>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="col s12 no-padding form-enterprise" v-else>
-            <div v-if="form_to_show == 2 & !has_select_dev" class="roles-container">
-              <div class="col s12 m4">
-                <div class="select-rol business-select" @click="indivualRegister">Individualmente<div class="text-help">Solo podras participar tu.</div></div>
-              </div>
-              <div class="col s12 m4">
-                <div class="select-rol dev-select" @click="newGroup">Grupalmente<div class="text-help">Crea tu grupo y comparte el codígo generado con tus amigos para que se unan contigo.</div></div>
-              </div>
-              <div class="col s12 m4">
-                <div class="select-rol dev-select" @click="addToGroup">Ya tengo grupo<div class="text-help">Ingresa el codígo de tu grupo para hacer parte de el.</div></div>
-              </div>
-            </div>
-            <form v-if="has_select_dev" class="form-inscription" :class="{'fadeAfter' : has_select_dev}">
-              <div class="col s12 body-form">
-                <div class="containter-question col s12 m6 first_name">
-                  <label>Nombres * <span class="red-text" v-if="error.first_name != null || error == undefined">{{ error.first_name[0] }}</span></label>
-                  <input type="text" v-model="makers_data.first_name" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 last_name">
-                  <label>Apellidos * <span class="red-text" v-if="error.last_name != null || error == undefined">{{ error.last_name[0] }}</span></label>
-                  <input type="text" v-model="makers_data.last_name" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 doc_type">
-                  <label>Tipo de Identificación * <span class="red-text" v-if="error.doc_type != null || error == undefined">{{ error.doc_type[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" v-model="makers_data.doc_type">
-                    <option selected disabled value="">Seleccione su tipo de identificación</option>
-                    <option value="TI">Tarjeta de identidad</option>
-                    <option value="CC">Cédula de ciudadanía</option>
-                    <option value="CE">Cédula de extranjería</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 document">
-                  <label>Número de identificación * <span class="red-text" v-if="error.document != null || error == undefined">{{ error.document[0] }}</span></label>
-                  <input type="number" v-model="makers_data.document" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 genere">
-                  <label>Genero * <span class="red-text" v-if="error.genere != null || error == undefined">{{ error.genere[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" v-model="makers_data.genere">
-                    <option selected disabled value="">Seleccione su género</option>
-                    <option value="M">Masculino</option>
-                    <option value="F">Femenino</option>
-                    <option value="O">Otro</option>
-                    <option value="P">Prefiero no decirlo</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 age">
-                  <label>Edad (16-30 años)<span class="red-text" v-if="error.age != null || error == undefined">{{ error.age[0] }}</span></label>
-                  <input type="number" v-model="makers_data.age" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 bird_date">
-                  <label>Fecha de nacimiento * <span class="red-text" v-if="error.bird_date != null || error == undefined">{{ error.bird_date[0] }}</span><span class="red-text" v-if="birt_date_fail">{{ error }}</span></label>
-                  <input type="text" id="bird_date" :disabled="completed_registration" @change="setDate" v-model="makers_data.bird_date" class="datepicker browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 country">
-                  <label>País * <span class="red-text" v-if="error.country != null || error == undefined">{{ error.country[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" disabled v-model="makers_data.country">
-                    <option selected disabled value="Colombia">Colombia</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 departament_id">
-                  <label>Departamento * <span class="red-text" v-if="error.departament_id != null || error == undefined">{{ error.departament_id[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" @change="getCities(2)" v-model="makers_data.departament_id">
-                    <option selected disabled value="">Seleccione su departamento</option>
-                    <option :value="state.id" v-for="(state, index) in states">{{ state.name }}</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 city_id">
-                  <label>Ciudad * <span class="red-text" v-if="error.city_id != null || error == undefined">{{ error.city_id[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration || makers_data.departament_id == ''" v-model="makers_data.city_id">
-                    <option selected disabled value="">Seleccione su ciudad</option>
-                    <option :value="city.id" v-for="(city, index) in cities">{{ city.name }}</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 email">
-                  <label>Correo electrónico * <span class="red-text" v-if="error.email != null || error == undefined">{{ error.email[0] }}</span></label>
-                  <input type="email" v-model="makers_data.email" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 phone">
-                  <label>Teléfono/Celular * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
-                  <input type="number" v-model="makers_data.phone" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 level">
-                  <label>Nivel académico * <span class="red-text" v-if="error.level != null || error == undefined">{{ error.level[0] }}</span></label>
-                  <select class="browser-default" :disabled="completed_registration" v-model="makers_data.level">
-                    <option selected disabled value="">Seleccione su nivel</option>
-                    <option value="Estudiante">Estudiante</option>
-                    <option value="Profesional">Profesional</option>
-                    <option value="Técnico">Técnico</option>
-                    <option value="Tecnólogo">Tecnólogo</option>
-                  </select>
-                </div>
-                <div class="containter-question col s12 m6 semester" v-if="makers_data.level == 'Estudiante'">
-                  <label>Semestre que está cursando * <span class="red-text" v-if="error.semester != null || error == undefined">{{ error.semester[0] }}</span></label>
-                  <input type="number" v-model="makers_data.semester" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 career">
-                  <label>Carrera * <span class="red-text" v-if="error.career != null || error == undefined">{{ error.career[0] }}</span></label>
-                  <input type="text" v-model="makers_data.career" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 m6 area">
-                  <label>Area * <span class="red-text" v-if="error.area != null || error == undefined">{{ error.area[0] }}</span></label>
-                  <input type="text" v-model="makers_data.area" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 skills">
-                  <label>Habilidades * <span class="red-text" v-if="error.skills != null || error == undefined">{{ error.skills[0] }}</span></label>
-                  <textarea v-model="makers_data.skills" :disabled="completed_registration" class="browser-default input-hack"></textarea>
-                </div>
-                <div class="containter-question col s12 bio">
-                  <label>Biografia <span class="red-text" v-if="error.bio != null || error == undefined">{{ error.bio[0] }}</span></label>
-                  <textarea v-model="makers_data.bio" :disabled="completed_registration" class="browser-default input-hack"></textarea>
-                </div>
-              </div>
-              <header class="col s12 header-steps no-padding" v-if="makers_data.new_group == 1 || add_to_group == true">
-                <div class="step end">Datos del grupo</div>
-              </header>
-              <div class="col s12 body-form" v-if="makers_data.new_group == 1 || add_to_group == true">
-                <div class="containter-question col s12 group_name" v-if="makers_data.new_group == 1 && add_to_group == false">
-                  <label>Nombre del grupo * <span class="red-text" v-if="error.group_name != null || error == undefined">{{ error.group_name[0] }}</span></label>
-                  <input type="text" v-model="makers_data.group_name" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-                <div class="containter-question col s12 group_description" v-if="makers_data.new_group == 1 && add_to_group == false">
-                  <label>Descripción del grupo * <span class="red-text" v-if="error.group_description != null || error == undefined">{{ error.group_description[0] }}</span></label>
-                  <textarea v-model="makers_data.group_description" :disabled="completed_registration" class="browser-default input-hack"></textarea>
-                </div>
-                <div class="containter-question col s12 group_code" v-if="makers_data.new_group == 0 && add_to_group == true">
-                  <label>Código del grupo * <span class="red-text" v-if="error.group_code != null || error == undefined">{{ error.group_code[0] }}</span><span class="red-text" v-if="code_not_found">{{ error_separated }}</span></label>
-                  <input type="text" v-model="makers_data.group_code" :disabled="completed_registration" class="browser-default input-hack" />
-                </div>
-              </div>
-              <div class="col s12 body-form">
-                <div class="containter-question col s12" v-if="!completed_registration">
-                  <p class="terms-check">
-                    <label>
-                      <input type="checkbox" v-model="makers_data.terms" class="filled-in" />
-                      <span>Acepto los terminos y condiciones</span>
-                    </label>
-                  </p>
-                </div>
-                <div class="containter-question col s12 center completed-successfully">
-                  <div v-if="code_not_found || completed_registration || group_exist" :class="{ 'completed' : completed_registration, 'error' : code_not_found || group_exist }">
-                    <span v-if="completed_registration">Inscripción completada</span>
-                    <span v-else-if="code_not_found">{{ error }}</span>
-                    <span v-else-if="group_exist">{{ error }}</span>
-                  </div>
-                  <button v-else type="submit" @click.prevent="sendMaker" :disabled="!makers_data.terms">Enviar</button>
-                </div>
-                <div class="col s12" v-if="completed_registration">
-                  <div class="code-container">
-                    <div class="share-code">¡Comparte este codigo a tus amigos para que se unan a tu grupo!</div>
-                    <div class="group-code">{{ group_code }}</div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-        <div class="help-actions">
-          <router-link to="/"><div class="help-btn home">Volver al inicio</div></router-link>
-          <div @click="changeRol" class="help-btn change" v-if="form_to_show != 0">¿Este no es tu rol?</div>
-          <div @click="changeRol" class="help-btn new" v-if="completed_registration">+ Nueva inscripción</div>
-        </div>
+  <div>
+    <div class="show-on-medium-and-down hide-on-med-and-up nav-container-mobile">
+      <span class="btn-mobile-menu" @click="$root.showMenu">|||</span>
+      <span class="title-mobile-menu">Hackathon Montería</span>
+    </div>
+    <div class="navbar-items-mobile" v-if="$root.show_mobile_menu" :class="{ 'show' : $root.show_mobile_menu }">
+      <div class="close-menu-icon" @click="$root.showMenu">X</div>
+      <div class="title-show-menu">Hackathon Montería</div>
+      <div class="item">
+        <router-link to="/">Volver al inicio</router-link>
+      </div>
+      <div class="item" v-if="form_to_show != 0" @click="changeRol">
+        <span>¿Este no es tu rol?</span>
+      </div>
+      <div class="item" v-if="completed_registration" @click="changeRol">
+        <span>+ Nueva inscripción</span>
+      </div>
+      <div class="item">
+		    <router-link to="/login" v-if="!$root.auth"><span>Login</span></router-link>
+		    <router-link to="/dashboard" v-else><span>Dashboard</span></router-link>
+	    </div>
+    </div>
+    <div class="container margin-to-mobile">
+      <div class="row">
         <div class="col s12">
-          <div class="copy">© 2018 Innovemp</div>
+          <div class="bg-inscription"></div>
+          <div class="title-description-inscription" :class="{ 'minify-margin-title' : has_select_dev && form_to_show == 2 || form_to_show == 1 }">{{ title }}</div>
+          <div v-if="form_to_show == 0" class="roles-container">
+            <div class="col s12 m6 l4 offset-l2">
+              <div class="select-rol business-select" @click="showEnterpriseForm">Empresario</div>
+            </div>
+            <div class="col s12 m6 l4">
+              <div class="select-rol dev-select" @click="showMakerForm">Dev - Maker</div>
+            </div>
+          </div>
+          <div v-else class="col s12 no-padding container-forms" :class="{ 'shadow' : form_to_show == 1 || (form_to_show == 2 && has_select_dev ) }">
+            <header class="col s12 header-steps no-padding" v-if="has_select_dev || form_to_show == 1" :class="{'fadeAfter' : has_select_dev, 'fadeInAfter' : form_to_show == 1}">
+              <div class="step first">Datos personales</div>
+            </header>
+            <div class="col s12 no-padding form-enterprise" v-if="form_to_show == 1" :class="{'fadeInAfter' : form_to_show == 1}">
+              <form class="form-inscription">
+                <div class="col s12 body-form">
+                  <div class="containter-question col s12 razon_social_propietario">
+                    <label>Razón social o propietario * <span class="red-text" v-if="error.razon_social_propietario != null || error == undefined">{{ error.razon_social_propietario[0] }}</span></label>
+                    <input type="text" v-model="enterprises_data.razon_social_propietario" :disabled="completed_registration" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 nit">
+                    <label>NIT * <span class="red-text" v-if="error.nit != null || error == undefined">{{ error.nit[0] }}</span></label>
+                    <input type="text" v-model="enterprises_data.nit" required :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 representante_legal">
+                    <label>Representante legal * <span class="red-text" v-if="error.representante_legal != null || error == undefined">{{ error.representante_legal[0] }}</span></label>
+                    <input type="text" v-model="enterprises_data.representante_legal" :disabled="completed_registration" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 actividad_comercial">
+                    <label>Actividad Comercial * <span class="red-text" v-if="error.actividad_comercial != null || error == undefined">{{ error.actividad_comercial[0] }}</span></label>
+                    <input type="text" v-model="enterprises_data.actividad_comercial" :disabled="completed_registration" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 sector_productivo">
+                    <label>Sector Productivo * <span class="red-text" v-if="error.sector_productivo != null || error == undefined">{{ error.sector_productivo[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration" v-model="enterprises_data.sector_productivo">
+                      <option selected disabled value="">Seleccione una opción</option>
+                      <option value="Agencias inmobiliarias">Agencias inmobiliarias</option>
+                      <option value="Hoteles y agencias turísticas">Hoteles y agencias turísticas</option>
+                      <option value="Constructoras">Constructoras</option>
+                      <option value="Restaurantes">Restaurantes</option>
+                      <option value="Servicios jurídicos y contables">Servicios jurídicos y contables</option>
+                      <option value="Industrias culturales y creativas">Industrias culturales y creativas</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col s12 body-form">
+                  <div class="containter-question col s12 country">
+                    <label>País * <span class="red-text" v-if="error.country != null || error == undefined">{{ error.country[0] }}</span></label>
+                    <select class="browser-default" disabled v-model="enterprises_data.country">
+                      <option selected disabled value="Colombia">Colombia</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 departament_id">
+                    <label>Departamento * <span class="red-text" v-if="error.departament_id != null || error == undefined">{{ error.departament_id[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration" @change="getCities(1)" v-model="enterprises_data.departament_id">
+                      <option selected disabled value="">Seleccione su departamento</option>
+                      <option :value="state.id" v-for="(state, index) in states">{{ state.name }}</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 city_id">
+                    <label>Ciudad * <span class="red-text" v-if="error.city_id != null || error == undefined">{{ error.city_id[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration || enterprises_data.departament_id == ''" v-model="enterprises_data.city_id">
+                      <option selected disabled value="">Seleccione su ciudad</option>
+                      <option :value="city.id" v-for="(city, index) in cities">{{ city.name }}</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 neigboard">
+                    <label>Barrio * <span class="red-text" v-if="error.neigboard != null || error == undefined">{{ error.neigboard[0] }}</span></label>
+                    <input type="text" v-model="enterprises_data.neigboard" :disabled="completed_registration" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 phone">
+                    <label>Teléfono/Celular * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
+                    <input type="number" v-model="enterprises_data.phone" :disabled="completed_registration" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 address">
+                    <label>Dirección * <span class="red-text" v-if="error.address != null || error == undefined">{{ error.address[0] }}</span></label>
+                    <input type="text" v-model="enterprises_data.address" :disabled="completed_registration" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 email">
+                    <label>Correo electrónico * <span class="red-text" v-if="error.email != null || error == undefined">{{ error.email[0] }}</span></label>
+                    <input type="text" v-model="enterprises_data.email" :disabled="completed_registration" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12" v-if="!completed_registration">
+                    <p class="terms-check">
+                      <label>
+                        <input type="checkbox" v-model="enterprises_data.terms" :disabled="completed_registration" required class="filled-in" />
+                        <span>Acepto los <div class="show-terms" @click="$root.showTerms">terminos y condiciones</div></span>
+                      </label>
+                    </p>
+                  </div>
+                  <div class="containter-question col s12 center completed-successfully">
+                    <div v-if="completed_registration" class="completed">Inscripción completada</div>
+                    <button v-else @click.prevent="sendEnterprise" :disabled="!enterprises_data.terms || loading">{{ !loading ? 'Enviar' : 'Enviando...' }}</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="col s12 no-padding form-enterprise" v-else>
+              <div v-if="form_to_show == 2 & !has_select_dev" class="roles-container">
+                <div class="col s12 m4">
+                  <div class="select-rol business-select" @click="indivualRegister">Individualmente<div class="text-help">Solo podras participar tu.</div></div>
+                </div>
+                <div class="col s12 m4">
+                  <div class="select-rol dev-select" @click="newGroup">Grupalmente<div class="text-help">Crea tu grupo y comparte el codígo generado con tus amigos para que se unan contigo.</div></div>
+                </div>
+                <div class="col s12 m4">
+                  <div class="select-rol dev-select" @click="addToGroup">Ya tengo grupo<div class="text-help">Ingresa el codígo de tu grupo para hacer parte de el.</div></div>
+                </div>
+              </div>
+              <form v-if="has_select_dev" class="form-inscription" :class="{'fadeAfter' : has_select_dev}">
+                <div class="col s12 body-form">
+                  <div class="containter-question col s12 m6 first_name">
+                    <label>Nombres * <span class="red-text" v-if="error.first_name != null || error == undefined">{{ error.first_name[0] }}</span></label>
+                    <input type="text" v-model="makers_data.first_name" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 last_name">
+                    <label>Apellidos * <span class="red-text" v-if="error.last_name != null || error == undefined">{{ error.last_name[0] }}</span></label>
+                    <input type="text" v-model="makers_data.last_name" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 doc_type">
+                    <label>Tipo de Identificación * <span class="red-text" v-if="error.doc_type != null || error == undefined">{{ error.doc_type[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration" v-model="makers_data.doc_type">
+                      <option selected disabled value="">Seleccione su tipo de identificación</option>
+                      <option value="TI">Tarjeta de identidad</option>
+                      <option value="CC">Cédula de ciudadanía</option>
+                      <option value="CE">Cédula de extranjería</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 document">
+                    <label>Número de identificación * <span class="red-text" v-if="error.document != null || error == undefined">{{ error.document[0] }}</span></label>
+                    <input type="number" v-model="makers_data.document" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 genere">
+                    <label>Genero * <span class="red-text" v-if="error.genere != null || error == undefined">{{ error.genere[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration" v-model="makers_data.genere">
+                      <option selected disabled value="">Seleccione su género</option>
+                      <option value="M">Masculino</option>
+                      <option value="F">Femenino</option>
+                      <option value="O">Otro</option>
+                      <option value="P">Prefiero no decirlo</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 bird_date">
+                    <label>Fecha de nacimiento * <span class="red-text" v-if="error.bird_date != null || error == undefined">{{ error.bird_date[0] }}</span><span class="red-text" v-if="birt_date_fail">{{ error }}</span></label>
+                    <input type="text" id="bird_date" :disabled="completed_registration" @change="setDate" v-model="makers_data.bird_date" class="datepicker browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 country">
+                    <label>País * <span class="red-text" v-if="error.country != null || error == undefined">{{ error.country[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration" disabled v-model="makers_data.country">
+                      <option selected disabled value="Colombia">Colombia</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 departament_id">
+                    <label>Departamento * <span class="red-text" v-if="error.departament_id != null || error == undefined">{{ error.departament_id[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration" @change="getCities(2)" v-model="makers_data.departament_id">
+                      <option selected disabled value="">Seleccione su departamento</option>
+                      <option :value="state.id" v-for="(state, index) in states">{{ state.name }}</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 city_id">
+                    <label>Ciudad * <span class="red-text" v-if="error.city_id != null || error == undefined">{{ error.city_id[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration || makers_data.departament_id == ''" v-model="makers_data.city_id">
+                      <option selected disabled value="">Seleccione su ciudad</option>
+                      <option :value="city.id" v-for="(city, index) in cities">{{ city.name }}</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 email">
+                    <label>Correo electrónico * <span class="red-text" v-if="error.email != null || error == undefined">{{ error.email[0] }}</span></label>
+                    <input type="email" v-model="makers_data.email" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 phone">
+                    <label>Teléfono/Celular * <span class="red-text" v-if="error.phone != null || error == undefined">{{ error.phone[0] }}</span></label>
+                    <input type="number" v-model="makers_data.phone" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 level">
+                    <label>Nivel académico * <span class="red-text" v-if="error.level != null || error == undefined">{{ error.level[0] }}</span></label>
+                    <select class="browser-default" :disabled="completed_registration" v-model="makers_data.level">
+                      <option selected disabled value="">Seleccione su nivel</option>
+                      <option value="Estudiante">Estudiante</option>
+                      <option value="Profesional">Profesional</option>
+                      <option value="Técnico">Técnico</option>
+                      <option value="Tecnólogo">Tecnólogo</option>
+                    </select>
+                  </div>
+                  <div class="containter-question col s12 m6 semester" v-if="makers_data.level == 'Estudiante'">
+                    <label>Semestre que está cursando * <span class="red-text" v-if="error.semester != null || error == undefined">{{ error.semester[0] }}</span></label>
+                    <input type="number" v-model="makers_data.semester" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 career">
+                    <label>Carrera * <span class="red-text" v-if="error.career != null || error == undefined">{{ error.career[0] }}</span></label>
+                    <input type="text" v-model="makers_data.career" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 m6 area">
+                    <label>Area * <span class="red-text" v-if="error.area != null || error == undefined">{{ error.area[0] }}</span></label>
+                    <input type="text" v-model="makers_data.area" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 skills">
+                    <label>Habilidades * <span class="red-text" v-if="error.skills != null || error == undefined">{{ error.skills[0] }}</span></label>
+                    <textarea v-model="makers_data.skills" :disabled="completed_registration" class="browser-default input-hack"></textarea>
+                  </div>
+                  <div class="containter-question col s12 bio">
+                    <label>Biografia <span class="red-text" v-if="error.bio != null || error == undefined">{{ error.bio[0] }}</span></label>
+                    <textarea v-model="makers_data.bio" :disabled="completed_registration" class="browser-default input-hack"></textarea>
+                  </div>
+                </div>
+                <header class="col s12 header-steps no-padding" v-if="makers_data.new_group == 1 || add_to_group == true">
+                  <div class="step end">Datos del grupo</div>
+                </header>
+                <div class="col s12 body-form" v-if="makers_data.new_group == 1 || add_to_group == true">
+                  <div class="containter-question col s12 group_name" v-if="makers_data.new_group == 1 && add_to_group == false">
+                    <label>Nombre del grupo * <span class="red-text" v-if="error.group_name != null || error == undefined">{{ error.group_name[0] }}</span></label>
+                    <input type="text" v-model="makers_data.group_name" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 group_description" v-if="makers_data.new_group == 1 && add_to_group == false">
+                    <label>Descripción del grupo * <span class="red-text" v-if="error.group_description != null || error == undefined">{{ error.group_description[0] }}</span></label>
+                    <textarea v-model="makers_data.group_description" :disabled="completed_registration" class="browser-default input-hack"></textarea>
+                  </div>
+                  <div class="containter-question col s12 group_code" v-if="makers_data.new_group == 0 && add_to_group == true">
+                    <label>Código del grupo * <span class="red-text" v-if="error.group_code != null || error == undefined">{{ error.group_code[0] }}</span><span class="red-text" v-if="code_not_found">{{ error_separated }}</span></label>
+                    <input type="text" v-model="makers_data.group_code" :disabled="completed_registration" class="browser-default input-hack" />
+                  </div>
+                </div>
+                <div class="col s12 body-form">
+                  <div class="containter-question col s12" v-if="!completed_registration">
+                    <p class="terms-check">
+                      <label>
+                        <input type="checkbox" v-model="makers_data.terms" class="filled-in" />
+                        <span>Acepto los <div class="show-terms" @click="$root.showTerms">terminos y condiciones</div></span>
+                      </label>
+                    </p>
+                  </div>
+                  <div class="containter-question col s12 center completed-successfully">
+                    <div v-if="completed_registration" class="completed">
+                      <span v-if="completed_registration">Inscripción completada</span>
+                    </div>
+                    <div v-if="code_empty || code_not_found || group_exist" class="error">
+                      <span v-if="code_not_found">{{ error }}</span>
+                      <span v-if="group_exist">{{ error }}</span>
+                      <span v-if="code_empty">{{ error_separated }}</span>
+                    </div>
+                    <button type="submit" @click.prevent="sendMaker" :disabled="!makers_data.terms || completed_registration">Enviar</button>
+                  </div>
+                  <div class="col s12" v-if="completed_registration && makers_data.new_group == 1 && add_to_group == false">
+                    <div class="code-container">
+                      <div class="share-code">¡Comparte este codigo a tus amigos para que se unan a tu grupo!</div>
+                      <div class="group-code">{{ group_code }}</div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="help-actions">
+            <router-link to="/"><div class="help-btn home">Volver al inicio</div></router-link>
+            <div @click="changeRol" class="help-btn change" v-if="form_to_show != 0">¿Este no es tu rol?</div>
+            <div @click="changeRol" class="help-btn new" v-if="completed_registration">+ Nueva inscripción</div>
+          </div>
+          <div class="col s12">
+            <div class="copy">© 2018 Innovemp</div>
+          </div>
+          <terms v-if="$root.terms_status"></terms>
         </div>
       </div>
     </div>
@@ -352,6 +375,7 @@
         cities: [
           { id: null, name: null}
         ],
+        code_empty: false,
         has_select_dev: false,
         group_code: null,
         group_exist: false
@@ -389,6 +413,12 @@
         this.has_select_dev = false
         this.completed_registration = false
         this.clearInputs()
+        this.resetErrorValues()
+        this.$root.show_mobile_menu = false
+        this.group_exist = false
+        this.code_not_found = false
+        this.birt_date_fail = false
+        this.code_empty = false
       },
       clearInputs: function () {
         this.enterprises_data = {
@@ -610,47 +640,60 @@
         let vm = this
         vm.loading = !vm.loading
         if (vm.add_to_group && (vm.makers_data.group_code == null || vm.makers_data.group_code == '')) {
-          vm.code_not_found = true
+          vm.code_empty = true
           vm.error_separated = "Debe introducir el codigo que le asignaron a su grupo para continuar"
         } else {
-          vm.code_not_found = false
+          vm.code_empty = false
           vm.error_separated = ''
+          axios.post('/api/makers', this.makers_data)
+            .then(function (response) {
+              if (response.data.data.code) {
+                vm.group_code = response.data.data.code
+              }
+              vm.loading = !vm.loading
+              vm.completed_registration = true
+              vm.error_separated = null
+              vm.resetErrorValues()
+              vm.goToChange('completed-successfully')
+              vm.code_not_found = false
+              vm.birt_date_fail = false
+              vm.code_empty = false
+            })
+            .catch(function (error) {
+              vm.loading = !vm.loading
+              vm.completed_registration = false
+              if (error.response.data.message == 'Codigo de grupo no encontrado') {
+                vm.code_not_found = true
+                vm.error = error.response.data.message
+                vm.goToChange('group_code')
+                vm.group_exist = false
+                vm.code_empty = false
+                vm.birt_date_fail = false
+              } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
+                vm.birt_date_fail = true
+                vm.error = error.response.data.message
+                vm.goToChange('bird_date')
+                vm.group_exist = false
+                vm.code_not_found = false
+                vm.code_empty = false
+              } else if (error.response.data.message == 'Su grupo ya se encuentra registrado en nuestro sistema') {
+                vm.group_exist = true
+                vm.error = error.response.data.message
+                vm.birt_date_fail = false
+                vm.code_not_found = false
+                vm.code_empty = false
+                vm.goToChange('group_name')
+              } else {
+                const e = error.response.data.errors
+                vm.error = e
+                vm.group_exist = false
+                vm.code_not_found = false
+                vm.birt_date_fail = false
+                vm.code_empty = false
+                vm.checkError(e)
+              }
+            })
         }
-        axios.post('/api/makers', this.makers_data)
-          .then(function (response) {
-            if (response.data.data.code) {
-              vm.group_code = response.data.data.code
-            }
-            vm.loading = !vm.loading
-            vm.completed_registration = true
-            vm.error_separated = null
-            vm.resetErrorValues()
-            vm.goToChange('completed-successfully')
-            vm.code_not_found = false
-            vm.birt_date_fail = false
-          })
-          .catch(function (error) {
-            vm.loading = !vm.loading
-            vm.completed_registration = false
-            if (error.response.data.message == 'Codigo de grupo no encontrado') {
-              vm.code_not_found = true
-              vm.error = error.response.data.message
-              if (vm.birt_date_fail)
-                vm.birt_date_fail = !vm.birt_date_fail
-            } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
-              vm.birt_date_fail = true
-              vm.error = error.response.data.message
-              if (vm.code_not_found)
-                vm.code_not_found = !vm.code_not_found
-            } else if (error.response.data.message == 'Su grupo ya se encuentra registrado en nuestro sistema') {
-              vm.group_exist = true
-              vm.error = error.response.data.message
-            } else {
-              const e = error.response.data.errors
-              vm.error = e
-              vm.checkError(e)
-            }
-          })
       },
       getCities: function (t) {
         let vm = this
@@ -684,6 +727,7 @@
       }
     },
     mounted() {
+      this.$root.show_mobile_menu = false
       this.getStates()
       setTimeout(function () {
         $('.dropdown-trigger').dropdown();
@@ -693,6 +737,13 @@
 </script>
 
 <style lang="scss" scoped>
+  .nav-container-mobile {
+    background: #3c4c95;
+  }
+  .show-terms {
+    display: inline-block;
+    color: #2196f3;
+  }
   .text-help {
     position: absolute;
     min-width: 300px;
@@ -721,11 +772,7 @@
     border-radius: 2px;
   }
   .copy {
-      text-align: center;
-      margin-top: 8em;
-      color: #fff;
-      font-weight: bold;
-      font-size: .8rem;
+    margin-top: 8em;
   }
   .help-btn {
     position: fixed;
@@ -781,7 +828,6 @@
       color: #fff;
       display: inline-block;
       background: #2196f3;
-      border-bottom: 4px solid #218ade;
       &.first {
         border-radius: 3px 0 0px 0;
       }
@@ -804,15 +850,15 @@
       font-size: .9rem;
       font-weight: bold;
       background: #fff;
-      color: #18648e;
+      color: #3b88bf;
       -webkit-box-shadow: inset 0 0 0 10px #ffffff;
-      box-shadow: inset 0 0 0 1px #18648e, 0 0 0 8px #FFF;
+      box-shadow: inset 0 0 0 1px #3b88bf, 0 0 0 8px #FFF;
       transition: all .3s ease;
       text-transform: uppercase;
       cursor: pointer;
       position: relative;
       &:hover {
-        box-shadow: inset 0 0 0 10px #18648e, 0 0 0 8px #FFF;
+        box-shadow: inset 0 0 0 10px #3b88bf, 0 0 0 8px #FFF;
         & .text-help {
           visibility: visible;
         }
@@ -826,7 +872,7 @@
     top: 50%;
     left: 50%;
     background-repeat: no-repeat;
-    background-image: url(../../images/bg.png);
+    background-image: url(../../images/bg_new.png);
     background-position: center;
     background-size: cover;
     z-index: -1;
@@ -846,6 +892,16 @@
     & [type="checkbox"].filled-in:checked + span:not(.lever):after {
       border: 2px solid #2196f3;
       background-color: #2196f3;
+      top: 3px;
+    }
+    & [type="checkbox"].filled-in:not(:checked) + span:not(.lever):after {
+      top: 3px;
+    }
+    & [type="checkbox"].filled-in:checked + span:not(.lever):before {
+      top: 3px;
+    }
+    & span {
+      font-size: .8rem;
     }
   }
   .info-inscription {
@@ -911,6 +967,9 @@
       }
     }
     & textarea {
+      width: 100% !important;
+      max-width: 100%;
+      min-height: 4rem;
       &:disabled {
         background-color: #ebebe4;
       }
@@ -946,12 +1005,18 @@
       color: #dddddd !important;
     }
   }
-  .completed {
-    background-color: #0fdc59;
+  .completed, .error {
     color: #ffffff;
     font-weight: bold;
     padding: .2em 1em;
     border-radius: 0;
     font-size: 1.3rem;
+    margin-bottom: 10px;
+  }
+  .completed {
+    background-color: #0fdc59;
+  }
+  .error {
+    background-color: #e54135;
   }
 </style>

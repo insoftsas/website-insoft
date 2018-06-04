@@ -1,17 +1,17 @@
 <template lang="html">
   <div class="schedule">
     <div class="event-current" :style=" 'top: ' + getPos.top + 'px;'  " v-if="$route.name == 'Dashboard' ">
-      <svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+      <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
           <defs>
             <filter id="dropshadow">
-              <feGaussianBlur in="SourceAlpha" stdDeviation="30"/> 
+              <feGaussianBlur in="SourceAlpha" stdDeviation="30"/>
               <feOffset dx="2" dy="2"/>
               <feComponentTransfer>
                 <feFuncA type="linear" slope="0.3"/>
               </feComponentTransfer>
-              <feMerge> 
+              <feMerge>
                 <feMergeNode/>
-                <feMergeNode in="SourceGraphic"/> 
+                <feMergeNode in="SourceGraphic"/>
               </feMerge>
             </filter>
           </defs>
@@ -26,12 +26,12 @@
           <rect x="134.3" y="458.64" style="fill:#F5F5FF;" width="121.7" height="30"/>
           <polygon style="fill:#294B6E;" points="512,23.356 256,23.356 235.984,173.44 256,323.524 512,323.524 "/>
           <rect y="23.356" style="fill:#6283A3;" width="256" height="300.17"/>
-          <polygon style="fill:#F5F5FF;" points="178.828,252.914 99.354,173.44 178.828,93.966 200.041,115.179 141.78,173.44 
+          <polygon style="fill:#F5F5FF;" points="178.828,252.914 99.354,173.44 178.828,93.966 200.041,115.179 141.78,173.44
             200.041,231.701 "/>
             <g>
-            <polygon style="fill:#D1E8FF;" points="333.172,252.914 311.959,231.701 370.22,173.44 311.959,115.179 333.172,93.966 
+            <polygon style="fill:#D1E8FF;" points="333.172,252.914 311.959,231.701 370.22,173.44 311.959,115.179 333.172,93.966
               412.646,173.44  "/>
-            
+
               <rect x="241" y="78.635" transform="matrix(-0.9808 -0.1951 0.1951 -0.9808 473.2431 393.505)" style="fill:#D1E8FF;" width="30" height="189.623"/>
             </g>
           </g>
@@ -41,7 +41,7 @@
       </div>
     </div>
 
-    <div class="event-schedule">
+    <div class="event-schedule fade-schedule trigger-first-schedule">
       <div class="pin-circle">
         <div class="container-flag">
           <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 70 42" style="enable-background:new 0 0 70 42;">
@@ -51,7 +51,7 @@
               </clipPath>
             </defs>
             <g clip-path="url(#flagMask)" class="position-flag">
-              <path class="flag" fill="#ffd54f" d="M100,31c-8.118,0-8.364,4.504-16.471,4.504
+              <path class="flag" fill="#38a1b6" d="M100,31c-8.118,0-8.364,4.504-16.471,4.504
                 c-7.657,0-8.026-4.504-16.47-4.504c-8.675,0-8.675,4.504-16.471,4.504c-8.091,0-8.091-4.504-16.471-4.504
                 c-8.492,0-8.739,4.504-16.47,4.504C9.027,35.504,9.37,31,1.178,31c-8.734,0-8.589,4.504-16.471,4.504S-24.251,31-31.763,31v34.438
                 c0,0,7.849,3.66,16.47,3.66c7.914,0,8.653-3.66,16.471-3.66c7.822,0,7.357,3.66,16.47,3.66s9.12-3.66,16.47-3.66
@@ -67,7 +67,7 @@
       </div>
       <div class="right-event empty"></div>
     </div>
-    <div class="event-schedule">
+    <div class="event-schedule fade-schedule-1">
       <div class="pin-circle"></div>
       <div class="left-event empty"></div>
       <div class="right-event">
@@ -80,7 +80,7 @@
         </div>
       </div>
     </div>
-    <div class="event-schedule">
+    <div class="event-schedule fade-schedule-2">
       <div class="pin-circle"></div>
       <div class="left-event">
         <div class="date-event">01 al 13 de Junio</div>
@@ -91,7 +91,7 @@
       </div>
       <div class="right-event empty"></div>
     </div>
-    <div class="event-schedule">
+    <div class="event-schedule fade-schedule-3">
       <div class="pin-circle"></div>
       <div class="left-event empty"></div>
       <div class="right-event">
@@ -99,7 +99,7 @@
         <div class="info-event">Publicación y notificación a Makers.</div>
       </div>
     </div>
-    <div class="event-schedule">
+    <div class="event-schedule fade-schedule-4">
       <div class="pin-circle"></div>
       <div class="left-event">
         <div class="date-event">18 de Junio</div>
@@ -107,7 +107,7 @@
       </div>
       <div class="right-event empty"></div>
     </div>
-    <div class="event-schedule">
+    <div class="event-schedule fade-schedule-5">
       <div class="pin-circle"></div>
       <div class="left-event empty"></div>
       <div class="right-event">
@@ -115,14 +115,14 @@
         <div class="info-event">Desarrollo de la Hackathon.</div>
       </div>
     </div>
-    <div class="event-schedule margin-default-bottom">
+    <div class="event-schedule fade-schedule-6 margin-default-bottom">
       <div class="pin-circle"></div>
       <div class="left-event">
         <div class="date-event">29 de Junio</div>
-        <div class="info-event">Cierre de la Hackaton.</div>
+        <div class="info-event">Cierre de la Hackathon.</div>
       </div>
       <div class="right-event empty"></div>
-      <div class="end-schedule">FIN</div>
+      <div class="end-schedule">FINAL</div>
     </div>
   </div>
 </template>
@@ -183,8 +183,8 @@ export default {
 .container-flag {
   width: 23px;
   margin: auto;
-  -webkit-transform: translateX(-21px) translateY(14px);
-  transform: translateX(-21px) translateY(14px);
+  -webkit-transform: translateX(-21px) translateY(16px);
+  transform: translateX(-21px) translateY(16px);
   position: absolute;
   top: -17px;
   right: 0;
@@ -217,9 +217,9 @@ export default {
     transform: translateX(-50%);
     width: 1em;
     height: 1em;
-    border: solid #ffd54f 2px;
+    border: solid #38a1b6 2px;
     border-radius: 50%;
-    background-color: #ffd54f;
+    background-color: #38a1b6;
     content: ' '
   }
   &:after {
@@ -230,7 +230,7 @@ export default {
     width: 0;
     margin-top: 1rem;
     height: 100%;
-    border: solid #ffd54f 2px;
+    border: solid #38a1b6 2px;
     content: ' ';
   }
 }
@@ -256,12 +256,12 @@ export default {
 .date-event {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #607d8b;
+  color: #38a1b6;
 }
 
 .info-event {
-  font-size: 1.1rem;
-  color: #9fb1b9;
+  font-size: 1rem;
+  color: #777777;
 }
 
 .item-event {
@@ -272,15 +272,16 @@ export default {
   position: absolute;
   left: 50%;
   bottom: -16px;
-  background: #ffd54f;
+  background: #38a1b6;
   width: 100px;
-  height: 20px;
-  line-height: 20px;
+  height: 25px;
+  line-height: 25px;
   font-weight: bold;
-  color: #041323;
+  color: #fff;
   transform: translateX(-50%);
   text-align: center;
   border-radius: 2px;
+  letter-spacing: 3px;
 }
 .event-current{
     position: absolute;

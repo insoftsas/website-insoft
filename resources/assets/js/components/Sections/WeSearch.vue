@@ -1,15 +1,17 @@
 <template lang="html">
   <section id="we-search">
-    <div class="container bg-special-border">
+    <div class="col s12 m10 offset-m1 card-special">
       <div class="row">
-        <div class="col s12 container-content-info no-padding">
-          <h2 class="title-section">¿Qué buscamos?</h2>
-          <div class="col s12">
+        <div class="col s12 margin-special container-content-info search-main-trigger-in">
+          <div class="col s12 first-fade-search">
+            <h2 class="title-section">¿Qué buscamos?</h2>
+          </div>
+          <div class="col s12 first-fade-search">
             <div class="content-info step-row">
-              <span>Queremos realizar una maratón tecnológica, denominada <span class="hack-sub">Hackathon</span>. Este evento consiste en la asignación de las necesidades tecnológicas de las empresas del departamento de Córdoba a varios grupos de desarrolladores, para que compitan por un premio a la mejor solución tecnológica (prototipo) de las necesidades presentadas, con el fin de mejorar el proceso de transformación productiva y digital de nuestros empresarios.</span>
+              <span class="trigger-fade-search">Queremos realizar una maratón tecnológica, denominada <span class="hack-sub">Hackathon</span>. Este evento consiste en la asignación de las necesidades tecnológicas de las empresas del departamento de Córdoba a varios grupos de desarrolladores, para que compitan por un premio a la mejor solución tecnológica (prototipo) de las necesidades presentadas, con el fin de mejorar el proceso de transformación productiva y digital de nuestros empresarios.</span>
             </div>
           </div>
-          <div class="col s12 m6">
+          <div class="col s12 m6 fade-search">
             <div class="content-solution-image">
               <svg version="1.1" id="solution-business" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 464 464" style="enable-background:new 0 0 464 464;" xml:space="preserve">
                 <path style="fill:#A6001E;" d="M64,328c0,4.418-3.582,8-8,8s-8,3.582-8,8v16c0,13.255,10.745,24,24,24h16c13.255,0,24-10.745,24-24
@@ -63,9 +65,9 @@
               </svg>
             </div>
           </div>
-          <div class="col s12 m6">
+          <div class="col s12 m6 fade-search">
             <div class="content-info">
-              <span>Para el desarrollo del mencionado evento se requiere convocar a un grupo de empresarios con el objetivo de capacitarlos en la identificación de sus necesidades tecnológicas, tendientes a la automatización y optimización de sus actividades mercantiles; para la solución (prototipo) de dichas necesidades se requiere de la conformación de los team makers (programadores) y de un espacio optimo y adecuado para el desarrollo del evento.</span>
+              <span class="trigger-for-schedule">Para el desarrollo del mencionado evento se requiere convocar a un grupo de empresarios con el objetivo de capacitarlos en la identificación de sus necesidades tecnológicas, tendientes a la automatización y optimización de sus actividades mercantiles; para la solución (prototipo) de dichas necesidades se requiere de la conformación de los team makers (programadores) y de un espacio optimo y adecuado para el desarrollo del evento.</span>
             </div>
           </div>
         </div>

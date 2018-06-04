@@ -24,14 +24,26 @@ Vue.use(VuePaginate)
 Vue.component('font-awesome-icon', fontawesomevue);
 
 Vue.component('main-app', require('./components/App.vue'));
+Vue.component('terms', require('./components/Terms.vue'));
 Vue.component('word-writing', require('./components/wordWriting.vue'));
 Vue.component('menu-admin', require('./components/MenuAdmin.vue'));
 Vue.component('inscription', require('./components/Inscription.vue'));
+
+// animations components
+Vue.component('trans-animation', require('./components/Sections/InfoAnim/TransAnimation.vue'));
+Vue.component('one-animation', require('./components/Sections/InfoAnim/OneAnimation.vue'));
+Vue.component('two-animation', require('./components/Sections/InfoAnim/TwoAnimation.vue'));
+Vue.component('three-animation', require('./components/Sections/InfoAnim/ThreeAnimation.vue'));
+Vue.component('four-animation', require('./components/Sections/InfoAnim/FourAnimation.vue'));
+Vue.component('five-animation', require('./components/Sections/InfoAnim/FiveAnimation.vue'));
+Vue.component('six-animation', require('./components/Sections/InfoAnim/SixAnimation.vue'));
+
 // sections components
 Vue.component('home-section', require('./components/Sections/Home.vue'));
 Vue.component('info-section', require('./components/Sections/Info.vue'));
 Vue.component('participate-section', require('./components/Sections/Participate.vue'));
 Vue.component('we-search-section', require('./components/Sections/WeSearch.vue'));
+Vue.component('phase-section', require('./components/Sections/Phase.vue'));
 Vue.component('schedule-section', require('./components/Sections/Schedule.vue'));
 Vue.component('schedule-map', require('./components/Sections/ScheduleMap.vue'));
 Vue.component('awards-section', require('./components/Sections/Awards.vue'));
@@ -64,7 +76,8 @@ const app = new Vue({
         },
         token: '',
         loading: false,
-        loaded: false
+        loaded: false,
+        terms_status: false
       }
     },
     watch: {
@@ -80,10 +93,21 @@ const app = new Vue({
       }
     },
     methods: {
+      showTerms: function () {
+        this.terms_status = !this.terms_status
+        if (this.terms_status)
+          document.getElementById('body-app').style.overflow = 'hidden'
+        else
+          document.getElementById('body-app').style.overflow = 'initial'
+      },
       showMenu: function () {
         this.show_mobile_menu = !this.show_mobile_menu
       },
       goToView: function (id) {
+        let h = document.getElementById(id).style.top
+        if (h != "0px") {
+          document.getElementById(id).style.top = "0px"
+        }
         document.getElementById(id).scrollIntoView({block: 'start', behavior: 'smooth'})
         this.show_mobile_menu = false
       },

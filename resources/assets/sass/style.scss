@@ -7,7 +7,10 @@ section, footer {
 }
 
 body {
-  background-color: #f9f9f9;
+  background: #fafafa url(../images/bg_body.svg) repeat-y 50% 0;
+  background-size: 100vw;
+  font-family: 'Dosis', sans-serif;
+  background-repeat: no-repeat;
 }
 .leader_span{
     font-size: 80%;
@@ -16,9 +19,9 @@ body {
     top: -7px;
     color: #0aafa9;
 }
-.bg-special-border {
+.card-special {
   background: #fff;
-  border: 1px solid #ececec;
+  border-radius: 10px;
 }
 .waves-effect.waves-blue .waves-ripple {
    /* The alpha value allows the text and background color
@@ -118,7 +121,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   top: 0;
   left: 0;
   z-index: 10;
-  background: linear-gradient(135deg, #0c468f, #019a95);
+  background: #3c4d96;
   & .item {
     padding: .5em 1em;
     font-weight: 300;
@@ -131,6 +134,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
     & > span {
       cursor: pointer;
       &:hover {
+        border-color: rgba(255, 255, 255, 0.7);
         &:before {
           content: '';
           border-left: 6px solid;
@@ -153,7 +157,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
     }
     &.active {
       & > span {
-        color: #71dfec !important;
+        color: #fff !important;
         &:before {
           content: '';
           border-left-color: inherit;
@@ -250,6 +254,10 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   filter: blur(10px);
 }
 
+.blue-bg-mobile {
+  background-color: #38a1b6 !important
+}
+
 .fill-menu-icon {
   fill: #efdab9;
 }
@@ -264,12 +272,12 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
 
 #home {
   background-repeat: no-repeat;
-  background-image: url(../images/bg.png);
+  background-image: url(../images/bg_new.png);
   background-size: cover;
   height: 100vh;
   background-position: center;
-  background-position-y: -1px;
 }
+
 .bg_panel{
   position: fixed;
   z-index: -1;
@@ -283,35 +291,27 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
 .r-text {
   color: $primary-color;
 }
+
 .container-objects {
-  display: flex;
-  flex-direction:row;
-  flex-wrap: wrap;
-  justify-content: space-between;
+  margin-top: 20px;
+  position: relative;
   & .object {
+    width: 100%;
+    margin-bottom: 30px;
     display: inline-block;
     position: relative;
     border-radius: 5px;
     text-align: center;
     -webkit-transition: all .3s ease;
     transition: all .3s ease;
-    margin: 20px 10px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
   }
-}
-
-.container-objects {
-  & .object {
-    max-width: 275px;
-    width: 275px;
-  }
   & .container-img {
-    background: #e7e8ff;
-    border-bottom: 1px solid #e4e4e4;
+    background: #f4f9fa;
+    border-bottom: 1px solid #4199ab;
     padding: 15px 0;
     border-radius: 5px 5px 0 0;
-    img {
-      object-fit: scale-down;
+    & svg {
       width: 70px;
       height: 70px;
       margin: 5px 0;
@@ -320,12 +320,12 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   }
   & .title-object {
     display: block;
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: bold;
-    background: #607D8B;
+    background: #38a1b6;
     color: #ffffff;
-    height: 55px;
-    padding: 5px 10px;
+    height: 68px;
+    padding: 5px 30px;
     border-radius: 0 0 5px 5px;
     &.two-lines {
       padding: 5px 15px;
@@ -358,10 +358,6 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   }
 }
 
-.no-padding {
-  padding: 0;
-}
-
 .step-row {
   margin-bottom: 20px;
 }
@@ -376,7 +372,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
 }
 
 .title-challenge {
-  background: #3848a2;
+  background: #83c9ed;
   color: #ffffff;
   text-align: center;
   font-size: 1.3rem;
@@ -388,8 +384,8 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   position: relative;
   text-align: center;
   height: 150px;
-  background: #4d5ec1;
-  border: 1px solid #4d5ec1;
+  background: #83c9ed;
+  border: 1px solid #83c9ed;
   border-top: 0;
   border-bottom: 0;
   & div {
@@ -410,7 +406,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   text-align: justify;
   background: #ffffff;
   padding: 12px 15px 10px 15px;
-  border: 1px solid #3848a2;
+  border: 1px solid #83c9ed;
   border-top: 0;
   min-height: 93px;
   color: #444;
@@ -422,7 +418,6 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
 }
 
 .title-number-challenge {
-  background: #4d5ec1;
   font-weight: bold;
 }
 
@@ -431,7 +426,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
   & .number-challenge {
     position: absolute;
     font-size: 2rem;
-    color: #ffd54f;
+    color: #fff;
     top: 0px;
     left: 11px;
     width: 100%;
