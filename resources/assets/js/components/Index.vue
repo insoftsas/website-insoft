@@ -85,9 +85,6 @@
     },
     mounted() {
     	this.$root.scrollMagicClass = new scrollIndex.default()
-    	var flag=document.querySelector(".flag");
-			TweenMax.set(flag, {x: 65})
-			TweenMax.to(flag, 2, {x: 0, repeat:-1,ease:Linear.easeNone});
 			this.$root.show_mobile_menu = false
     },
     destroyed(){

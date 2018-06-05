@@ -47,7 +47,9 @@ Vue.component('phase-section', require('./components/Sections/Phase.vue'));
 Vue.component('schedule-section', require('./components/Sections/Schedule.vue'));
 Vue.component('schedule-map', require('./components/Sections/ScheduleMap.vue'));
 Vue.component('awards-section', require('./components/Sections/Awards.vue'));
+Vue.component('map-section', require('./components/Sections/Map.vue'));
 Vue.component('contact-section', require('./components/Sections/Contact.vue'));
+
 const router = new VueRouter({
     routes
 });
