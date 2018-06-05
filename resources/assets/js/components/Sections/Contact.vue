@@ -4,7 +4,7 @@
       <div class="row">
         <div class="col s12 m4">
           <p class="title-main-contact">Patrocinan</p>
-          <div class="col s12">
+          <div class="col s12 no-padding">
             <div class="image-sponsor">
               <img src="/images/sponsors.png" alt="Patrocinadores de la Hackathon" class="responsive-img" />
             </div>
@@ -22,7 +22,7 @@
           </ul>
           <p class="title-main-contact">Legal</p>
           <ul class="info-contact">
-            <li @click="$root.showTerms" class="show-terms">Terminos y condiciones</li>
+            <li @click="$root.showTerms" class="show-terms">Termínos y condiciones</li>
           </ul>
         </div>
         <div class="col s12 m5">
@@ -71,7 +71,7 @@ export default {
     color: #fff;
   }
   .info-contact {
-    font-size: .8rem;
+    font-size: .9rem;
     color: #fff;
     & a {
       color: #fff;

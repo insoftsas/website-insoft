@@ -71,7 +71,7 @@
       <div class="pin-circle"></div>
       <div class="left-event empty"></div>
       <div class="right-event">
-        <div class="date-event">01, 07 y 13 de Junio</div>
+        <div class="date-event">1, 7 y 13 de Junio</div>
         <div class="info-event">
           <div class="item-event">Capacitación a empresarios en transformación digital.
           </div>
@@ -83,7 +83,7 @@
     <div class="event-schedule fade-schedule-2">
       <div class="pin-circle"></div>
       <div class="left-event">
-        <div class="date-event">01 al 13 de Junio</div>
+        <div class="date-event">1 al 13 de Junio</div>
         <div class="info-event">
           <div class="item-event">Registro de Makers.</div>
           <div class="item-event">Selección de Makers.</div>
@@ -103,7 +103,7 @@
       <div class="pin-circle"></div>
       <div class="left-event">
         <div class="date-event">18 de Junio</div>
-        <div class="info-event">Capacitación en prototopado.</div>
+        <div class="info-event">Capacitación en prototipado.</div>
       </div>
       <div class="right-event empty"></div>
     </div>
