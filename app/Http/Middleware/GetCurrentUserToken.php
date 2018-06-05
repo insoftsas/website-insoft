@@ -16,9 +16,9 @@ class GetCurrentUserToken
      */
     public function handle($request, Closure $next)
     {
-        if(auth()->guard("api")->check()){
-            if($request->user() != null){
-                if($request->user()->token() != null){
+        if( auth()->guard("api")->check() ){
+            if( $request->user() != null ){
+                if( $request->user()->token() != null ){
                     $token = $request->user()->token();
                     $obj = (object) array(
                         'user_agent' => $request->header('user-agent')??'none',
@@ -27,13 +27,13 @@ class GetCurrentUserToken
                         'url' => $request->server->get('REQUEST_URI')??'/',
                         'method' => $request->method()
                     );
-                    $last = json_decode($token->last_access);
+                    $last = json_decode( $token->last_access );
                     if($last != null){
                         if ( property_exists( $last , "locate") ) {
                             $obj->locate = $last->locate;
                         }
                     }
-                    $token->last_access = json_encode($obj);
+                    $token->last_access = json_encode( $obj );
                     $token->save();
                 }
             }
