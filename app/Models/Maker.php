@@ -91,4 +91,16 @@ class Maker extends Model
     {
         return $this->first_name.' '.$this->last_name;
     }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($maker){
+            $us = User::where('email',$maker->email)->first();
+            if($us!=null){
+                $us->delete();
+            }
+        });
+    }
 }

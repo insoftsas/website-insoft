@@ -67,5 +67,17 @@ class Enterprise extends Model
         return $this->belongsTo('App\Models\City');
     }
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($enterprise){
+            $us = User::where('email',$enterprise->email)->first();
+            if($us!=null){
+                $us->delete();
+            }
+        });
+    }
+
     
 }
