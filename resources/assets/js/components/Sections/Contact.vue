@@ -6,16 +6,15 @@
           <p class="title-main-contact">Patrocinan</p>
           <div class="col s12">
             <div class="image-sponsor">
-              <img src="/images/logo.png" alt="Logo Transformación Digital" class="responsive-img" />
-            </div>
-          </div>
-          <div class="col s12">
-            <div class="image-sponsor">
-              <img src="/images/innovemp.jpg" alt="Logo Innovemp" class="responsive-img" />
+              <img src="/images/sponsors.png" alt="Patrocinadores de la Hackathon" class="responsive-img" />
             </div>
           </div>
         </div>
         <div class="col s12 m3">
+          <p class="title-main-contact">Lugar del evento</p>
+          <ul class="info-contact">
+            <li>Cl. 28 #4 - 61, Montería, Córdoba</li>
+          </ul>
           <p class="title-main-contact">Contactenos</p>
           <ul class="info-contact">
             <li>Comuníquese a la línea: <a href="tel:3006039992">300 603 99992</a></li>
@@ -27,10 +26,6 @@
           </ul>
         </div>
         <div class="col s12 m5">
-          <p class="title-main-contact">Lugar del evento</p>
-          <ul class="info-contact">
-            <li>Cl. 28 #4 - 61, Montería, Córdoba</li>
-          </ul>
           <map-section></map-section>
         </div>
         <div class="col s12">
@@ -49,6 +44,9 @@ export default {
 <style lang="scss" scoped>
   #contact {
     background: #38a2b8;
+  }
+  .copy {
+    margin-top: 10px;
   }
   .inputs-contact {
     & input, & textarea {
@@ -89,7 +87,7 @@ export default {
     }
   }
   .image-sponsor {
-    width: 175px;
+    width: 300px;
     display: inline-block;
   }
 </style>
