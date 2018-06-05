@@ -54,7 +54,7 @@ class WelcomeGroupNotification extends Notification
                     ->line('Contraseña: '.$this->password)
                     ->action('Iniciar sesion', url('/').'#/login')
                     ->line('Gracias por hacer parte de la Hackathon Montería!')
-                    ->salutation(config('app.name'));
+                    ->salutation('Innovemp');
     }
 
     /**
