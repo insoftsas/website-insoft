@@ -703,6 +703,53 @@
               }
             })
         }
+<<<<<<< HEAD
+=======
+        axios.post('/api/makers', this.makers_data)
+          .then(function (response) {
+            if (response.data.data.code) {
+              vm.group_code = response.data.data.code
+            }
+            vm.loading = false
+            vm.completed_registration = true
+            vm.error_separated = null
+            vm.resetErrorValues()
+            vm.goToChange('completed-successfully')
+            vm.code_not_found = false
+            vm.birt_date_fail = false
+          })
+          .catch(function (error) {
+            vm.loading = false
+            vm.completed_registration = false
+            if(error.response != undefined){
+              if(error.response.data != undefined){
+                if(error.response.data.errors != undefined){
+                  const e = error.response.data.errors
+                  vm.error = e
+                  vm.checkError(e)
+                }else if(error.response.data.message != undefined){
+                  if (error.response.data.message == 'Codigo de grupo no encontrado') {
+                    vm.code_not_found = true
+                    vm.error = error.response.data.message
+                    if (vm.birt_date_fail)
+                      vm.birt_date_fail = !vm.birt_date_fail
+                  } else if (error.response.data.message == 'La edad permitida para el evento es de 16-30 años de edad') {
+                    vm.birt_date_fail = true
+                    vm.error = error.response.data.message
+                    if (vm.code_not_found)
+                      vm.code_not_found = !vm.code_not_found
+                  } else if (error.response.data.message == 'Su grupo ya se encuentra registrado en nuestro sistema') {
+                    vm.group_exist = true
+                    vm.error = error.response.data.message
+                  }else{
+                    M.toast({html: error.response.data.message});
+                    vm.error = error.response.data.message
+                  }
+                }
+              }
+            }
+          })
+>>>>>>> ace6efc4662e75be7c472440b079b0244b6c97d3
       },
       getCities: function (t) {
         let vm = this
