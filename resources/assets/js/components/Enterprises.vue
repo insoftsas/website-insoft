@@ -46,7 +46,7 @@
                           <a class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </a>
-                          <a class="waves-effect waves-red circle btn-flat">
+                          <a class="waves-effect waves-red circle btn-flat" @click="delEnterprise(enterprise)">
                             <font-awesome-icon :icon="['fas', 'trash']"/>
                           </a>
                         </td>
@@ -71,6 +71,13 @@
       }
     },
     methods: {
+      delEnterprise: function (enterprise) {
+          this.$root.$emit('delete-data', {
+              text: 'esta empresa',
+              route: 'enterprises',
+              content: enterprise
+          })
+      },
       getEnterprises: function() {
         let vm = this
         vm.loading = true
@@ -93,6 +100,9 @@
     mounted() {
       let vm = this
       vm.getEnterprises()
+      vm.$root.$on('update-data', function (data) {
+        vm.getEnterprises()
+      })
       var loginCard = anime({
         targets: '#enterprises_card',
         duration: 1250,

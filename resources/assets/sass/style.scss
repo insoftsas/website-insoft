@@ -12,6 +12,12 @@ body {
   font-family: 'Dosis', sans-serif;
   background-repeat: no-repeat;
 }
+.progress{
+  background-color: #3c4d9680;
+  & .indeterminate{
+    background-color: #3c4d96;
+  }
+}
 .leader_span{
     font-size: 80%;
     margin-left: 5px;

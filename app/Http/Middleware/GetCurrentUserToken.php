@@ -26,8 +26,10 @@ class GetCurrentUserToken
                 'method' => $request->method()
             );
             $last = json_decode($token->last_access);
-            if ( property_exists( $last , "locate") ) {
-                $obj->locate = $last->locate;
+            if($last != null){
+                if ( property_exists( $last , "locate") ) {
+                    $obj->locate = $last->locate;
+                }
             }
             $token->last_access = json_encode($obj);
             $token->save();
