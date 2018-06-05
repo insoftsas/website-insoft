@@ -11,7 +11,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
     
-    protected $appends = ['isSuperAdmin', 'isAdmin', 'isJury', 'isMixAdmin'];
+    protected $appends = ['isSuperAdmin'];
     
     /**
      * The attributes that are mass assignable.
@@ -37,6 +37,13 @@ class User extends Authenticatable
         'avatar' => ''
     ]; 
 
+    public static $attributesCustom = [     
+        'name' => 'nombre',   
+        'email' => 'correo',   
+        'avatar' => 'avatar',  
+        'password' => 'contraseña',  
+    ];
+
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
@@ -49,7 +56,7 @@ class User extends Authenticatable
     
     public function getIsSuperAdminAttribute()
     {
-        return $this->isSuperAdmin();
+        return count( $this->isSuperAdmin() ) != 0 ? true : false;
     }
 
     public function isAdmin()
@@ -106,6 +113,36 @@ class User extends Authenticatable
     public function roles()
     {
         return $this->belongsToMany('App\Role', 'assigned_roles')->withTimestamps();
+    }
+
+    public function enterprise()
+    {
+        return $this->belongsTo('App\Models\Enterprise', 'email', 'email');
+    }
+
+    public function getEnterpriseAttribute()
+    {
+        return $this->enterprise();
+    }
+
+    public function getIsEnterpriseAttribute()
+    {
+        return count($this->enterprise())!=0?true:false;
+    }
+
+    public function getIsMakerAttribute()
+    {
+        return count($this->maker())!=0?true:false;
+    }
+
+    public function getMakerAttribute()
+    {
+        return $this->maker();
+    }
+
+    public function maker()
+    {
+        return $this->belongsTo('App\Models\Maker', 'email', 'email');
     }
 
 }

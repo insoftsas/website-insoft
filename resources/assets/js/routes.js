@@ -6,8 +6,8 @@ import Tokens from './components/Tokens.vue';
 import Makers from './components/Makers.vue';
 import Users from './components/Users.vue';
 import Groups from './components/Groups.vue';
-import GroupsShow from './components/E404.vue';
 import Enterprises from './components/Enterprises.vue';
+import ObjectShow from './components/ObjectShow.vue';
 import E404 from './components/E404.vue';
 
 const routes = [
@@ -19,8 +19,8 @@ const routes = [
     { path: '/makers', component: Makers, name: 'Makers' },
     { path: '/groups', component: Groups, name: 'Groups' },
     { path: '/users', component: Users, name: 'Users' },
-    { path: '/groups/:id', component: GroupsShow, name: 'Groups.Show' },
     { path: '/enterprises', component: Enterprises, name: 'Enterprises' },
+    { path: '/:type/:id', component: ObjectShow, name: 'Object.Show' },
     { path: '*', component: E404 }
 ];
 

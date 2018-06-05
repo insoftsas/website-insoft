@@ -105,6 +105,8 @@ export default {
     text-align: center;
     margin: 112px 0 57px 0;
     position: relative;
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    animation: moveInscription 2.5s ease-in-out infinite alternate;
     & a {
       color: #3c7fb9;
       font-weight: bold;
