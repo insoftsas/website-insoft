@@ -1,5 +1,6 @@
 <template>
   <div class="row">
+    <modal-delete v-if="$route.name != 'Index' && $route.name != 'Inscription'"></modal-delete>
     <div :class="{'bg_panel' : $route.name != 'Index' && $route.name != 'Inscription'}"></div>
 	  <router-view v-if="$root.loaded"></router-view>
       <div class="MainLoader"  v-else>

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\User;
 
 class Maker extends Model
 {
@@ -90,5 +90,17 @@ class Maker extends Model
     public function getFullNameAttribute()
     {
         return $this->first_name.' '.$this->last_name;
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($maker){
+            $us = User::where('email',$maker->email)->first();
+            if($us!=null){
+                $us->delete();
+            }
+        });
     }
 }

@@ -5,7 +5,7 @@ namespace App\Models;
 use Eloquent as Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
-
+use App\User;
 
 class Enterprise extends Model
 {
@@ -65,6 +65,18 @@ class Enterprise extends Model
     public function city()
     {
         return $this->belongsTo('App\Models\City');
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($enterprise){
+            $us = User::where('email',$enterprise->email)->first();
+            if($us!=null){
+                $us->delete();
+            }
+        });
     }
 
     

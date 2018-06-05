@@ -28,6 +28,7 @@ Vue.component('terms', require('./components/Terms.vue'));
 Vue.component('word-writing', require('./components/wordWriting.vue'));
 Vue.component('menu-admin', require('./components/MenuAdmin.vue'));
 Vue.component('inscription', require('./components/Inscription.vue'));
+Vue.component('modal-delete', require('./components/ModalDelete.vue'));
 
 // animations components
 Vue.component('trans-animation', require('./components/Sections/InfoAnim/TransAnimation.vue'));

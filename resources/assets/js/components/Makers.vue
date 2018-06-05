@@ -45,7 +45,7 @@
                           <a class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </a>
-                          <a class="waves-effect waves-red circle btn-flat">
+                          <a class="waves-effect waves-red circle btn-flat" @click="delMaker(maker)">
                             <font-awesome-icon :icon="['fas', 'trash']"/>
                           </a>
                         </td>
@@ -70,6 +70,13 @@
       }
     },
     methods: {
+      delMaker: function (maker) {
+          this.$root.$emit('delete-data', {
+              text: 'este maker',
+              route: 'makers',
+              content: maker
+          })
+      },
       getMakers: function() {
         let vm = this
         vm.loading = true
@@ -92,6 +99,9 @@
     mounted() {
       let vm = this
       vm.getMakers()
+      vm.$root.$on('update-data', function (data) {
+        vm.getMakers()
+      })
       var loginCard = anime({
         targets: '#makers_card',
         duration: 1250,

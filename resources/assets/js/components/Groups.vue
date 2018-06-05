@@ -43,7 +43,7 @@
                           <a class="waves-effect waves-blue circle btn-flat">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </a>
-                          <a class="waves-effect waves-red circle btn-flat">
+                          <a class="waves-effect waves-red circle btn-flat" @click="delGroup(group)">
                             <font-awesome-icon :icon="['fas', 'trash']"/>
                           </a>
                         </td>
@@ -68,7 +68,14 @@
       }
     },
     methods: {
-      getMakers: function() {
+      delGroup: function (group) {
+          this.$root.$emit('delete-data', {
+              text: 'este grupo',
+              route: 'groups',
+              content: group
+          })
+      },
+      getGroups: function() {
         let vm = this
         vm.loading = true
         axios.get(vm.$root.apiMap.groups)
@@ -89,7 +96,10 @@
     },
     mounted() {
       let vm = this
-      vm.getMakers()
+      vm.getGroups()
+      vm.$root.$on('update-data', function (data) {
+        vm.getGroups()
+      })
       var loginCard = anime({
         targets: '#groups_card',
         duration: 1250,
