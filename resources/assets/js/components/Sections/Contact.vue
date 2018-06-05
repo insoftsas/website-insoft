@@ -11,7 +11,7 @@
           </div>
           <div class="col s12">
             <div class="image-sponsor">
-              <img src="/images/logo.png" alt="Logo Transformación Digital" class="responsive-img" />
+              <img src="/images/innovemp.jpg" alt="Logo Innovemp" class="responsive-img" />
             </div>
           </div>
         </div>
