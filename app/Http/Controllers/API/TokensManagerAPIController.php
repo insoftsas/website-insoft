@@ -69,7 +69,7 @@ class TokensManagerAPIController extends AppBaseController
 
 	public function user()
 	{
-        auth()->user()->notify(new \App\Notifications\WelcomeMakerNotification(str_random(15)));
+        //auth()->user()->notify(new \App\Notifications\WelcomeMakerNotification(str_random(15)));
 		return $this->sendResponse(auth()->user(), 'User retrieved successfully');	
 	}
 
