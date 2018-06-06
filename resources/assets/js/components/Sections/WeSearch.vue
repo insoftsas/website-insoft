@@ -62,34 +62,33 @@
               </div>
             </div>
             <div class="col s12 m7 first-fade-search">
-              <div class="content-info step-row">
+              <div class="content-info">
                 <span class="trigger-fade-search">Queremos realizar una maratón tecnológica, denominada <span class="hack-sub">Hackathon</span>. Este evento consiste en la asignación de las necesidades tecnológicas de las empresas del departamento de Córdoba a varios grupos de desarrolladores, para que compitan por un premio a la mejor solución tecnológica (prototipo) de las necesidades presentadas, con el fin de mejorar el proceso de transformación productiva y digital de nuestros empresarios.</span>
               </div>
             </div>
-
           </div>
           <div class="row">
             <div class="col s12 m5 fade-search">
-              <div class="content-info">
+              <div class="content-info step-row">
                 <span class="trigger-for-schedule">Queremos ofrecer soluciones tecnológicas a las empresas con dificultades para incursionar o avanzar en el proceso de transformación digital, para ello esas empresas deberan estar ligadas a cualquiera de los siguientes sectores productivos:</span>
               </div>
             </div>
             <div class="col s12 m7 fade-search">
               <div class="content-info">
                 <div class="row">
-                  <div class="col s12 m4">
+                  <div class="col s4">
                     <div class="icon-sector-productive">
                       <img src="/images/search/hotel-building.svg" class="responsive-img" />
                       <span>Hoteles y agencias turísticas</span>
                     </div>
                   </div>
-                  <div class="col s12 m4">
+                  <div class="col s4">
                     <div class="icon-sector-productive">
                       <img src="/images/search/engineer.svg" class="responsive-img" />
                       <span>Constructoras</span>
                     </div>
                   </div>
-                  <div class="col s12 m4">
+                  <div class="col s4">
                     <div class="icon-sector-productive">
                       <img src="/images/search/dish.svg" class="responsive-img" />
                       <span>Restaurantes</span>
@@ -97,19 +96,19 @@
                   </div>
                 </div>
                 <div class="row">
-                  <div class="col s12 m4">
+                  <div class="col s4">
                     <div class="icon-sector-productive">
                       <img src="/images/search/libra.svg" class="responsive-img" />
                       <span>Servicios jurídicos y contables</span>
                     </div>
                   </div>
-                  <div class="col s12 m4">
+                  <div class="col s4">
                     <div class="icon-sector-productive">
                       <img src="/images/search/home.svg" class="responsive-img" />
                       <span>Agencias inmobiliarias</span>
                     </div>
                   </div>
-                  <div class="col s12 m4">
+                  <div class="col s4">
                     <div class="icon-sector-productive">
                       <img src="/images/search/fireworks.svg" class="responsive-img" />
                       <span>Industrias culturales y creativas</span>
