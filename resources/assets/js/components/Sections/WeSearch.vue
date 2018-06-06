@@ -67,7 +67,7 @@
           </div>
           <div class="col s12 m6 fade-search">
             <div class="content-info">
-              <span class="trigger-for-schedule">Para el desarrollo del mencionado evento se requiere convocar a un grupo de empresarios con el objetivo de capacitarlos en la identificación de sus necesidades tecnológicas, tendientes a la automatización y optimización de sus actividades mercantiles; para la solución (prototipo) de dichas necesidades se requiere de la conformación de los team makers (programadores) y de un espacio optimo y adecuado para el desarrollo del evento.</span>
+              <span class="trigger-for-schedule">Para el desarrollo del mencionado evento se requiere convocar a un grupo de empresarios con el objetivo de capacitarlos en la identificación de sus necesidades tecnológicas, tendientes a la automatización y optimización de sus actividades mercantiles; para la solución (prototipo) de dichas necesidades se requiere de la conformación de los team makers (programadores) y de un espacio óptimo y adecuado para el desarrollo del evento.</span>
             </div>
           </div>
         </div>

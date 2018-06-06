@@ -8,7 +8,7 @@
           </div>
           <div class="col s12 container-content-info award-fade">
             <div class="content-info margin-default-bottom">
-              <span>Los jurados evaluarán y calificaran a los participantes para entregar los premios a los 3 participantes o grupos ganadores.</span>
+              <span>Los jurados evaluarán y calificarán a los participantes para entregar los premios a los 3 participantes o grupos ganadores.</span>
             </div>
           </div>
           <div class="col s12 hide-on-small-and-down move-awards">
