@@ -75,7 +75,7 @@ class EnterpriseAPIController extends AppBaseController
         $password_gen = str_random(8);
 
         $user = User::create([
-            'name' => $enterprises->first_name.' '.$enterprises->last_name,
+            'name' => $enterprises->razon_social_propietario,
             'email' => $enterprises->email,
             'password' =>  $password_gen
         ]);
