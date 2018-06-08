@@ -22,7 +22,7 @@
           </ul>
           <p class="title-main-contact">Legal</p>
           <ul class="info-contact">
-            <li @click="$root.showTerms" class="show-terms">Termínos y condiciones</li>
+            <li @click="$root.showTerms" class="show-terms">Términos y condiciones</li>
           </ul>
         </div>
         <div class="col s12 m5">
