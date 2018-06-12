@@ -14,7 +14,10 @@ use Illuminate\Console\Command;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('artisan', function () {
-    $exit=Artisan::call("passport:install");
+Route::get('artisan', function (Request $request) {
+	if(!$request->has('command')){
+		return 'No se ha enviado el comando';
+	}
+    $exit = Artisan::call($request->get('command'));
     return $exit;
 });
