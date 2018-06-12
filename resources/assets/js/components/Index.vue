@@ -59,6 +59,9 @@
 	    	<span>Premios</span>
 	    </div>
 			<div class="item">
+				<router-link to="/evaluate"><span>Acta de capacitación</span></router-link>
+			</div>
+			<div class="item">
 		    <router-link to="/login" v-if="!$root.auth"><span>Login</span></router-link>
 		    <router-link to="/dashboard" v-else><span>Dashboard</span></router-link>
 	    </div>
@@ -80,7 +83,7 @@
   export default {
     data() {
       return {
-				
+
       }
     },
     methods: {

@@ -7,7 +7,7 @@
             <h2 class="title-section">¿Qué buscamos?</h2>
           </div>
           <div class="row">
-            <div class="col s12 m5 fade-search">
+            <div class="col s12 m5 first-fade-search">
               <div class="content-solution-image">
                 <svg version="1.1" id="solution-business" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 464 464" style="enable-background:new 0 0 464 464;" xml:space="preserve">
                   <path style="fill:#A6001E;" d="M64,328c0,4.418-3.582,8-8,8s-8,3.582-8,8v16c0,13.255,10.745,24,24,24h16c13.255,0,24-10.745,24-24
@@ -61,7 +61,7 @@
                 </svg>
               </div>
             </div>
-            <div class="col s12 m7 first-fade-search">
+            <div class="col s12 m7 fade-search">
               <div class="content-info">
                 <span class="trigger-fade-search">Queremos realizar una maratón tecnológica, denominada <span class="hack-sub">Hackathon</span>. Este evento consiste en la asignación de las necesidades tecnológicas de las empresas del departamento de Córdoba a varios grupos de desarrolladores, para que compitan por un premio a la mejor solución tecnológica (prototipo) de las necesidades presentadas, con el fin de mejorar el proceso de transformación productiva y digital de nuestros empresarios.</span>
               </div>
