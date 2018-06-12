@@ -31,5 +31,5 @@ Route::get('artisan', function (Request $request) {
     	$exit = Artisan::call($request->get('command'));
 	}
 	echo "status: ".$exit."<br>";
-    return Artisan::output();
+    return "<pre>".Artisan::output()."</pre>";
 });
