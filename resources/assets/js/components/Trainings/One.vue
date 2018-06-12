@@ -222,7 +222,7 @@
       title: function () {
         if (this.show_form) {
             return 'Acta de Capacitación'
-        } else if (!this.evaluate_status) {
+        } else if (!this.evaluate_status && !this.finished) {
           return 'Seleccione las temáticas abordadas por el capacitador:'
         } else {
           if (this.step_evaluate >= 1 && this.step_evaluate <= 3) {
