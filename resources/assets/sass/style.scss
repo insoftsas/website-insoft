@@ -725,3 +725,7 @@ input:not([type]):focus:not([readonly]), input[type=text]:not(.browser-default):
 .error {
   background-color: #e54135;
 }
+.break-line {
+  display: block;
+  font-size: 1.3rem;
+}

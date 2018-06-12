@@ -10413,6 +10413,11 @@ textarea.materialize-textarea:focus:not([readonly]) {
   background-color: #e54135;
 }
 
+.break-line {
+  display: block;
+  font-size: 1.3rem;
+}
+
 /* Enter and leave animations can use different */
 
 /* durations and timing functions.              */
