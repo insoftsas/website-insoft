@@ -31,5 +31,6 @@ Route::get('/states', 'CentralAPIController@states');
 
 Route::post('/cities', 'CentralAPIController@getCities');
 
-
 Route::resource('users', 'UserAPIController');
+
+Route::resource('qualifies', 'QualifyAPIController');

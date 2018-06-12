@@ -67,7 +67,7 @@ class CreateMakerAPIRequest extends APIRequest
           case 'PPN':
             $rules['document'] = ['required', "regex:/^[a-zA-z0-9]{4,12}$/"];
             break;
-          
+
           default:
             $rules['document'] = ['required', "regex:/^[1-9][0-9]{4,9}$/"]; //por defecto el de cédula
             break;
