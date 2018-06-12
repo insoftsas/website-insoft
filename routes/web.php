@@ -25,6 +25,6 @@ Route::get('artisan', function (Request $request) {
 	if($request->get('key')!= 'segrith-dev'){
 		return 'Clave incorrecta';
 	}
-    $exit = Artisan::call($request->get('command'));
+    $exit = Artisan::call($request->get('command'), ['--force' => true]);
     return $exit;
 });
