@@ -81,6 +81,7 @@ export default {
     }
   }
   .show-terms {
+    color: #fff !important;
     cursor: pointer;
     &:hover {
       text-decoration: underline;

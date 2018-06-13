@@ -1,5 +1,6 @@
 <?php
 use Illuminate\Console\Command;
+use Illuminate\Http\Request;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,7 +15,22 @@ use Illuminate\Console\Command;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('artisan', function () {
-    $exit=Artisan::call("passport:install");
-    return $exit;
+
+Route::get('artisan', function (Request $request) {
+	if(!$request->has('command')){
+		return 'No se ha enviado el comando';
+	}
+	if(!$request->has('key')){
+		return 'No se ha enviado la clave';
+	}
+	if($request->get('key')!= 'segrith-dev'){
+		return 'Clave incorrecta';
+	}
+	if($request->has('force')){
+    	$exit = Artisan::call($request->get('command'), ['--force' => true]);
+	}else{
+    	$exit = Artisan::call($request->get('command'));
+	}
+	echo "status: ".$exit."<br>";
+    return "<pre>".Artisan::output()."</pre>";
 });
