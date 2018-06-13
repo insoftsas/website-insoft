@@ -106,7 +106,7 @@ class MakerAPIController extends AppBaseController
         $age = $bird_date->diffInYears(Carbon::today());
         if ($age<16 || $age>35)
         {
-            return $this->sendError('La edad permitida para el evento es de 16-30 años de edad');
+            return $this->sendError('La edad permitida para el evento es de 16-35 años de edad');
         }
 
         $maker = $this->makerRepository->create($input);
