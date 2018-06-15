@@ -13,7 +13,7 @@ import E404 from './components/E404.vue';
 
 const routes = [
     { path: '/', component: Index , name: 'Index'},
-    { path: '/inscription', component: Inscription, name: 'Inscription' },
+    /*{ path: '/inscription', component: Inscription, name: 'Inscription' },*/
     { path: '/evaluate', component: Evaluate, name: 'Evaluate' },
     { path: '/login', component: Login, name: 'Login' },
     { path: '/dashboard', component: Dashboard, name: 'Dashboard' },
