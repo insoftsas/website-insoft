@@ -414,14 +414,8 @@
           vm.setError('nit', true)
           vm.error_status.nit = true
         } else {
-          var regex_nit = new RegExp(/^[1-9][0-9]{6,8}(\\-[0-9])?$/)
-          if (regex_nit.test(parseInt(i.nit))) {
-            vm.error.nit = null
-            vm.error_status.nit = false
-          } else {
-            vm.error_status.nit = true
-            vm.setError('nit', false)
-          }
+          vm.error.nit = null
+          vm.error_status.nit = false
         }
 
         if (i.address == '') {
