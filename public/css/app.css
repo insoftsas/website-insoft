@@ -9547,6 +9547,10 @@ body {
   background-color: #3c4d96;
 }
 
+.text_count {
+  text-align: right;
+}
+
 .leader_span {
   font-size: 80%;
   margin-left: 5px;
