@@ -13,9 +13,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string assistant
  * @property string doc_type
  * @property string document
- * @property string job
- * @property string enterprise
- * @property string nit
+ * @property string level
+ * @property string semester
+ * @property string career
  * @property string address
  * @property string neighborhood
  * @property integer city_id
@@ -56,9 +56,9 @@ class QualifyMakers extends Model
         'assistant',
         'doc_type',
         'document',
-        'job',
-        'enterprise',
-        'nit',
+        'level',
+        'semester',
+        'career',
         'address',
         'neighborhood',
         'city_id',
@@ -95,9 +95,9 @@ class QualifyMakers extends Model
         'assistant' => 'string',
         'doc_type' => 'string',
         'document' => 'string',
-        'job' => 'string',
-        'enterprise' => 'string',
-        'nit' => 'string',
+        'level' => 'string',
+        'semester' => 'string',
+        'career' => 'string',
         'address' => 'string',
         'neighborhood' => 'string',
         'city_id' => 'integer',
@@ -132,9 +132,9 @@ class QualifyMakers extends Model
     public static $rules = [
         'assistant'    => 'required|string',
         'document'     => 'required|string',
-        'job'          => 'required|string',
-        'enterprise'   => 'required|string',
-        'nit'          => 'required|integer',
+        'level'          => 'required|string',
+        'semester'   => 'required_if:level,Estudiante',
+        'career'          => 'required|integer',
         'address'      => 'required|string',
         'neighborhood' => 'required|string',
         'city_id'      => 'required|integer|exists:cities,id',
@@ -169,9 +169,9 @@ class QualifyMakers extends Model
     public static $attributesCustom = [
         'assistant'    => 'asistente',
         'document'     => 'documento',
-        'job'          => 'cargo',
-        'enterprise'   => 'nombre de la empresa',
-        'nit'          => 'nit',
+        'level'          => 'nivel academico',
+        'semester'   => 'semestre',
+        'career'          => 'carrera',
         'address'      => 'dirección',
         'neighborhood' => 'barrio',
         'city_id'      => 'ciudad',

@@ -18,9 +18,9 @@ class CreateQualifiesMakersTable extends Migration
             $table->string('assistant');
             $table->string('doc_type', 3)->default('CC');
             $table->string('document');
-            $table->string('job');
-            $table->string('enterprise');
-            $table->string('nit');
+            $table->string('level');
+            $table->string('semester');
+            $table->string('career');
             $table->string('address');
             $table->string('neighborhood');
             $table->integer('city_id')->unsigned();
