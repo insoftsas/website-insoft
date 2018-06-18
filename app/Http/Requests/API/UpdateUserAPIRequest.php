@@ -24,6 +24,10 @@ class UpdateUserAPIRequest extends APIRequest
      */
     public function rules()
     {
-        return User::$rules;
+        return [
+            'name' => 'required',
+            'email' => 'required|email',
+            'avatar' => ''
+        ];
     }
 }

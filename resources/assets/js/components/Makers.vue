@@ -40,13 +40,13 @@
                           {{ maker.created_at }}
                         </td>
                         <td>
-                          <router-link :to="'/makers/' + maker.id" class="waves-effect waves-blue circle btn-flat">
+                          <router-link :to="'/makers/' + maker.id" class="waves-effect waves-blue circle btn-flat primary-color">
                             <font-awesome-icon :icon="['fas', 'eye']"/>
                           </router-link>
-                          <a class="waves-effect waves-blue circle btn-flat">
+                          <router-link :to="'/makers/' + user.id + '/edit'" class="waves-effect waves-blue circle btn-flat primary-color">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
-                          </a>
-                          <a class="waves-effect waves-red circle btn-flat" @click="delMaker(maker)">
+                          </router-link>
+                          <a class="waves-effect waves-red circle btn-flat red-text" @click="delMaker(maker)">
                             <font-awesome-icon :icon="['fas', 'trash']"/>
                           </a>
                         </td>

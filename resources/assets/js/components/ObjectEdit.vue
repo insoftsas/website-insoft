@@ -15,23 +15,17 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col s12">
-                  <table class="striped highlight" id="objects">
-                    <tbody>
-                      <tr v-for="(field,k) in temp" v-if=" k != 'deleted_at' && k != 'updated_at' ">
-                          <th>{{ k }}</th>
-                          <td v-html=" printField(field)"></td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div class="containter-question col s12 m6" v-for="(field,k) in temp" v-if="checkField(field,k)">
+                  <label>{{k}} <span class="red-text" v-if="error[k] != undefined">* {{ error[k][0] }}</span></label>
+                  <input type="text" v-model="temp[k]" :disabled="loading" required class="browser-default input-hack" />
                 </div>
               </div>
               <div class="row">
                 <div class="containter-question col s12 m6 center completed-successfully">
-                  <button @click.prevent="$router.push('/'+$route.params.type)" :disabled="loading">Volver</button>
+                  <button @click.prevent="$router.push('/'+$route.params.type+'/'+$route.params.id)" :disabled="loading">Volver</button>
                 </div>
                 <div class="containter-question col s12 m6 center completed-successfully">
-                  <button @click.prevent="$router.push('/'+$route.params.type+'/'+$route.params.id+'/edit')" :disabled="loading">Editar</button>
+                  <button @click.prevent="saveObj" :disabled="loading">{{ !loading ? 'Guardar' : 'Guardando...' }}</button>
                 </div>
               </div>
             </div>
@@ -46,6 +40,9 @@
     data() {
       return {
         temp: {
+
+        },
+        error: {
 
         },
         loading: false
@@ -69,34 +66,39 @@
       isArray: function(ob){
         return _.isArray(ob)
       },
-      printField: function(field){
-        let print = ''
-        if(_.isArray(field)){
-          _.forEach(field,function (o,k) {
-            if( _.isObject(o) ){
-              if(_.has(o, 'display_name')){
-                print += '<p>'+o.display_name+'</p>'
-              }else if(_.has(o, 'name')){
-                print += '<p>'+o.name+'</p>'
-              }else {
-                print += '<p>'+o+'</p>'
-              }
-            }else{
-              print += '<p>'+o+'</p>'
-            }
-          })
-        }else if( _.isObject(field) ){
-          if(_.has(field, 'display_name')){
-            print += '<p>'+field.display_name+'</p>'
-          }else if(_.has(field, 'name')){
-            print += '<p>'+field.name+'</p>'
-          }else {
-            print += '<p>'+field+'</p>'
-          }
-        }else{
-          print += '<p>'+field+'</p>'
+      checkField: function (field,k) {
+        if(k == 'deleted_at' || k == 'updated_at' || k == 'created_at' || k == 'id' || k == 'isSuperAdmin' || k == 'isEnterprise' || k == 'isMaker' || _.isArray(field) || _.isObject(field)){
+          return false
         }
-        return print;
+        return true
+      },
+      saveObj: function () {
+        let vm = this
+        vm.loading = true
+        vm.error = {}
+        axios.put('/api/' + vm.$route.params.type + '/' +  vm.$route.params.id,vm.temp)
+        .then(response => {
+          vm.$router.push("/"+vm.$route.params.type);
+        })
+        .catch(error => {
+            console.log(error)
+            let m = true
+            if(error.response != undefined){
+              if(error.response.data != undefined){
+                if(error.response.data.errors != undefined){
+                  m = false
+                }
+              }
+            }
+            if(m){
+              M.toast({html:"Hubo un error al guardar los datos"},6000);
+            }else{
+              vm.error = error.response.data.errors
+            }
+        })
+        .then(() => {
+            vm.loading = false
+        })
       },
       getObj: function() {
         let vm = this
@@ -104,9 +106,11 @@
         axios.get('/api/' + vm.$route.params.type + '/' +  vm.$route.params.id)
         .then(response => {
             vm.temp = response.data.data
-            setTimeout(function(){
-              $('.tooltipped').tooltip();
-            },10)
+            _.forEach(vm.temp,function (o,k) {
+              if(!vm.checkField(o,k)){
+                delete vm.temp[k]
+              }
+            })
         })
         .catch(error => {
             console.log(error)

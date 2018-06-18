@@ -9,6 +9,7 @@ import Users from './components/Users.vue';
 import Groups from './components/Groups.vue';
 import Enterprises from './components/Enterprises.vue';
 import ObjectShow from './components/ObjectShow.vue';
+import ObjectEdit from './components/ObjectEdit.vue';
 import E404 from './components/E404.vue';
 
 const routes = [
@@ -23,6 +24,7 @@ const routes = [
     { path: '/users', component: Users, name: 'Users' },
     { path: '/enterprises', component: Enterprises, name: 'Enterprises' },
     { path: '/:type/:id', component: ObjectShow, name: 'Object.Show' },
+    { path: '/:type/:id/edit', component: ObjectEdit, name: 'Object.Edit' },
     { path: '*', component: E404 }
 ];
 

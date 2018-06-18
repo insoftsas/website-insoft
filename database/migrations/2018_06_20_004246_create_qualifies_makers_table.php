@@ -19,7 +19,7 @@ class CreateQualifiesMakersTable extends Migration
             $table->string('doc_type', 3)->default('CC');
             $table->string('document');
             $table->string('level');
-            $table->string('semester');
+            $table->string('semester')->nullable();
             $table->string('career');
             $table->string('address');
             $table->string('neighborhood');
