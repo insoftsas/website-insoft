@@ -39,6 +39,21 @@ export default {
         case 4:
           if (v)
             vm.$parent.evaluate_data.topic_4 = v
+          vm.$parent.step_topic++
+          break
+        case 5:
+          if (v)
+            vm.$parent.evaluate_data.topic_5 = v
+          vm.$parent.step_topic++
+          break
+        case 6:
+          if (v)
+            vm.$parent.evaluate_data.topic_6 = v
+          vm.$parent.step_topic++
+          break
+        case 7:
+          if (v)
+            vm.$parent.evaluate_data.topic_7 = v
           vm.$parent.evaluate_status = true
           break
         default:
