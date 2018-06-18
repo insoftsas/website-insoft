@@ -11,7 +11,7 @@ class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
     
-    protected $appends = ['isSuperAdmin'];
+    protected $appends = ['isSuperAdmin','isEnterprise', 'isMaker'];
     
     /**
      * The attributes that are mass assignable.
@@ -56,7 +56,7 @@ class User extends Authenticatable
     
     public function getIsSuperAdminAttribute()
     {
-        return count( $this->isSuperAdmin() ) != 0 ? true : false;
+        return $this->isSuperAdmin() != 0 ? true : false;
     }
 
     public function isAdmin()
@@ -127,12 +127,12 @@ class User extends Authenticatable
 
     public function getIsEnterpriseAttribute()
     {
-        return count($this->enterprise())!=0?true:false;
+        return $this->enterprise->count()!=0?true:false;
     }
 
     public function getIsMakerAttribute()
     {
-        return count($this->maker())!=0?true:false;
+        return $this->maker->count()!=0?true:false;
     }
 
     public function getMakerAttribute()

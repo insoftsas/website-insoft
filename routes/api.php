@@ -34,3 +34,4 @@ Route::post('/cities', 'CentralAPIController@getCities');
 Route::resource('users', 'UserAPIController');
 
 Route::resource('qualifies', 'QualifyAPIController');
+Route::resource('qualifiesmakers', 'QualifyMakersAPIController');
