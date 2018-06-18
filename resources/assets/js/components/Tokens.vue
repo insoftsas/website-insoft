@@ -9,7 +9,34 @@
               <div class="indeterminate"></div>
             </div>
             <div class="card-content">
-              <span class="card-title">Dónde iniciaste sesión</span>
+              <span class="card-title">Mi Perfil</span>
+              <div class="row">
+                <div class="col s12 m6">
+                  <span class="card-title sub-title">
+                    <span v-if="$root.user.isSuperAdmin">Super Administrador</span>
+                    <span v-if="$root.user.isMaker">Desarrollador</span>
+                    <span v-if="$root.user.isEnterprise">Empresario</span>
+                  </span>
+                  <p><b>Nombre: </b>{{$root.user.name}}</p>
+                  <p><b>Correo: </b>{{$root.user.email}}</p>
+                  <p><b>Creado: </b>{{$root.user.created_at}}</p>
+                </div>
+                <div class="col s12 m6">
+                  <span class="card-title sub-title">Cambiar Contraseña</span>
+                  <div class="containter-question col s12">
+                    <label>Contraseña <span class="red-text" v-if="error != null">{{ error }}</span></label>
+                    <input type="password" v-model="user_data.password" :disabled="loading" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12">
+                    <label>Confirmar Contraseña</label>
+                    <input type="password" v-model="user_data.password_confirm" :disabled="loading" required class="browser-default input-hack" />
+                  </div>
+                  <div class="containter-question col s12 center completed-successfully">
+                    <button @click.prevent="sendPassword" :disabled="loading">{{ !loading ? 'Actualizar Contraseña' : 'Actualizando...' }}</button>
+                  </div>
+                </div>
+              </div>
+              <span class="card-title sub-title">Dónde iniciaste sesión</span>
               <table class="striped highlight" id="sessions">
                 <tbody>
                   <tr v-for="(token,i) in tokens" :key="i">
@@ -89,7 +116,12 @@
     data() {
       return {
         tokens: [],
-        loading: false
+        loading: false,
+        error: null,
+        user_data: {
+          password: null,
+          password_confirm: null
+        }
       }
     },
     computed: {
@@ -108,6 +140,24 @@
       },
       moment: function(time) {
         return moment(time)
+      },
+      sendPassword: function () {
+        let vm = this
+        vm.loading = true
+        axios.post(vm.$root.apiMap.user,vm.user_data)
+        .then(response => {
+          vm.error = null
+          vm.user_data.password = null
+          vm.user_data.password_confirm = null
+          M.toast({html:"Contraseña actualizada correctamente"},6000);
+        })
+        .catch(error => {
+            console.log(error)
+            vm.error = error.response.data.message
+        })
+        .then(() => {
+            vm.loading = false
+        })
       },
       getTokens: function() {
         let vm = this
@@ -220,7 +270,9 @@
         }
       }
     }
-
+    .sub-title{
+      font-size: 2rem;
+    }
  .btn-floating.tooltipped{
   font-size: 20px;
  }

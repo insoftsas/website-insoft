@@ -16,6 +16,7 @@
               </div>
               <div class="row">
                 <div class="col s12">
+                  <p class="text_count">Registros: {{groups.length}}</p>
                   <table class="striped highlight" id="groups">
                     <tbody>
                       <tr>
