@@ -510,7 +510,7 @@
       },
       sendEvaluate: function () {
         let vm = this
-        axios.post('/api/qualifies', vm.evaluate_data)
+        axios.post('/api/qualifiesmakers', vm.evaluate_data)
           .then(function (response) {
             vm.finished = true
             vm.evaluate_status = false
