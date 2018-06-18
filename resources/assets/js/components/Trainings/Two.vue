@@ -58,7 +58,7 @@
                       </select>
                     </div>
                     <div class="containter-question col s12 m6 l4 semester">
-                      <label>Semestre que está cursando * <span class="red-text" v-if="error.semester != null || error == undefined">{{ error.semester }}</span></label>
+                      <label>Semestre que está cursando *<span class="red-text" v-if="error.semester != null || error == undefined">{{ error.semester }}</span></label>
                       <input type="number" v-model="evaluate_data.semester" :disabled="evaluate_data.level != 'Estudiante'" :placeholder="evaluate_data.level != 'Estudiante' ? 'Solo para estudiantes' : ''" class="browser-default input-hack" />
                     </div>
                     <div class="containter-question col s12 m6 l4 career">

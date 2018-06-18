@@ -1,6 +1,6 @@
 import Index from './components/Index.vue';
 //import Inscription from './components/Inscription.vue';
-import Evaluate from './components/Trainings/One.vue';
+import Evaluate from './components/Trainings/Two.vue';
 import Dashboard from './components/Dashboard.vue';
 import Login from './components/Auth/Login.vue';
 import Tokens from './components/Tokens.vue';
