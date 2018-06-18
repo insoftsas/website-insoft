@@ -46,7 +46,7 @@ class QualifyMakers extends Model
 {
     use SoftDeletes;
 
-    public $table = 'qualifies';
+    public $table = 'qualifies_makers';
     
 
     protected $dates = ['deleted_at'];

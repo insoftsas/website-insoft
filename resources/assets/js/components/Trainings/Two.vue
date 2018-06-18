@@ -58,7 +58,7 @@
                       </select>
                     </div>
                     <div class="containter-question col s12 m6 l4 semester">
-                      <label>Semestre que está cursando *<span class="red-text" v-if="error.semester != null || error == undefined">{{ error.semester }}</span></label>
+                      <label>Semestre que está cursando *<span class="red-text" v-if="error.semester != null || error == undefined">{{ evaluate_data.level == 'Estudiante' ? error.semester : '' }}</span></label>
                       <input type="number" v-model="evaluate_data.semester" :disabled="evaluate_data.level != 'Estudiante'" :placeholder="evaluate_data.level != 'Estudiante' ? 'Solo para estudiantes' : ''" class="browser-default input-hack" />
                     </div>
                     <div class="containter-question col s12 m6 l4 career">
@@ -323,7 +323,7 @@
           break
           case 'address':
             if (v)
-              vm.error.address = 'Digite la dirección de la empresa'
+              vm.error.address = 'Digite su dirección'
             vm.goToChange('address')
           break
           case 'neighborhood':
@@ -499,8 +499,14 @@
       },
       hasErrors: function () {
         let e = this.error_status
-        if (e.assistant || e.doc_type || e.document || e.level || e.semester || e.career || e.address || e.neighborhood || e.departament_id || e.city_id || e.cellphone || e.email) {
-          return true
+        if (this.evaluate_data.level == 'Estudiante') {
+          if (e.assistant || e.doc_type || e.document || e.level || e.semester || e.career || e.address || e.neighborhood || e.departament_id || e.city_id || e.cellphone || e.email) {
+            return true
+          }
+        } else {
+          if (e.assistant || e.doc_type || e.document || e.level || e.career || e.address || e.neighborhood || e.departament_id || e.city_id || e.cellphone || e.email) {
+            return true
+          }
         }
         return false
       },
@@ -518,6 +524,7 @@
           })
           .catch(function (error) {
             console.log(error)
+            M.toast({html:"Hubo un error al guardar el acta"},6000);
           })
       },
       getCities: function () {
