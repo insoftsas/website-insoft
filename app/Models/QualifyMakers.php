@@ -46,7 +46,7 @@ class QualifyMakers extends Model
 {
     use SoftDeletes;
 
-    public $table = 'qualifies';
+    public $table = 'qualifies_makers';
     
 
     protected $dates = ['deleted_at'];
@@ -134,7 +134,7 @@ class QualifyMakers extends Model
         'document'     => 'required|string',
         'level'          => 'required|string',
         'semester'   => 'required_if:level,Estudiante',
-        'career'          => 'required|integer',
+        'career'          => 'required|string',
         'address'      => 'required|string',
         'neighborhood' => 'required|string',
         'city_id'      => 'required|integer|exists:cities,id',

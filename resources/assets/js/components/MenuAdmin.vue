@@ -6,7 +6,7 @@
     <router-link v-if="$root.user.isSuperAdmin" to="/makers" class="item" :class="{'active' : $route.name == 'Makers'}"><span>Makers</span></router-link>
     <router-link v-if="$root.user.isSuperAdmin" to="/enterprises" class="item" :class="{'active' : $route.name == 'Enterprises'}"><span>Empresas</span></router-link>
     <router-link v-if="$root.user.isSuperAdmin" to="/users" class="item" :class="{'active' : $route.name == 'Users'}"><span>Usuarios</span></router-link>
-    <router-link to="/tokens" class="item" :class="{'active' : $route.name == 'Tokens'}"><span>Mis Sesiones</span></router-link>
+    <router-link to="/profile" class="item" :class="{'active' : $route.name == 'Profile'}"><span>Mi Perfil</span></router-link>
     <div class="item" @click.prevent="$root.logout"><span>Logout</span></div>
   </div>
 </template>

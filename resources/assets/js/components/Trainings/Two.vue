@@ -323,7 +323,7 @@
           break
           case 'address':
             if (v)
-              vm.error.address = 'Digite la dirección de la empresa'
+              vm.error.address = 'Digite su dirección'
             vm.goToChange('address')
           break
           case 'neighborhood':
@@ -524,6 +524,7 @@
           })
           .catch(function (error) {
             console.log(error)
+            M.toast({html:"Hubo un error al guardar el acta"},6000);
           })
       },
       getCities: function () {

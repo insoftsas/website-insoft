@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 */
 
 Route::get('/user',  'TokensManagerAPIController@user');
+Route::post('/user',  'TokensManagerAPIController@userupdate');
 Route::get('/user/tokens', 'TokensManagerAPIController@index');
 Route::get('/user/tokens/{id}', 'TokensManagerAPIController@show');
 Route::post('/user/tokens/{id}', 'TokensManagerAPIController@update');

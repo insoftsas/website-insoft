@@ -16,6 +16,7 @@
               </div>
               <div class="row">
                 <div class="col s12">
+                  <p class="text_count">Registros: {{makers.length}}</p>
                   <table class="striped highlight" id="makers">
                     <tbody>
                       <tr>

@@ -58,9 +58,9 @@
 	    <div class="item" id="award-item" @click="$root.goToView('awards')">
 	    	<span>Premios</span>
 	    </div>
-			<!--<div class="item">
+			<div class="item">
 				<router-link to="/evaluate"><span>Acta de capacitación</span></router-link>
-			</div>-->
+			</div>
 			<div class="item">
 		    <router-link to="/login" v-if="!$root.auth"><span>Login</span></router-link>
 		    <router-link to="/dashboard" v-else><span>Dashboard</span></router-link>

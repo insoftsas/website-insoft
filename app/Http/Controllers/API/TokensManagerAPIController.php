@@ -66,7 +66,31 @@ class TokensManagerAPIController extends AppBaseController
 		}
 		return $this->sendResponse($toks->toArray(), 'Tokens retrieved successfully');	
 	}
-
+    public function userupdate(Request $request)
+    {
+        if(!$request->has('password') || !$request->has('password_confirm')){
+            return response()->json([
+                    'error' => 'invalid_request',
+                    'message' => 'Debe rellenar los campos contraseña y confirmación'
+                ], 401);
+        }
+        if($request->get('password') == '' || $request->get('password_confirm') == '' ){
+            return response()->json([
+                    'error' => 'invalid_request',
+                    'message' => 'Debe rellenar los campos contraseña y confirmación'
+                ], 401);
+        }
+        if($request->get('password') != $request->get('password_confirm') ){
+            return response()->json([
+                    'error' => 'invalid_request',
+                    'message' => 'Los campos no coinciden'
+                ], 401);
+        }
+        $user = auth()->user();
+        $user->password = $request->get('password');
+        $user->save();
+        return $this->sendResponse(auth()->user(), 'User password updated successfully');
+    }
 	public function user()
 	{
         //auth()->user()->notify(new \App\Notifications\WelcomeMakerNotification(str_random(15)));
