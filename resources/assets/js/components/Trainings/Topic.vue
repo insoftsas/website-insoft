@@ -17,6 +17,7 @@
 
 <script>
 export default {
+  props: ['isMaker'],
   methods: {
     setTopic: function (t, v) {
       let vm = this
@@ -39,12 +40,15 @@ export default {
         case 4:
           if (v)
             vm.$parent.evaluate_data.topic_4 = v
-          vm.$parent.step_topic++
+          if (this.isMaker)
+            vm.$parent.evaluate_status = true
+          else
+            vm.$parent.step_topic++
           break
         case 5:
           if (v)
             vm.$parent.evaluate_data.topic_5 = v
-          vm.$parent.step_topic++
+            vm.$parent.step_topic++
           break
         case 6:
           if (v)
@@ -63,32 +67,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-  .thematic {
-    display: inline-block;
-    & .number-thematic {
-      display: inline-block;
-      width: 40px;
-      text-align: center;
-      font-weight: bold;
-      color: #fff;
-      font-size: 3rem;
-      vertical-align: middle;
-    }
-    & .content-thematic {
-      display: inline-block;
-      text-align: left;
-      padding: 10px 18px;
-      font-weight: bold;
-      color: #fbfcfd;
-      vertical-align: middle;
-    }
-  }
-  .roles-container {
-    margin-top: 40px;
-  }
-  .title-description-inscription {
-    margin: 3em 0;
-  }
-</style>

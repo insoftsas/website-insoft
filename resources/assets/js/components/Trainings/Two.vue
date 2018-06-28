@@ -1,21 +1,6 @@
 <template lang="html">
   <div>
-    <div class="show-on-medium-and-down hide-on-med-and-up nav-container-mobile">
-      <span class="btn-mobile-menu" @click="$root.showMenu">|||</span>
-      <span class="title-mobile-menu">Hackathon Montería</span>
-    </div>
-    <div class="navbar-items-mobile" v-if="$root.show_mobile_menu" :class="{ 'show' : $root.show_mobile_menu }">
-      <div class="close-menu-icon" @click="$root.showMenu">X</div>
-      <div class="title-show-menu">Hackathon Montería</div>
-      <div class="item">
-        <router-link to="/">Volver al inicio</router-link>
-      </div>
-      <div class="item">
-		    <router-link to="/login" v-if="!$root.auth"><span>Login</span></router-link>
-		    <router-link to="/dashboard" v-else><span>Dashboard</span></router-link>
-	    </div>
-    </div>
-    <div class="container margin-to-mobile">
+    <div class="container">
       <div class="row">
         <div class="col s12">
           <div class="bg-inscription"></div>
@@ -110,13 +95,13 @@
             </div>
             <div class="evaluate" v-else>
               <div class="thematics-container" v-if="!evaluate_status">
-                <topic-training class="fadeInAfter" v-if="step_topic == 1"></topic-training>
-                <topic-training class="fadeInAfter" v-if="step_topic == 2"></topic-training>
-                <topic-training class="fadeInAfter" v-if="step_topic == 3"></topic-training>
-                <topic-training class="fadeInAfter" v-if="step_topic == 4"></topic-training>
-                <topic-training class="fadeInAfter" v-if="step_topic == 5"></topic-training>
-                <topic-training class="fadeInAfter" v-if="step_topic == 6"></topic-training>
-                <topic-training class="fadeInAfter" v-if="step_topic == 7"></topic-training>
+                <topic-training class="fadeInAfter" v-if="step_topic == 1" :is-maker="false"></topic-training>
+                <topic-training class="fadeInAfter" v-if="step_topic == 2" :is-maker="false"></topic-training>
+                <topic-training class="fadeInAfter" v-if="step_topic == 3" :is-maker="false"></topic-training>
+                <topic-training class="fadeInAfter" v-if="step_topic == 4" :is-maker="false"></topic-training>
+                <topic-training class="fadeInAfter" v-if="step_topic == 5" :is-maker="false"></topic-training>
+                <topic-training class="fadeInAfter" v-if="step_topic == 6" :is-maker="false"></topic-training>
+                <topic-training class="fadeInAfter" v-if="step_topic == 7" :is-maker="false"></topic-training>
               </div>
               <div class="evaluate-container" v-else>
                 <evaluate-training class="fadeInAfter" v-if="step_evaluate == 1" number-item="1.1" title-event="Contenido"></evaluate-training>
@@ -135,9 +120,6 @@
           </div>
           <div class="finished" v-else>
             <div>Muchas gracias por asistir a la capacitación.</div>
-          </div>
-          <div class="help-actions">
-            <router-link to="/"><div class="help-btn home">Volver al inicio</div></router-link>
           </div>
           <div class="col s12">
             <div class="copy">© 2018 Innovemp</div>

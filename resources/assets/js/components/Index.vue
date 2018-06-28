@@ -22,9 +22,9 @@
 	    <div class="item" id="award-item" @click="$root.goToView('awards')">
 	    	<span>Premios</span>
 	    </div>
-			<!--<div>
+			<div>
 	    	<router-link to="/evaluate" class="item left"><span>Acta de Capacitación</span></router-link>
-	    </div>-->
+	    </div>
 	    <div>
 		    <router-link to="/login" class="item right" v-if="!$root.auth"><span>Login</span></router-link>
 		    <router-link to="/dashboard" class="item right" v-else><span>Dashboard</span></router-link>

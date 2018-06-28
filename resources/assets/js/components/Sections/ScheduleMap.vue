@@ -111,19 +111,21 @@
       <div class="pin-circle"></div>
       <div class="left-event empty"></div>
       <div class="right-event">
-        <div class="date-event">27 al 29 de Junio</div>
-        <div class="info-event">Desarrollo de la Hackathon.</div>
+        <div class="date-event">Pronto</div>
+        <!--<div class="info-event">Desarrollo de la Hackathon.</div>-->
+        <div class="info-event">Makers, la hackathon será reprogramada. En los proximos dias publicaremos las nuevas fechas.</div>
       </div>
+      <div class="end-schedule">FINAL</div>
     </div>
-    <div class="event-schedule fade-schedule-6 margin-default-bottom">
+    <!--<div class="event-schedule fade-schedule-6 margin-default-bottom">
       <div class="pin-circle"></div>
-      <div class="left-event">
+      <div class="left-event empty">
         <div class="date-event">29 de Junio</div>
         <div class="info-event">Cierre de la Hackathon.</div>
       </div>
       <div class="right-event empty"></div>
       <div class="end-schedule">FINAL</div>
-    </div>
+    </div>-->
   </div>
 </template>
 <script>
@@ -163,12 +165,14 @@ export default {
       }else if( moment().isBefore( moment('2018-06-30') ) ){
         return {
           'top': 443,
-          'message': 'Escribe y compila lo mas rapido que puedas, la competencia está que arde!'
+          'message': 'Te comunicaremos muy pronto la fecha del desarrollo de la Hackathon.'
+          //'message': 'Escribe y compila lo mas rapido que puedas, la competencia está que arde!'
         }
       }else{
         return {
           'top': 506,
-          'message': 'Gracias por hacer parte del evento tecnologico mejor preparado para la región!'
+          'message': 'Te comunicaremos muy pronto la fecha del desarrollo de la Hackathon.'
+          // 'message': 'Gracias por hacer parte del evento tecnologico mejor preparado para la región!'
         }
       }
     }
