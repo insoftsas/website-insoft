@@ -2,6 +2,7 @@
   <section id="home">
     <div class="container">
       <div class="col s12">
+
         <div class="container-image-transdigital">
           <img src="/images/logo.png" alt="Logo Transformación Digital" class="responsive-img" />
         </div>
@@ -15,6 +16,10 @@
           </span>
         </span>
         <div class="trigger-main">
+          <div class="new-date-hackathon" @click="$root.goToView('schedule')">
+            El evento comienza comienza el
+            <span class="date">24 de Julio</span>
+          </div>
           <div class="btn-inscription-container">
             <router-link to="/inscription">Inscribirme</router-link>
           </div>
@@ -87,7 +92,7 @@ export default {
     cursor: pointer;
     width: 35px;
     margin: auto;
-    margin-top: 10em;
+    margin-top: 5em;
     animation: moveArrow 1.5s ease-out infinite alternate;
     &:hover {
       & svg {
@@ -104,7 +109,7 @@ export default {
   }
   .btn-inscription-container {
     text-align: center;
-    margin: 112px 0 57px 0;
+    margin: 57px 0;
     position: relative;
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
     animation: moveInscription 2.5s ease-in-out infinite alternate;
@@ -136,6 +141,25 @@ export default {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     animation: parpadeo 1s step-end infinite;
+  }
+  .new-date-hackathon {
+    position: relative;
+    width: max-content;
+    cursor: pointer;
+    margin: auto;
+    margin-top: 40px;
+    padding: 15px 20px;
+    border-radius: 7px;
+    color: #ffff;
+    font-size: 1.2rem;
+    z-index: 2;
+    font-weight: bold;
+    & .date {
+      display: block;
+      line-height: normal;
+      text-align: center;
+      font-size: 2rem;
+    }
   }
   .write-mode {
     position: relative;
