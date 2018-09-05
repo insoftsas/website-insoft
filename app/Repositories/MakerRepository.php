@@ -52,4 +52,9 @@ class MakerRepository extends BaseRepository
     {
         return $this->model->with(['city','group'])->get();
     }
+
+    public function getbydocument($document)
+    {
+        return $this->model->where('document', $document)->first();
+    }
 }
