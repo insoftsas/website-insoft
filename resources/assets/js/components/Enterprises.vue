@@ -44,7 +44,7 @@
                           <router-link :to="'/enterprises/' + enterprise.id" class="waves-effect waves-blue circle btn-flat primary-color">
                             <font-awesome-icon :icon="['fas', 'eye']"/>
                           </router-link>
-                          <router-link :to="'/enterprises/' + user.id + '/edit'" class="waves-effect waves-blue circle btn-flat primary-color">
+                          <router-link :to="'/enterprises/' + enterprise.id + '/edit'" class="waves-effect waves-blue circle btn-flat primary-color">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </router-link>
                           <a class="waves-effect waves-red circle btn-flat red-text" @click="delEnterprise(enterprise)">

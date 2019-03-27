@@ -41,7 +41,7 @@
                         </td>
                         <td>
                           <router-link :to="'/groups/' + group.id" class="waves-effect waves-blue circle btn-flat primary-color"><font-awesome-icon :icon="['fas', 'eye']"/></router-link>
-                          <router-link :to="'/groups/' + user.id + '/edit'" class="waves-effect waves-blue circle btn-flat primary-color">
+                          <router-link :to="'/groups/' + group.id + '/edit'" class="waves-effect waves-blue circle btn-flat primary-color">
                             <font-awesome-icon :icon="['fas', 'edit']"/>
                           </router-link>
                           <a class="waves-effect waves-red circle btn-flat red-text" @click="delGroup(group)">
