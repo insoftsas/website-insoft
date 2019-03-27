@@ -36,3 +36,5 @@ Route::resource('users', 'UserAPIController');
 
 Route::resource('qualifies', 'QualifyAPIController');
 Route::resource('qualifiesmakers', 'QualifyMakersAPIController');
+
+Route::post('/fet/getmaker', 'MakerAPIController@getByDocument');

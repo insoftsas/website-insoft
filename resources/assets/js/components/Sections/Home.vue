@@ -2,6 +2,7 @@
   <section id="home">
     <div class="container">
       <div class="col s12">
+
         <div class="container-image-transdigital">
           <img src="/images/logo.png" alt="Logo Transformación Digital" class="responsive-img" />
         </div>
@@ -15,9 +16,13 @@
           </span>
         </span>
         <div class="trigger-main">
-          <!--<div class="btn-inscription-container">
+          <div class="new-date-hackathon" @click="$root.goToView('schedule')">
+            El evento comienza comienza el
+            <span class="date">24 de Julio</span>
+          </div>
+          <div class="btn-inscription-container">
             <router-link to="/inscription">Inscribirme</router-link>
-          </div>-->
+          </div>
           <div class="more-info" @click="$root.goToView('info')">
             <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Capa_1" x="0px" y="0px" viewBox="0 0 490.688 490.688" style="enable-background:new 0 0 490.688 490.688;" xml:space="preserve">
               <path d="M245.213,373.415c-2.831,0.005-5.548-1.115-7.552-3.115L2.994,135.633c-4.093-4.237-3.975-10.99,0.262-15.083  c4.134-3.992,10.687-3.992,14.82,0l227.136,227.115l227.115-227.136c4.093-4.237,10.845-4.354,15.083-0.262  c4.237,4.093,4.354,10.845,0.262,15.083c-0.086,0.089-0.173,0.176-0.262,0.262L252.744,370.279  C250.748,372.281,248.039,373.408,245.213,373.415z"/>
@@ -87,7 +92,7 @@ export default {
     cursor: pointer;
     width: 35px;
     margin: auto;
-    margin-top: 10em;
+    margin-top: 5em;
     animation: moveArrow 1.5s ease-out infinite alternate;
     &:hover {
       & svg {
@@ -104,7 +109,7 @@ export default {
   }
   .btn-inscription-container {
     text-align: center;
-    margin: 112px 0 57px 0;
+    margin: 57px 0;
     position: relative;
     transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
     animation: moveInscription 2.5s ease-in-out infinite alternate;
@@ -136,6 +141,25 @@ export default {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     animation: parpadeo 1s step-end infinite;
+  }
+  .new-date-hackathon {
+    position: relative;
+    width: max-content;
+    cursor: pointer;
+    margin: auto;
+    margin-top: 40px;
+    padding: 15px 20px;
+    border-radius: 7px;
+    color: #ffff;
+    font-size: 1.2rem;
+    z-index: 2;
+    font-weight: bold;
+    & .date {
+      display: block;
+      line-height: normal;
+      text-align: center;
+      font-size: 2rem;
+    }
   }
   .write-mode {
     position: relative;

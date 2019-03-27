@@ -1,6 +1,6 @@
 import Index from './components/Index.vue';
-//import Inscription from './components/Inscription.vue';
-import Evaluate from './components/Trainings/Two.vue';
+import Inscription from './components/Inscription.vue';
+import Evaluate from './components/Trainings/Main.vue';
 import Dashboard from './components/Dashboard.vue';
 import Login from './components/Auth/Login.vue';
 import Tokens from './components/Tokens.vue';
@@ -14,11 +14,11 @@ import E404 from './components/E404.vue';
 
 const routes = [
     { path: '/', component: Index , name: 'Index'},
-    //{ path: '/inscription', component: Inscription, name: 'Inscription' },
+    { path: '/inscription', component: Inscription, name: 'Inscription' },
     { path: '/evaluate', component: Evaluate, name: 'Evaluate' },
     { path: '/login', component: Login, name: 'Login' },
     { path: '/dashboard', component: Dashboard, name: 'Dashboard' },
-    { path: '/profile', component: Tokens, name: 'Profile' },
+    { path: '/tokens', component: Tokens, name: 'Tokens' },
     { path: '/makers', component: Makers, name: 'Makers' },
     { path: '/groups', component: Groups, name: 'Groups' },
     { path: '/users', component: Users, name: 'Users' },

@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="schedule">
-    <div class="event-current" :style=" 'top: ' + getPos.top + 'px;'  " v-if="$route.name == 'Dashboard' ">
+    <!--<div class="event-current" :style=" 'top: ' + getPos.top + 'px;'  " v-if="$route.name == 'Dashboard' ">
       <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
           <defs>
             <filter id="dropshadow">
@@ -39,7 +39,7 @@
       <div class="toast_mesage">
         {{getPos.message}}
       </div>
-    </div>
+    </div>-->
 
     <div class="event-schedule fade-schedule trigger-first-schedule">
       <div class="pin-circle">
@@ -111,15 +111,18 @@
       <div class="pin-circle"></div>
       <div class="left-event empty"></div>
       <div class="right-event">
-        <div class="date-event">27 al 29 de Junio</div>
-        <div class="info-event">Desarrollo de la Hackathon.</div>
+        <div class="date-event">23 de Julio</div>
+        <div class="info-event">
+          <div class="item-event">8:00 AM Capacitación de Makers</div>
+          <div class="item-event">7:00 PM Inauguración de la Hackathon</div>
+        </div>
       </div>
     </div>
     <div class="event-schedule fade-schedule-6 margin-default-bottom">
       <div class="pin-circle"></div>
-      <div class="left-event">
-        <div class="date-event">29 de Junio</div>
-        <div class="info-event">Cierre de la Hackathon.</div>
+      <div class="left-event empty">
+        <div class="date-event">24, 25 y 26 de Julio</div>
+        <div class="info-event">Desarrollo de la Hackathon.</div>
       </div>
       <div class="right-event empty"></div>
       <div class="end-schedule">FINAL</div>

@@ -30,7 +30,10 @@ Vue.component('menu-admin', require('./components/MenuAdmin.vue'));
 Vue.component('inscription', require('./components/Inscription.vue'));
 Vue.component('modal-delete', require('./components/ModalDelete.vue'));
 Vue.component('topic-training', require('./components/Trainings/Topic.vue'));
+Vue.component('enterprise-training', require('./components/Trainings/One.vue'));
+Vue.component('maker-training', require('./components/Trainings/Two.vue'));
 Vue.component('evaluate-training', require('./components/Trainings/Evaluate.vue'));
+Vue.component('main-evaluate', require('./components/Trainings/Main.vue'));
 
 // animations components
 Vue.component('trans-animation', require('./components/Sections/InfoAnim/TransAnimation.vue'));

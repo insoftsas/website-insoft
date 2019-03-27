@@ -30,9 +30,22 @@ class MakerAPIController extends AppBaseController
 
     public function __construct(MakerRepository $makerRepo)
     {
-        $this->middleware('auth:api')->except('store');
-        $this->middleware('roles:root')->except(['store','update']);
+        $this->middleware('auth:api')->except('store', 'getByDocument');
+        $this->middleware('roles:root')->except(['store','update', 'getByDocument']);
         $this->makerRepository = $makerRepo;
+    }
+
+
+    public function getByDocument(Request $request)
+    {
+
+        $maker = $this->makerRepository->getbydocument($request->document);
+
+        if (empty($maker)) {
+            return $this->sendError('Maker not found');
+        }
+
+        return $this->sendResponse($maker, 'Maker retrieved successfully');
     }
 
     /**
