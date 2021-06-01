@@ -5,6 +5,7 @@ use Response;
 use Illuminate\Http\Request;
 use App\Http\Controllers\AppBaseController;
 use GuzzleHttp\Client;
+use Auth;
 
 class TokensManagerAPIController extends AppBaseController
 {
@@ -15,6 +16,15 @@ class TokensManagerAPIController extends AppBaseController
     }
     public function login(Request $request)
     {
+        if(Auth::attempt(['email' => $request->get('username'), 'password' => $request->get('password')])){ 
+            $user = Auth::user();
+            return response()->json(['data' => ['access_token'=>$user->createToken($user->email)->accessToken] ], 200); 
+        }
+        return response()->json([
+            'error' => 'invalid_credentials',
+            //'message' => "{$e->getCode()}: {$e->getMessage()}"
+            'message' => "Usuario incorrecto"
+        ], 401);
     	try {
             $http = new Client([ 'verify' => false, 'headers' => ['Accept' => 'application/json'] ]);
             $url =  env('APP_URL') . '/oauth/token';
@@ -31,9 +41,10 @@ class TokensManagerAPIController extends AppBaseController
             $contents = (string) $response->getBody();
             $json = json_decode($contents, true);
             return response()->json([
-                'data' => $json,
-                'message' => 'User logged successfully'
-            ]);
+                'error' => 'invalid_credentials',
+                //'message' => "{$e->getCode()}: {$e->getMessage()}"
+                'message' => "Usuario incorrecto"
+            ], 401);
         } catch (\Exception $e) {
             $json = json_decode($e->getResponse()->getBody()->getContents(), true);
             if(isset($json['hint'])){
